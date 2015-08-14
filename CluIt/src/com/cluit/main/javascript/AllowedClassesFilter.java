@@ -1,4 +1,4 @@
-package com.cluit.structure.javascript;
+package com.cluit.main.javascript;
 
 import jdk.nashorn.api.scripting.ClassFilter;
 

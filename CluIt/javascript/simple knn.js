@@ -6,7 +6,7 @@ var cursor = 0;
 
 var calculate = function() {
 	print("initializing")
-	API = Java.type("api.API").create();
+	API = Java.type("com.cluit.api.API").create();
 	
 	entries = API.getAllEntries();
 	numberOfClusters = API.getTargetNumberOfClusters();

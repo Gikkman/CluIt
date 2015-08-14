@@ -14,7 +14,7 @@ import java.io.FileNotFoundException;
 import java.net.URL;
 import java.util.ResourceBundle;
 
-import com.cluit.structure.main.Overseer;
+import com.cluit.main.Overseer;
 import com.cluit.util.Const;
 import com.cluit.util.AoP.Invocation;
 import com.cluit.util.AoP.MethodMapper;

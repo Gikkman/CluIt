@@ -1,11 +1,11 @@
-package com.cluit.structure.main;
+package com.cluit.main;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 
 import javax.script.ScriptException;
 
-import com.cluit.structure.javascript.JavascriptEngine;
+import com.cluit.main.javascript.JavascriptEngine;
 import com.cluit.util.Const;
 import com.cluit.util.AoP.MethodMapper;
 import com.cluit.util.AoP.ReferencePasser;

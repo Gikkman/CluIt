@@ -1,4 +1,4 @@
-package com.cluit.structure.javascript;
+package com.cluit.main.javascript;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -32,7 +32,7 @@ public class JavascriptEngine extends Thread{
 		
 		//Set up the Nashorn script engine and then evaluate the script and whether the entry function exists
 		NashornScriptEngineFactory factory = new NashornScriptEngineFactory();
-		mScriptEngine = factory.getScriptEngine( new com.cluit.structure.javascript.AllowedClassesFilter() );
+		mScriptEngine = factory.getScriptEngine( new com.cluit.main.javascript.AllowedClassesFilter() );
 		mScriptEngine.eval( new FileReader( jsFile ) );
 		if (mScriptEngine.eval( 
 				"if (typeof "+jsEntryFunction+" == 'function') "
