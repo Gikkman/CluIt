@@ -20,29 +20,28 @@ public class Overseer {
 		//TODO: Read data from Excel file - http://stackoverflow.com/questions/1516144/how-to-read-and-write-excel-file-in-java
 		//Create points
 		//Create JS Engine
-		//Extract settings, such as "which JS to run"
-		File jsFile 	       = (File) VariableSingleton.getInstance().getObject(Const.KEY_COMBOBOX_JAVASCRIPT_FILE);
-		String jsEntryFunction = Const.STRING_JAVASCRIPT_ENTRY_FUNCTION;	
+		File jsFile 	       = (File) VariableSingleton.getInstance().getObject(Const.V_KEY_COMBOBOX_JAVASCRIPT_FILE);
 			
 		Entry[] data = com.cluit.util.methods.MiscUtils.pointsFromBmp();
 		int dimensions = data[0].getDimensions();
 		
 		ReferencePasser.storeReference(	Const.REFERENCE_API_SPACE, Space.create(dimensions, data) );
 		
-		mJavascriptEngine = new JavascriptEngine(jsFile, jsEntryFunction);
+		mJavascriptEngine = new JavascriptEngine(jsFile);
+		mJavascriptEngine.addCustomFields();
 	}
 	
 	public static Overseer create() {
 		try {
 			return new Overseer();
 		} catch (FileNotFoundException | ScriptException | NoSuchMethodException e) {		
-			MethodMapper.invoke(Const.EXCEPTION_GENERAL, "Overseer couldn't be instantiated", e );
+			MethodMapper.invoke(Const.METHOD_EXCEPTION_GENERAL, "Overseer couldn't be instantiated", e );
 			return null;
 		}	
 	}
 	
 	public void cluster(){
-		MethodMapper.addMethod(Const.METOD_JS_SCRIPT_STEP, (args) -> clusteringStep(args) );
+		MethodMapper.addMethod(Const.METHOD_JS_SCRIPT_STEP,   (args) -> clusteringStep(args) );
 		MethodMapper.addMethod(Const.METHOD_JS_SCRIPT_FINISH,(args) -> clusteringFinished(args) );
 		
 		mJavascriptEngine.start();
@@ -57,7 +56,7 @@ public class Overseer {
 		paint(entries, membership);
 		
 		MethodMapper.invoke(Const.METHOD_DONE_BUTTON_REACTIVATE);
-		MethodMapper.removeMethod(Const.METOD_JS_SCRIPT_STEP);
+		MethodMapper.removeMethod(Const.METHOD_JS_SCRIPT_STEP);
 		MethodMapper.removeMethod(Const.METHOD_JS_SCRIPT_FINISH);
 	}
 	

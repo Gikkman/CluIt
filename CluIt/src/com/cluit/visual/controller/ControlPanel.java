@@ -32,17 +32,17 @@ public class ControlPanel implements Initializable {
 			updateAlgorithmsComboBox();
 			comboBox_Algorithm_changed(new ActionEvent() );
 		} catch (FileNotFoundException e) {
-			MethodMapper.invoke(Const.EXCEPTION_GENERAL, "Could not update list of availible Javascripts", e);
+			MethodMapper.invoke(Const.METHOD_EXCEPTION_GENERAL, "Could not update list of availible Javascripts", e);
 		}
 		
 		//TODO: editable spinners
 		spinner_NumberClusters.valueProperty().addListener(( obs, oldValue, newValue) -> 
-															 VariableSingleton.getInstance().putInt(Const.KEY_SPINNER_NUMBER_OF_CLUSTERS, newValue) );
-		VariableSingleton.getInstance().putInt(Const.KEY_SPINNER_NUMBER_OF_CLUSTERS, spinner_NumberClusters.getValue() );
+															 VariableSingleton.getInstance().putInt(Const.V_KEY_SPINNER_NUMBER_OF_CLUSTERS, newValue) );
+		VariableSingleton.getInstance().putInt(Const.V_KEY_SPINNER_NUMBER_OF_CLUSTERS, spinner_NumberClusters.getValue() );
 	}
 	
 	@FXML protected void checkbox_Normalize_Clicked(ActionEvent event) {	
-		VariableSingleton.getInstance().putBool(Const.KEY_CHECKBOX_NORMALIZE, checkBox_Normalize.isSelected() );
+		VariableSingleton.getInstance().putBool(Const.V_KEY_CHECKBOX_NORMALIZE, checkBox_Normalize.isSelected() );
 	}
 	
 	@FXML protected void comboBox_Algorithm_changed(ActionEvent event){
@@ -51,7 +51,8 @@ public class ControlPanel implements Initializable {
 		
 		File algorithmFile = new File( Const.STRING_JAVASCRIPT_PATH + comboBox_Algorithm.getValue() + ".js" );		
 		System.out.println(algorithmFile +" "+com.cluit.util.methods.MiscUtils.getStackPos());
-		VariableSingleton.getInstance().putObject( Const.KEY_COMBOBOX_JAVASCRIPT_FILE, algorithmFile);
+		VariableSingleton.getInstance().putObject( Const.V_KEY_COMBOBOX_JAVASCRIPT_FILE, algorithmFile);
+		
 		
 	}
 	
@@ -86,7 +87,7 @@ public class ControlPanel implements Initializable {
 	private void updateAlgorithmsComboBox() throws FileNotFoundException{
 		File dir = new File( Const.STRING_JAVASCRIPT_PATH );
 		if( !dir.exists() )
-			MethodMapper.invoke(Const.EXCEPTION_GENERAL, "Javascript directory not found. Have you removed it?", new Exception() );
+			MethodMapper.invoke(Const.METHOD_EXCEPTION_GENERAL, "Javascript directory not found. Have you removed it?", new Exception() );
 		
 		File[] files = dir.listFiles( new FileFilter() {
 			

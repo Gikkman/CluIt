@@ -117,7 +117,7 @@ public class ClusteringUtils {
 	 */
 	public static double eucDistance(Entry pointA, Entry pointB){
 		if( pointA.getDimensions() != pointB.getDimensions()){
-			MethodMapper.invoke(Const.EXCEPTION_GENERAL ,"Error in ClusteringUtils.java! The lenght of vectorA ("+pointA.getDimensions()+") and vectorB ("+pointB.getDimensions() + ") does not match! " + com.cluit.util.methods.MiscUtils.getStackPos(), new Exception() );
+			MethodMapper.invoke(Const.METHOD_EXCEPTION_GENERAL ,"Error in ClusteringUtils.java! The lenght of vectorA ("+pointA.getDimensions()+") and vectorB ("+pointB.getDimensions() + ") does not match! " + com.cluit.util.methods.MiscUtils.getStackPos(), new Exception() );
 			return -1;
 		}
 		/* Euclidian distance = sqrt( x^2 + y^2 + z^2 + ... + m^2 + n^2 ), for n-dimensional space

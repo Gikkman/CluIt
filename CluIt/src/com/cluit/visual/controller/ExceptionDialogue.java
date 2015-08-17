@@ -18,9 +18,9 @@ import com.cluit.util.AoP.MethodMapper;
 public class ExceptionDialogue {
 	public void initialize() {
 		//TODO: Different types of exceptions
-		MethodMapper.addMethod(Const.EXCEPTION_GENERAL, new RemoteMethod() );		
-		MethodMapper.addMethod(Const.EXCEPTION_API,     new RemoteMethod() );		
-		MethodMapper.addMethod(Const.EXCEPTION_JS,      new RemoteMethod() );			
+		MethodMapper.addMethod(Const.METHOD_EXCEPTION_GENERAL, new RemoteMethod() );		
+		MethodMapper.addMethod(Const.METHOD_EXCEPTION_API,     new RemoteMethod() );		
+		MethodMapper.addMethod(Const.METHOD_EXCEPTION_JS,      new RemoteMethod() );			
 	}
 	
 	

@@ -4,9 +4,12 @@ var numberOfClusters;
 var k = 2;
 var cursor = 0;
 
+var fields = function() {
+	
+}
+
 var calculate = function() {
 	print("initializing")
-	API = Java.type("com.cluit.api.API").create();
 	
 	entries = API.getAllEntries();
 	numberOfClusters = API.getTargetNumberOfClusters();

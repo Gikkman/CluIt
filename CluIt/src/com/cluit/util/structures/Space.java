@@ -173,7 +173,7 @@ public class Space {
 	/*****************************************************************************************************************/
 
 	private int exception( String message){
-		MethodMapper.invoke(Const.EXCEPTION_API, "Error in Space.java! " + message +" " + com.cluit.util.methods.MiscUtils.getStackPos(), new Exception() );
+		MethodMapper.invoke(Const.METHOD_EXCEPTION_API, "Error in Space.java! " + message +" " + com.cluit.util.methods.MiscUtils.getStackPos(), new Exception() );
 		return -1;
 	}
 }

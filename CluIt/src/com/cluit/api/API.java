@@ -18,7 +18,7 @@ public class API {
 	private API() {
 		mSpace = ReferencePasser.getReference(Const.REFERENCE_API_SPACE);
 		if( mSpace == null ) {
-			MethodMapper.invoke(Const.EXCEPTION_GENERAL, "API couldn't fetch a viable clustering algorithm object", new Exception() );
+			MethodMapper.invoke(Const.METHOD_EXCEPTION_GENERAL, "API couldn't fetch a viable clustering algorithm object", new Exception() );
 		}
 	}
 	
@@ -35,7 +35,7 @@ public class API {
 		for(int i = 0; i < memberships.length; i++)
 			memberships[i] = mSpace.getEntryMembership(entries[i]);
 		
-		MethodMapper.invoke(Const.METOD_JS_SCRIPT_STEP, entries, memberships );
+		MethodMapper.invoke(Const.METHOD_JS_SCRIPT_STEP, entries, memberships );
 	}
 	
 	public void finalize(){
@@ -73,7 +73,7 @@ public class API {
 	}
 	
 	public int getTargetNumberOfClusters(){
-		return VariableSingleton.getInstance().getInt(Const.KEY_SPINNER_NUMBER_OF_CLUSTERS);
+		return VariableSingleton.getInstance().getInt(Const.V_KEY_SPINNER_NUMBER_OF_CLUSTERS);
 	}
 	
 	public int getCurrentNumberOfClusters(){
@@ -126,6 +126,29 @@ public class API {
 	}
 	
 	public Object getFieldValue(String name){
-		return VariableSingleton.getInstance().getObject(Const.NAME_JS_REFERENCE+name);
+		return VariableSingleton.getInstance().getObject(Const.V_KEY_JS_REFERENCE+name);
+	}
+	
+	public void createField_IntegerSpinner(String name, int ... values){
+		int[] defaults = {0, 100, 5, 1};
+		Object[] args = new Object[5];
+		args[0] = name;		
+		
+		for(int i = 0; i < 4; i++){
+			if( values.length > i)
+				args[i+1] = values[i];
+			else
+				args[i+1] = defaults[i];
+		}
+		
+		MethodMapper.invoke(Const.METHOD_ADD_INTEGER_SPINNER, args);
+	}
+
+	public void createField_CheckBox(String name, boolean ... values){
+		Object[] args = new Object[2];
+		args[0] = name;
+		args[1] = (values.length > 0) ? values[0] : false;
+		
+		MethodMapper.invoke(Const.METHOD_ADD_CHECKBOX, args);
 	}
 }

@@ -166,7 +166,7 @@ public class Cluster {
 	}
 	
 	private int API_Exeption(String s){
-		MethodMapper.invoke(Const.EXCEPTION_GENERAL, "Error in Cluster.java! " + s +" " + com.cluit.util.methods.MiscUtils.getStackPos(), new Exception() );
+		MethodMapper.invoke(Const.METHOD_EXCEPTION_GENERAL, "Error in Cluster.java! " + s +" " + com.cluit.util.methods.MiscUtils.getStackPos(), new Exception() );
 		return -1;
 	}
 }
