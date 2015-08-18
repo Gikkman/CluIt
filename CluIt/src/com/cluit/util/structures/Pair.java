@@ -8,4 +8,8 @@ public class Pair <L, R> {
 		this.l = l;
 		this.r = r;
 	}
+	
+	public String toString(){
+		return "["+l+":"+r+"]";
+	}
 }

@@ -16,7 +16,7 @@ public class Main extends Application {
 			primaryStage.setMinWidth(800);
 			primaryStage.setMinHeight(600);
 			
-			Parent root = FXMLLoader.load(getClass().getResource("../view/MainWindow.fxml"));    
+			Parent root = FXMLLoader.load(getClass().getResource("view/MainWindow.fxml"));    
 	        Scene scene = new Scene(root, 600, 500);
 	        primaryStage.setTitle("FXML Welcome");
 	        primaryStage.setScene(scene);
