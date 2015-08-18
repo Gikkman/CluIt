@@ -22,12 +22,10 @@ public class API {
 		}
 	}
 	
-	public static API create(){
-		API api = new API();			
-		return api;
+	public static API create_this_API(){
+		return new API();	
 	}
 	
-	//TODO: Fake a "delayed" queue
 	public void step(){
 		Entry[] entries = mSpace.getAllEntries();
 		int[] memberships = new int[entries.length];
@@ -38,7 +36,7 @@ public class API {
 		MethodMapper.invoke(Const.METHOD_JS_SCRIPT_STEP, entries, memberships );
 	}
 	
-	public void finalize(){
+	public void finish(){
 		Entry[] entries = mSpace.getAllEntries();
 		int[] memberships = new int[entries.length];
 		
@@ -127,28 +125,5 @@ public class API {
 	
 	public Object getFieldValue(String name){
 		return VariableSingleton.getInstance().getObject(Const.V_KEY_JS_REFERENCE+name);
-	}
-	
-	public void createField_IntegerSpinner(String name, int ... values){
-		int[] defaults = {0, 100, 5, 1};
-		Object[] args = new Object[5];
-		args[0] = name;		
-		
-		for(int i = 0; i < 4; i++){
-			if( values.length > i)
-				args[i+1] = values[i];
-			else
-				args[i+1] = defaults[i];
-		}
-		
-		MethodMapper.invoke(Const.METHOD_ADD_INTEGER_SPINNER, args);
-	}
-
-	public void createField_CheckBox(String name, boolean ... values){
-		Object[] args = new Object[2];
-		args[0] = name;
-		args[1] = (values.length > 0) ? values[0] : false;
-		
-		MethodMapper.invoke(Const.METHOD_ADD_CHECKBOX, args);
 	}
 }

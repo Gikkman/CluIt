@@ -13,9 +13,10 @@ import com.cluit.util.AoP.MethodMapper;
 
 import jdk.nashorn.api.scripting.NashornScriptEngineFactory;
 
-public class JavascriptEngine extends Thread{
+public class JavascriptEngine {
 		
 	private final ScriptEngine mScriptEngine;
+	private final String	   mFieldsFunctionName;
 	private final String 	   mEntryFunctionName;
 	
 	/**Sets up a Javascript engine, bound to the file specified by <b>jsFilePath</b>.
@@ -27,10 +28,13 @@ public class JavascriptEngine extends Thread{
 	 */
 	public JavascriptEngine(File jsFile) throws FileNotFoundException, ScriptException, NoSuchMethodException {
 		mEntryFunctionName = Const.STRING_JAVASCRIPT_ENTRY_FUNCTION;
+		mFieldsFunctionName =Const.STRING_JAVASCRIPT_ADD_FIELDS_FUNCTION;
 		
 		//Set up the Nashorn script engine and then evaluate the script and whether the entry function exists
 		NashornScriptEngineFactory factory = new NashornScriptEngineFactory();
 		mScriptEngine = factory.getScriptEngine( new com.cluit.main.javascript.AllowedClassesFilter() );
+		
+		
 		mScriptEngine.eval( new FileReader( jsFile ) );
 		
 		if (mScriptEngine.eval( 
@@ -41,22 +45,22 @@ public class JavascriptEngine extends Thread{
 			).equals(false) ) {
 			throw new NoSuchMethodException("No entry method! " + mEntryFunctionName +" not found in script definition: "+ jsFile); 
 		}
-				
-		mScriptEngine.eval("var API = Java.type(\"com.cluit.api.API\").create();");	
-
+		
+		if (mScriptEngine.eval( 
+				"if (typeof "+mFieldsFunctionName+" == 'function') "
+						+ "{ var JS_ENGINE_TRUE = function() { return true; };  JS_ENGINE_TRUE();  } "
+			  + "else "
+			  			+ "{ var JS_ENGINE_FALSE= function() { return false; }; JS_ENGINE_FALSE(); } "
+			).equals(false) ) {
+			throw new NoSuchMethodException("No custom fields method! " + mFieldsFunctionName +" not found in script definition: "+ jsFile); 
+		}
 	}
 	
-	public void create(File jsFile){
-		//TODO
-	}
-
-	
-	@Override
-	public void run() {
-		super.run();
-				
+	public void performClustering() {	
+		
 		Invocable invocable = (Invocable) mScriptEngine;
 		try {
+			mScriptEngine.eval("var API = Java.type(\"com.cluit.api.API\").create_this_API();");		
 			invocable.invokeFunction( mEntryFunctionName );
 		} catch (NoSuchMethodException e) {		
 			MethodMapper.invoke(Const.METHOD_EXCEPTION_JS, "Javascript Exception occured! No such method: " + e.getMessage(), e);
@@ -65,14 +69,12 @@ public class JavascriptEngine extends Thread{
 		} catch (Exception e) {
 			MethodMapper.invoke(Const.METHOD_EXCEPTION_JS, "Javascript Exception occured! Unknown exception: " + e.getMessage(), e);
 		}
-		
-		MethodMapper.invoke(Const.METHOD_DONE_BUTTON_REACTIVATE);
 	}
 	
 	public void addCustomFields() {
-		Invocable invocable = (Invocable) mScriptEngine;
-		
+		Invocable invocable = (Invocable) mScriptEngine;		
 		try{
+			mScriptEngine.eval("var JFX_API = Java.type(\"com.cluit.api.JFX_API\").create_this_API();");		
 			invocable.invokeFunction("fields");
 		} catch (NoSuchMethodException e) {		
 			MethodMapper.invoke(Const.METHOD_EXCEPTION_JS, "Javascript Exception occured! No such method: " + e.getMessage(), e);

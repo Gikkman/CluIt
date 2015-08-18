@@ -2,6 +2,9 @@ package com.cluit.main;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.TimeUnit;
 
 import javax.script.ScriptException;
 
@@ -13,38 +16,86 @@ import com.cluit.util.AoP.VariableSingleton;
 import com.cluit.util.dataTypes.Entry;
 import com.cluit.util.structures.Space;
 
-public class Overseer {
-	private final JavascriptEngine mJavascriptEngine;
+public class Overseer extends Thread {
+	public static enum Message {INIT_MESSAGE, CLUSTER_MESSAGE, TERMINATE_MESSAGE };
 	
-	private Overseer() throws FileNotFoundException, ScriptException, NoSuchMethodException {
-		//TODO: Read data from Excel file - http://stackoverflow.com/questions/1516144/how-to-read-and-write-excel-file-in-java
-		//Create points
-		//Create JS Engine
-		File jsFile 	       = (File) VariableSingleton.getInstance().getObject(Const.V_KEY_COMBOBOX_JAVASCRIPT_FILE);
+	private final BlockingQueue<Message> mQueue = new LinkedBlockingQueue<>();
+	
+	private boolean			 mIsAlive = true;
+	private File 			 mJsFile;
+	private JavascriptEngine mJavascriptEngine;
+	
+	public Overseer() {
+		this.setDaemon(true);
+		mJsFile = (File) VariableSingleton.getInstance().getObject(Const.V_KEY_COMBOBOX_JAVASCRIPT_FILE);
+	}
+	
+	@Override
+	public void run() {
+		while( mIsAlive ){
+			try {
+				Message message = mQueue.poll(1, TimeUnit.MINUTES);
+				if( message != null ) 
+					handleMessage( message );			
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+	}
+	
+	public void queueMessage(Message m){
+		try {
+			mQueue.put(m);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	private void handleMessage(Message message) {
+		switch (message) {
+		case INIT_MESSAGE:
+			doInit();
+			break;
+		case CLUSTER_MESSAGE:
+			doCluster();
+			break;
+		case TERMINATE_MESSAGE:
+			doTerminate();
+			break;
+		}
+	}
+
+	private void doInit(){
+		try {
+			mJavascriptEngine = new JavascriptEngine(mJsFile);
+			mJavascriptEngine.addCustomFields();
 			
-		Entry[] data = com.cluit.util.methods.MiscUtils.pointsFromBmp();
-		int dimensions = data[0].getDimensions();
+		} catch (FileNotFoundException | ScriptException | NoSuchMethodException e) {		
+			MethodMapper.invoke(Const.METHOD_EXCEPTION_GENERAL, "Overseer couldn't be initialized correctly", e );
+		}
+	}
+	
+	private void doCluster(){
+		//TODO: Read data from Excel file - http://stackoverflow.com/questions/1516144/how-to-read-and-write-excel-file-in-java
 		
+		//Read data points				
+		Entry[] data = com.cluit.util.methods.MiscUtils.pointsFromBmp();
+		int dimensions = data[0].getDimensions();	
 		ReferencePasser.storeReference(	Const.REFERENCE_API_SPACE, Space.create(dimensions, data) );
 		
-		mJavascriptEngine = new JavascriptEngine(jsFile);
-		mJavascriptEngine.addCustomFields();
-	}
-	
-	public static Overseer create() {
-		try {
-			return new Overseer();
-		} catch (FileNotFoundException | ScriptException | NoSuchMethodException e) {		
-			MethodMapper.invoke(Const.METHOD_EXCEPTION_GENERAL, "Overseer couldn't be instantiated", e );
-			return null;
-		}	
-	}
-	
-	public void cluster(){
+		//Create methods that'll be called upon algorithm finish
 		MethodMapper.addMethod(Const.METHOD_JS_SCRIPT_STEP,   (args) -> clusteringStep(args) );
 		MethodMapper.addMethod(Const.METHOD_JS_SCRIPT_FINISH,(args) -> clusteringFinished(args) );
 		
-		mJavascriptEngine.start();
+		mJavascriptEngine.performClustering();
+
+		MethodMapper.invoke(Const.METHOD_DONE_BUTTON_REACTIVATE);
+	}
+	
+	private void doTerminate(){
+		mIsAlive = false;
 	}
 
 	private void clusteringFinished(Object ... args) {
@@ -55,7 +106,6 @@ public class Overseer {
 		
 		paint(entries, membership);
 		
-		MethodMapper.invoke(Const.METHOD_DONE_BUTTON_REACTIVATE);
 		MethodMapper.removeMethod(Const.METHOD_JS_SCRIPT_STEP);
 		MethodMapper.removeMethod(Const.METHOD_JS_SCRIPT_FINISH);
 	}

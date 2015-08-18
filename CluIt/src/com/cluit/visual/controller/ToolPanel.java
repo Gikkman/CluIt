@@ -1,5 +1,6 @@
 package com.cluit.visual.controller;
 
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -18,13 +19,14 @@ import com.cluit.util.AoP.MethodMapper;
 import com.cluit.util.AoP.VariableSingleton;
 
 public class ToolPanel implements Initializable{
-	@FXML GridPane grid_tools;
+	@FXML GridPane tools_grid;
 	private int mRows = 0;
 	
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
 		MethodMapper.addMethod(Const.METHOD_ADD_INTEGER_SPINNER, (args) -> addIntegerSpinner(args) );
 		MethodMapper.addMethod(Const.METHOD_ADD_CHECKBOX, (args) -> addCheckBox(args) );
+		MethodMapper.addMethod(Const.METHOD_CLEAR_TOOLS_PANE, (args) -> clearGrid() );
 	}
 			
 	private void addIntegerSpinner(Object ... args){
@@ -49,7 +51,7 @@ public class ToolPanel implements Initializable{
 			addGridObject(name, spinner);			
 			
 		} catch (Exception e) {
-			MethodMapper.invoke(Const.METHOD_EXCEPTION_API, "Error when trying to instantiate spinner with args: "+args);
+			MethodMapper.invoke(Const.METHOD_EXCEPTION_API, "Error when trying to instantiate spinner with args: "+args, e);
 		}
 	}
 	
@@ -68,20 +70,20 @@ public class ToolPanel implements Initializable{
 			addGridObject(name, checkbox);
 			
 		} catch (Exception e) {
-			MethodMapper.invoke(Const.METHOD_EXCEPTION_API, "Error when trying to instantiate checkbox with args: "+args);
+			MethodMapper.invoke(Const.METHOD_EXCEPTION_API, "Error when trying to instantiate checkbox with args: "+args, e);
 		}
 	}
 	
 	private void addGridObject(String name, Node element){
 		Label label = new Label(name+":");
-		grid_tools.addRow(mRows++, label, element);	
+		Platform.runLater( () -> tools_grid.addRow(mRows++, label, element) ); 	
+	}
+
+	private void clearGrid(){
+		Platform.runLater( () -> tools_grid.getChildren().clear() );
 	}
 	
 	@FXML protected void test(ActionEvent e){
-		Object[] spinnerArgs = {"Hello", 1, 9, 5, 2 };
-		addIntegerSpinner(spinnerArgs);
-		
-		Object[] checkboxArgs = {"World", true};
-		addCheckBox(checkboxArgs);
+		System.out.println();
 	}
 }

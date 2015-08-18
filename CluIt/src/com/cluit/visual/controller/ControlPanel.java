@@ -26,6 +26,10 @@ public class ControlPanel implements Initializable {
 	 @FXML private Button button_OK;
 	 @FXML private Spinner<Integer> spinner_NumberClusters;
 	 
+	 private Overseer mOverseer;
+	 
+	 private String   mComboOldValue = "";
+	 
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
 		try {
@@ -46,34 +50,38 @@ public class ControlPanel implements Initializable {
 	}
 	
 	@FXML protected void comboBox_Algorithm_changed(ActionEvent event){
-		if( comboBox_Algorithm.getValue() == null )
+		String val = comboBox_Algorithm.getValue();
+		if( val == null || val.equals(mComboOldValue) )
 			return;
 		
-		File algorithmFile = new File( Const.STRING_JAVASCRIPT_PATH + comboBox_Algorithm.getValue() + ".js" );		
-		System.out.println(algorithmFile +" "+com.cluit.util.methods.MiscUtils.getStackPos());
+		MethodMapper.invoke(Const.METHOD_CLEAR_TOOLS_PANE);
+		
+		File algorithmFile = new File( Const.STRING_JAVASCRIPT_PATH + val + ".js" );		
 		VariableSingleton.getInstance().putObject( Const.V_KEY_COMBOBOX_JAVASCRIPT_FILE, algorithmFile);
 		
+		if( mOverseer != null )
+			mOverseer.queueMessage( Overseer.Message.TERMINATE_MESSAGE );
+		mOverseer = new Overseer();
+		mOverseer.start();
+		mOverseer.queueMessage( Overseer.Message.INIT_MESSAGE );
 		
+		mComboOldValue = val;
 	}
 	
 	@FXML protected void button_OK_Clicked(ActionEvent event){		
 		button_OK.setDisable( true );
-		Overseer o = Overseer.create();
+		MethodMapper.addMethod(Const.METHOD_DONE_BUTTON_REACTIVATE, new Invocation() {			
+			@Override
+			public void execute(Object... args) {
+				try { Thread.sleep(1000); } 
+				catch (InterruptedException e) { }
+				button_OK.setDisable(false);
+				MethodMapper.removeMethod(Const.METHOD_DONE_BUTTON_REACTIVATE);
+			}
+		});	
 		
-		if( o != null ){
-			o.cluster();	
-			MethodMapper.addMethod(Const.METHOD_DONE_BUTTON_REACTIVATE, new Invocation() {			
-				@Override
-				public void execute(Object... args) {
-					try { Thread.sleep(1000); } 
-					catch (InterruptedException e) { }
-					button_OK.setDisable(false);
-					MethodMapper.removeMethod(Const.METHOD_DONE_BUTTON_REACTIVATE);
-				}
-			});	
-		} else {
-			button_OK.setDisable( false );
-		}			
+		mOverseer.queueMessage( Overseer.Message.CLUSTER_MESSAGE );
+				
 	}
 	
 	@FXML protected void test() throws FileNotFoundException{

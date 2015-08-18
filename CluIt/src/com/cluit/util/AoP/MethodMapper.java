@@ -16,9 +16,9 @@ public class MethodMapper {
 	 * @return True if key was not present in the map
 	 */
 	public static synchronized boolean addMethod(String key, Invocation method){
-
-		if( map.containsKey(key) )
+		if( map.containsKey(key) ){
 			return false;
+		}
 		map.put(key, method);
 		return true;
 	}
@@ -29,9 +29,9 @@ public class MethodMapper {
 	 * @return True if the key was present in the map
 	 */
 	public static synchronized boolean removeMethod(String key){
-		
-		if(!map.containsKey(key))
-			return false;
+		if(!map.containsKey(key)){
+			return false;	
+		}
 		map.remove(key);
 		return true;
 	}
@@ -44,10 +44,9 @@ public class MethodMapper {
 	 * @return True if the key was mapped to a method
 	 */
 	public static synchronized boolean invoke(String key, Object ... args){
-		
-		if(!map.containsKey(key))
+		if(!map.containsKey(key)){		
 			return false;
-		
+		}
 		map.get(key).execute(args);
 		return true;
 	}

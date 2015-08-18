@@ -35,7 +35,7 @@ public class MiscUtils {
 	
 
 	private static String filename = "resources/test.bmp";
-	private static int[] colors = {0xff0000, 0x00ff00, 0x0000ff, 0x00ffff, 0xffff00, 0xff00ff}; 
+	private static int[] colors = {0xff0000, 0x00ff00, 0x0000ff, 0x00ffff, 0xffff00, 0xff00ff, 0xf0f0f}; 
 	private static BMP_Image img;
 	public static Entry[] pointsFromBmp(){
 		img = null;		

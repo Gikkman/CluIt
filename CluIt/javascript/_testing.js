@@ -1,12 +1,13 @@
 
 
 var fields = function() {
-	API.createField_IntegerSpinner("Hello", 1, 9, 5, 2 );
-	API.createField_CheckBox("World", true );
+	JFX_API.createField_IntegerSpinner("foo", 1, 9, 5, 2 );
+	JFX_API.createField_CheckBox("bar", true );
 }
 
 var calculate = function() {	
-	print( API.getFieldValue("Hello") );
+	print( API.getFieldValue("foo") );	
+	print( API.getFieldValue("bar") );
 	
-	print( API.getFieldValue("World") );
+	API.finish();
 }

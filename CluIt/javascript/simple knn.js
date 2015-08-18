@@ -1,11 +1,10 @@
-var API;
 var entries;
 var numberOfClusters;
-var k = 2;
-var cursor = 0;
+var k;
+var cursor;
 
 var fields = function() {
-	
+	JFX_API.createField_IntegerSpinner("Neighbours", 1, 6, 3);
 }
 
 var calculate = function() {
@@ -16,9 +15,13 @@ var calculate = function() {
 	
 	entries = API.shuffleArray(entries);
 	
+	cursor = 0;
 	addClusters();
-
+	
+	k = API.getFieldValue("Neighbours");
 	cluster();
+	
+	API.finish();
 }
 
 //Add the initial entries to the initial clusters
@@ -42,8 +45,6 @@ var cluster = function(){
 		i = getCursor();
 	}
 	
-	print("finished");
-	API.finalize();
 }
 
 var doVote = function(e){
@@ -99,6 +100,7 @@ var getClosestPoints = function(e, voters) {
 var castVotes = function(voters) {
 	var draw = false;
 	var ballot = new Array( numberOfClusters+1 ).join('0').split('').map(parseFloat)
+	
 	//Each voter casts a vote for his cluster
 	for each (var e in voters){
 		var cluster = API.getEntryMembership(e);
@@ -115,7 +117,6 @@ var castVotes = function(voters) {
 			draw = true;
 		}
 	}
-	
 	if( draw )
 		return -1;
 	return winner;

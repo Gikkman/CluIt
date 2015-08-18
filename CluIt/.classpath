@@ -8,10 +8,22 @@
 	</classpathentry>
 	<classpathentry kind="con" path="org.eclipse.fx.ide.jdt.core.JAVAFX_CONTAINER"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/image4j"/>
-	<classpathentry kind="lib" path="D:/Git/CluIt/CluIt/guava-18.0.jar" sourcepath="D:/Git/CluIt/CluIt/guava-18.0-sources.jar">
+	<classpathentry kind="lib" path="D:/Git/CluIt/CluIt/lib/guava/guava-18.0.jar" sourcepath="lib/guava/guava-18.0-sources.jar">
 		<attributes>
-			<attribute name="javadoc_location" value="jar:file:/D:/Git/CluIt/CluIt/guava-18.0-javadoc.jar!/"/>
+			<attribute name="javadoc_location" value="jar:platform:/resource/CluIt/lib/guava/guava-18.0-javadoc.jar!/"/>
 		</attributes>
 	</classpathentry>
+	<classpathentry kind="lib" path="lib/poi-3.12/poi-ooxml-3.12-20150511.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="jar:platform:/resource/CluIt/lib/poi-3.12/docs/apidocs/apidocs.zip!/"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="lib/poi-3.12/poi-3.12-20150511.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="jar:platform:/resource/CluIt/lib/poi-3.12/docs/apidocs/apidocs.zip!/"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="lib/poi-3.12/ooxml-lib/xmlbeans-2.6.0.jar"/>
+	<classpathentry kind="lib" path="lib/poi-3.12/poi-ooxml-schemas-3.12-20150511.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

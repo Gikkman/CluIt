@@ -26,5 +26,6 @@ public final class Const {
 	public static final String METHOD_EXCEPTION_JS = "method_invocation_javascript_exception_occured";
 	public static final String METHOD_ADD_INTEGER_SPINNER = "method_add_integer_spinner_invocation";
 	public static final String METHOD_ADD_CHECKBOX = "method_add_checkbox_invocation";
+	public static final String METHOD_CLEAR_TOOLS_PANE = "method_clear_all_tools_from_tools_pane";
 	
 }
