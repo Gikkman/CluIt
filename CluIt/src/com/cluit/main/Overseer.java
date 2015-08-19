@@ -38,8 +38,7 @@ public class Overseer extends Thread {
 				if( message != null ) 
 					handleMessage( message );			
 			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				MethodMapper.invoke(Const.METHOD_EXCEPTION_GENERAL, "The Overseer.fetchMessage() was interupted for an unknown reason", e);
 			}
 		}
 	}
@@ -48,8 +47,7 @@ public class Overseer extends Thread {
 		try {
 			mQueue.put(m);
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			MethodMapper.invoke(Const.METHOD_EXCEPTION_GENERAL, "The Overseer.queueMessage() was interupted for an unknown reason", e);
 		}
 	}
 	

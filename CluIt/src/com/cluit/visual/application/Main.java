@@ -1,6 +1,7 @@
 package com.cluit.visual.application;
 	
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -14,7 +15,7 @@ public class Main extends Application {
 	public void start(Stage primaryStage) {
 		try {
 			primaryStage.setMinWidth(800);
-			primaryStage.setMinHeight(600);
+			primaryStage.setMinHeight(650);
 			
 			Parent root = FXMLLoader.load(getClass().getResource("view/MainWindow.fxml"));    
 	        Scene scene = new Scene(root, 600, 500);
@@ -25,6 +26,8 @@ public class Main extends Application {
 	        e.initialize();
 	        
 	        primaryStage.show();
+	        
+	        primaryStage.setOnCloseRequest( (value) -> Platform.exit() );
 		} catch(Exception e) {
 			e.printStackTrace();
 			System.exit(-1);
