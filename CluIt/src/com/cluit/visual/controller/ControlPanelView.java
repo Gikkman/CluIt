@@ -20,7 +20,7 @@ import com.cluit.util.AoP.Invocation;
 import com.cluit.util.AoP.MethodMapper;
 import com.cluit.util.AoP.VariableSingleton;
 
-public class ControlPanel implements Initializable {
+public class ControlPanelView implements Initializable {
 	 @FXML private ComboBox<String> comboBox_Algorithm;
 	 @FXML private CheckBox checkBox_Normalize;
 	 @FXML private Button button_OK;
@@ -56,7 +56,7 @@ public class ControlPanel implements Initializable {
 		
 		MethodMapper.invoke(Const.METHOD_CLEAR_TOOLS_PANE);
 		
-		File algorithmFile = new File( Const.STRING_JAVASCRIPT_PATH + val + ".js" );		
+		File algorithmFile = new File( Const.DIR_JAVASCRIPT + val + ".js" );		
 		VariableSingleton.getInstance().putObject( Const.V_KEY_COMBOBOX_JAVASCRIPT_FILE, algorithmFile);
 		
 		if( mOverseer != null )
@@ -93,7 +93,7 @@ public class ControlPanel implements Initializable {
 	 * @throws FileNotFoundException Thrown if the user has removed the /javascript folder from the project
 	 */
 	private void updateAlgorithmsComboBox() throws FileNotFoundException{
-		File dir = new File( Const.STRING_JAVASCRIPT_PATH );
+		File dir = new File( Const.DIR_JAVASCRIPT );
 		if( !dir.exists() )
 			MethodMapper.invoke(Const.METHOD_EXCEPTION_GENERAL, "Javascript directory not found. Have you removed it?", new Exception() );
 		

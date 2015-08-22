@@ -14,6 +14,7 @@ import com.cluit.util.AoP.MethodMapper;
 import com.cluit.util.AoP.ReferencePasser;
 import com.cluit.util.AoP.VariableSingleton;
 import com.cluit.util.dataTypes.Entry;
+import com.cluit.util.methods.MiscUtils;
 import com.cluit.util.structures.Space;
 
 public class Overseer extends Thread {
@@ -75,20 +76,25 @@ public class Overseer extends Thread {
 		}
 	}
 	
-	private void doCluster(){
-		//TODO: Read data from Excel file - http://stackoverflow.com/questions/1516144/how-to-read-and-write-excel-file-in-java
-		
-		//Read data points				
-		Entry[] data = com.cluit.util.methods.MiscUtils.pointsFromBmp();
+	private void doCluster(){			
+		Object fetch = VariableSingleton.getInstance().getObject(Const.V_IMPORTED_EXCEL_DATA);
+		if( fetch == null ){
+			MethodMapper.invoke(Const.METHOD_INFORMATION_EXCEL, "Data from an Excel file must be loaded before clustering can be performed.\nThe Import view can be found under Show -> Excel Import");
+			MethodMapper.invoke(Const.METHOD_DONE_BUTTON_REACTIVATE);
+			return;
+		}
+		//Fetch data points, create the space, store the space reference
+		Entry[] data = MiscUtils.entriesFromFeatureMatrix( (double[][]) fetch );
 		int dimensions = data[0].getDimensions();	
 		ReferencePasser.storeReference(	Const.REFERENCE_API_SPACE, Space.create(dimensions, data) );
 		
-		//Create methods that'll be called upon algorithm finish
+		//Create methods that'll be called upon algorithm step and finish
 		MethodMapper.addMethod(Const.METHOD_JS_SCRIPT_STEP,   (args) -> clusteringStep(args) );
 		MethodMapper.addMethod(Const.METHOD_JS_SCRIPT_FINISH,(args) -> clusteringFinished(args) );
 		
 		mJavascriptEngine.performClustering();
 
+		//Reactive the "Calculate" button when we are done
 		MethodMapper.invoke(Const.METHOD_DONE_BUTTON_REACTIVATE);
 	}
 	
@@ -118,6 +124,6 @@ public class Overseer extends Thread {
 	}
 	
 	private void paint(Entry[] entries, int[] membership){
-		com.cluit.util.methods.MiscUtils.colorPixels(entries, membership);
+		MiscUtils.colorPixels(entries, membership);
 	}
 }

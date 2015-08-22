@@ -1,5 +1,7 @@
 package com.cluit.util.drawing;
 
+import java.awt.Color;
+import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
 import java.awt.image.WritableRaster;
@@ -37,9 +39,23 @@ public class BMP_Image {
 	 */
 	public static BMP_Image create(String filepath) throws IOException{
 		BMP_Image i = new BMP_Image(filepath);
-		i.createBlankImage();		
+		i.createBlankImage(1, 1);		
 		return i;
 	}	
+	
+	/**Creates an empty BMP-file in the file system. This file should later be used to write to.
+	 * 
+	 * @param filepath Path to where the file should be created 
+	 * @param width How many pixels wide should the image be
+	 * @param height How many pixels high should the image be
+	 * @return A blank BMP_Image object
+	 * @throws IOException Thrown if the file could not be created
+	 */
+	public static BMP_Image create(String filepath, int width, int height) throws IOException{
+		BMP_Image i = new BMP_Image(filepath);
+		i.createBlankImage(width, height);		
+		return i;
+	}
 	
 	/**Retrieves the RGB_Pixel element at coordinate [x,y] counting from the top left corner
 	 * 
@@ -123,11 +139,18 @@ public class BMP_Image {
 			img = BMPDecoder.read(file);
 			pixels = readPixels();
 	}
-	private void createBlankImage() throws IOException {
-		img = new BufferedImage(1, 1, BufferedImage.TYPE_INT_BGR);
+	private void createBlankImage(int w, int h) throws IOException {
+		img = new BufferedImage(w, h, BufferedImage.TYPE_INT_BGR);
+		Graphics2D g = img.createGraphics();
+		g.setBackground( Color.WHITE );
+		g.clearRect(0, 0, w, h);
+		g.dispose();		
+		
 		BMPEncoder.write(img, file);
 		readImage();
 	}
+	
+	
 	private RGB_Pixel[][] readPixels() {			
 		final int[] pixels = ((DataBufferInt) img.getRaster().getDataBuffer()).getData();
 	    final int width = img.getWidth();

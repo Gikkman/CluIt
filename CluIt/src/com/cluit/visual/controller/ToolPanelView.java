@@ -18,7 +18,7 @@ import com.cluit.util.Const;
 import com.cluit.util.AoP.MethodMapper;
 import com.cluit.util.AoP.VariableSingleton;
 
-public class ToolPanel implements Initializable{
+public class ToolPanelView implements Initializable{
 	@FXML GridPane tools_grid;
 	private int mRows = 0;
 	

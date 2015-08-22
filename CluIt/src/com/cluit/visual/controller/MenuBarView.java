@@ -7,10 +7,11 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
-public class MenuBar {
-
+public class MenuBarView {
+	
 	@FXML protected void open_ExcelImport(ActionEvent event){
-		try{            
+		//TODO: Make window unique (i.e. disallow multiples)
+		try{    
             Stage stage = new Stage();
             Parent root = FXMLLoader.load(getClass().getResource("../application/view/ExcelImporter.fxml"));    
 	        Scene scene = new Scene(root);
@@ -21,6 +22,7 @@ public class MenuBar {
 	        stage.setMaxHeight( stage.getHeight() );
 	        stage.setMinHeight( stage.getHeight() );
 	        stage.setMinWidth( stage.getWidth() -200 );
+	        
           } catch(Exception e) {
   			e.printStackTrace();
   		}

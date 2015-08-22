@@ -5,7 +5,7 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.layout.AnchorPane?>
 
-<MenuBar xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.cluit.visual.controller.MenuBar">
+<MenuBar xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.cluit.visual.controller.MenuBarView">
   <menus>
     <Menu mnemonicParsing="false" text="File">
       <items>

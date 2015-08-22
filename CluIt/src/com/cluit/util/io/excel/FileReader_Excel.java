@@ -6,6 +6,8 @@ import java.io.IOException;
 import java.nio.file.AccessDeniedException;
 import java.util.ArrayList;
 
+import org.apache.poi.EncryptedDocumentException;
+import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.FormulaError;
 import org.apache.poi.ss.usermodel.Row;
@@ -17,7 +19,7 @@ import com.cluit.util.Const;
 import com.cluit.util.AoP.MethodMapper;
 import com.cluit.util.structures.Pair;
 
-public class ExcelReader {
+public class FileReader_Excel {
 	public enum TypeFilter {DATE, STRING, BLANK, NUMERIC, BOOL, FORMULA};
 	
 	private Workbook workbook;
@@ -33,10 +35,10 @@ public class ExcelReader {
 	 * 
 	 * @param file
 	 */
-	private ExcelReader(){
+	private FileReader_Excel(){
 	}
 	
-	public static ExcelReader create(File file) throws Exception{
+	public static FileReader_Excel create(File file) throws EncryptedDocumentException, InvalidFormatException, IOException{
 		if( !file.exists() )
 			throw new FileNotFoundException("The requested file "+file+" does not exist!");
 		if( !file.isFile())
@@ -44,16 +46,16 @@ public class ExcelReader {
 		if( !file.canRead() )
 			throw new AccessDeniedException("The requested file "+file+" cannot be read. Access denied!");
 		if( !(file.getName().endsWith(".xls") || file.getName().endsWith(".xlsx") || file.getName().endsWith(".xlsm")) )
-			throw new Exception("The requested file "+file+" is not of a valid file type! The supported types are .xls .xlsx and .xlsm\nMake sure that a .xls are not in a Excel-95 or older format!");
+			throw new FileNotFoundException("The requested file "+file+" is not of a valid file type! The supported types are .xls .xlsx and .xlsm\nMake sure that a .xls are not in a Excel-95 or older format!");
 
-		ExcelReader reader = new ExcelReader();
+		FileReader_Excel reader = new FileReader_Excel();
 		reader.workbook = WorkbookFactory.create(file);
 		return reader;
 	}
 	
-	public ExcelReader loadSheet(int index) throws IOException, NumberFormatException{
+	public FileReader_Excel loadSheet(int index) throws IOException{
 		if(index >= workbook.getNumberOfSheets() )
-			throw new IOException("The requested sheet "+index+" is out of bounds. The current workbook only contains "+workbook.getNumberOfSheets()+" sheets");
+			throw new IOException("The requested sheet "+(index+1)+" is out of bounds. The current workbook only contains "+workbook.getNumberOfSheets()+" sheets");
 		
 		ArrayList<Pair<String, Object[]>> data = new ArrayList<>();
 		currentSheet = workbook.getSheetAt(index);	
@@ -76,18 +78,16 @@ public class ExcelReader {
 			for( y = 1; y < rows; y++){
 				row = currentSheet.getRow(y);
 				if( row.getPhysicalNumberOfCells() != cols){
-					throw new IOException();
+					throw new IOException("The number of cells in row "+(y+1)+" ("+row.getPhysicalNumberOfCells()+") does not match the assumed number of cells ("+cols+").\nPlease make sure that the data in the desired sheet block is exactly rectangular.");
 				}
 				for( x = 0; x < cols; x++){
 					val = getCellValue( row.getCell(x) );
 					data.get(x).r[y-1] = val;
 				}			
 			}
-		} catch ( NumberFormatException e){
+		} catch ( IOException e){
 			throw e;
-		} catch( IOException e){
-			throw e;
-		}		
+		} 	
 				
 		mData = data;
 		return this;
@@ -148,7 +148,7 @@ public class ExcelReader {
 	}
 	
 	@Deprecated
-	public ExcelReader setRowFilter(int ... rows){
+	public FileReader_Excel setRowFilter(int ... rows){
 		rowFilter = rows;
 		return this;
 	}
@@ -158,7 +158,7 @@ public class ExcelReader {
 	 * @param cols
 	 * @return 
 	 */
-	public ExcelReader setColFilter(int ... cols){
+	public FileReader_Excel setColFilter(int ... cols){
 		int high = -1;
 		for(int val : cols ){
 			if( val > high )
@@ -204,6 +204,46 @@ public class ExcelReader {
 				}
 				
 				val = mData.get(x).r[y];
+				out[y-rowFilterIndex][x-colFilterIndex] = val;
+			}
+		}
+		
+		return out;
+	}
+	
+	public double[][] getDoubleValues() throws ClassCastException, IOException{
+		if( mData.size() <= 0){
+			throw new IOException("The reading of the Excel sheet didn't give any data. Please verify that the Excel document is correctly formated");
+		}
+		int rowFilterIndex = 0, colFilterIndex = 0;
+		//Each element in mData corresponst to one row. 
+		//Since we already know that all rows are of the same lenght, we simply fetch the lenght of row 0
+		int cols = mData.size();
+		int rows = mData.get(0).r.length;
+		
+		//To create feature vectors, we have to create rows of doubles out of the columns in mData
+		double[][] out = new double[rows - rowFilter.length][cols - colFilter.length];
+		if( out.length == 0 || out[0].length == 0 )
+			throw new IOException("The column filter cancels out all data. Nothing can be loaded");
+		
+		double val = 0;
+		for(int y = 0; y < rows; y++){	
+			if( rowFilterIndex < rowFilter.length && y == rowFilter[rowFilterIndex] ){
+				rowFilterIndex++;
+				continue;
+			}
+			
+			colFilterIndex = 0;
+			for(int x = 0; x < cols; x++){
+				if( colFilterIndex < colFilter.length && x == colFilter[colFilterIndex] ){
+					colFilterIndex++;
+					continue;
+				}
+				try{
+					val = (double) mData.get(x).r[y];
+				} catch(ClassCastException e){
+					throw new ClassCastException("Cannot convert the value in row "+(y+1)+" column "+(x+1)+" to a double. Please check your data block");
+				}
 				out[y-rowFilterIndex][x-colFilterIndex] = val;
 			}
 		}

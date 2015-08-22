@@ -33,6 +33,12 @@ public class MiscUtils {
 		return out;
 	}
 	
+	public static Entry[] entriesFromFeatureMatrix(double[][] data){
+		ArrayList<Entry> points = new ArrayList<Entry>();
+		for(int i = 0; i < data.length; i++)
+			points.add( new Entry( data[i] ) );
+		return points.toArray( new Entry[0] );
+	}	
 
 	private static String filename = "resources/test.bmp";
 	private static int[] colors = {0xff0000, 0x00ff00, 0x0000ff, 0x00ffff, 0xffff00, 0xff00ff, 0xf0f0f}; 
@@ -62,6 +68,17 @@ public class MiscUtils {
 	 * @param clusterMembership
 	 */
 	public static void colorPixels(Entry[] points, int[] clusterMembership){
+		int highestX = 1, highestY = 1;
+		for(Entry e : points){
+			if( e.getEntry(0) > highestX ) highestX = (int) e.getEntry(0);
+			if( e.getEntry(1) > highestY ) highestY = (int) e.getEntry(1);
+		}
+		try {
+			img = BMP_Image.create(filename, highestX+1, highestY+1 );
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
 		for(int i = 0; i < points.length; i++){
 			Entry p = points[i];
 			double[] dim = p.getAllEntries();

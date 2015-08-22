@@ -18,13 +18,27 @@ import com.cluit.util.AoP.MethodMapper;
 public class ExceptionDialogue {
 	public void initialize() {
 		//TODO: Different types of exceptions
-		MethodMapper.addMethod(Const.METHOD_EXCEPTION_GENERAL, new RemoteMethod() );		
-		MethodMapper.addMethod(Const.METHOD_EXCEPTION_API,     new RemoteMethod() );		
-		MethodMapper.addMethod(Const.METHOD_EXCEPTION_JS,      new RemoteMethod() );			
+		MethodMapper.addMethod(Const.METHOD_EXCEPTION_GENERAL, new RemoteException() );		
+		MethodMapper.addMethod(Const.METHOD_EXCEPTION_API,     new RemoteException() );		
+		MethodMapper.addMethod(Const.METHOD_EXCEPTION_JS,      new RemoteException() );
+		
+		MethodMapper.addMethod(Const.METHOD_INFORMATION_EXCEL,   new RemoteInformation() );
 	}
 	
+	private class RemoteInformation implements Invocation{
+		@Override
+		public void execute(Object... args) {
+			Platform.runLater( () -> {
+				Alert alert = new Alert( AlertType.INFORMATION);
+				alert.setTitle("Information");
+				alert.setContentText( (String) args[0] );
+				alert.showAndWait();
+			}			
+			);
+		}	
+	}
 	
-	private class RemoteMethod implements Invocation{
+	private class RemoteException implements Invocation{
 		@Override
 		public void execute(Object... args) {
 			Platform.runLater( new Runnable() {
