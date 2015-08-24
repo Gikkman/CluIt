@@ -19,6 +19,7 @@ import com.cluit.util.Const;
 import com.cluit.util.AoP.Invocation;
 import com.cluit.util.AoP.MethodMapper;
 import com.cluit.util.AoP.VariableSingleton;
+import com.cluit.util.visuals.IntegerSpinnersConfigurator;
 
 public class ControlPanelView implements Initializable {
 	 @FXML private ComboBox<String> comboBox_Algorithm;
@@ -39,7 +40,7 @@ public class ControlPanelView implements Initializable {
 			MethodMapper.invoke(Const.METHOD_EXCEPTION_GENERAL, "Could not update list of availible Javascripts", e);
 		}
 		
-		//TODO: editable spinners
+		IntegerSpinnersConfigurator.configure(spinner_NumberClusters);
 		spinner_NumberClusters.valueProperty().addListener(( obs, oldValue, newValue) -> 
 															 VariableSingleton.getInstance().putInt(Const.V_KEY_SPINNER_NUMBER_OF_CLUSTERS, newValue) );
 		VariableSingleton.getInstance().putInt(Const.V_KEY_SPINNER_NUMBER_OF_CLUSTERS, spinner_NumberClusters.getValue() );

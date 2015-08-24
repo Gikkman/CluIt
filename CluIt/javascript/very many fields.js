@@ -4,7 +4,8 @@ var k;
 var cursor;
 
 var fields = function() {
-	JFX_API.createField_IntegerSpinner("Neighbours", 1, 6, 3, 1);
+	for( var i = 0; i < 30; i++)
+		JFX_API.createField_IntegerSpinner("Neighbours "+i, 1, 6, 3, 1);
 }
 
 var calculate = function() {
@@ -18,7 +19,7 @@ var calculate = function() {
 	cursor = 0;
 	addClusters();
 	
-	k = API.getFieldValue("Neighbours");
+	k = API.getFieldValue("Neighbours 0");
 	cluster();
 	
 	API.finish();
@@ -53,18 +54,18 @@ var doVote = function(e){
 	
 	getClosestPoints(e, voters);
 	
-	var cluster = castVotes( voters );
+	var cluster = castVotes( e, voters );
 		
-	return (cluster != -1) ? cluster : doVoteRecursive( voters ); 
+	return (cluster != -1) ? cluster : doVoteRecursive( e, voters ); 
 }
 
-var doVoteRecursive = function(voters) {
+var doVoteRecursive = function(e, voters) {
 	//Voters are sorted in descending order, from closest to the Entry to furthest away
 	//We remove the voter that is furthest from the point in question, and then do voting again
 	voters.removeLast();	
-	var cluster = castVotes(voters);
-
-	return cluster != -1 ? cluster : doVoteRecursive(voters);
+	var cluster = castVotes( e, voters );
+		
+	return (cluster != -1) ? cluster : doVoteRecursive( e, voters ); 
 }
 
 var getClosestPoints = function(e, voters) {
@@ -97,14 +98,23 @@ var getClosestPoints = function(e, voters) {
 
 }
 
-var castVotes = function(voters) {
+var castVotes = function(e, voters) {
+	if( voters.length == 1)
+		return API.getEntryMembership(voters[0]);
+	
 	var draw = false;
 	var ballot = new Array( numberOfClusters+1 ).join('0').split('').map(parseFloat)
-	
+	var totalDist = 0;
+	print(voters +" E: "+e);
+	//Calculate total distance to all voters. Will be used for weighting their votes
+	for each( var voter in voters ){
+		totalDist += API.getDistance(e, voter);
+	}
+	print(totalDist);
 	//Each voter casts a vote for his cluster
-	for each (var e in voters){
-		var cluster = API.getEntryMembership(e);
-		ballot[cluster]++;
+	for each (var voter in voters){
+		var cluster = API.getEntryMembership(voter);
+		ballot[cluster] += (1-(API.getDistance(e, voter) / totalDist));
 	}
 	//Find the cluster with the most votes		
 	var winner = 0;

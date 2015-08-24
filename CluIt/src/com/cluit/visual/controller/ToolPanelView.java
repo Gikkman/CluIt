@@ -5,10 +5,12 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
+import javafx.scene.SnapshotParameters;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Spinner;
-import javafx.scene.control.SpinnerValueFactory.IntegerSpinnerValueFactory;
+import javafx.scene.image.WritableImage;
 import javafx.scene.layout.GridPane;
 
 import java.net.URL;
@@ -17,13 +19,17 @@ import java.util.ResourceBundle;
 import com.cluit.util.Const;
 import com.cluit.util.AoP.MethodMapper;
 import com.cluit.util.AoP.VariableSingleton;
+import com.cluit.util.visuals.IntegerSpinnersConfigurator;
 
 public class ToolPanelView implements Initializable{
 	@FXML GridPane tools_grid;
+	@FXML ScrollPane scroll_pane;
 	private int mRows = 0;
 	
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
+		scroll_pane.vvalueProperty().addListener( (ov, oldV, newV) -> scroll_pane.snapshot( new SnapshotParameters(), new WritableImage(1, 1) ) );
+		
 		MethodMapper.addMethod(Const.METHOD_ADD_INTEGER_SPINNER, (args) -> addIntegerSpinner(args) );
 		MethodMapper.addMethod(Const.METHOD_ADD_CHECKBOX, (args) -> addCheckBox(args) );
 		MethodMapper.addMethod(Const.METHOD_CLEAR_TOOLS_PANE, (args) -> clearGrid() );
@@ -37,11 +43,8 @@ public class ToolPanelView implements Initializable{
 			int defautlValue = (int) args[3];
 			int stepSize 	 = (int) args[4];
 			
-			//TODO editable spinners
 			Spinner<Integer> spinner = new Spinner<>();
-			spinner.setEditable(false);
-			IntegerSpinnerValueFactory spinnerFactory = new IntegerSpinnerValueFactory(min, max, defautlValue, stepSize);
-			spinner.setValueFactory(spinnerFactory);
+			IntegerSpinnersConfigurator.configure(spinner, min, max, defautlValue, stepSize);
 			
 			//Set the function for mapping this spinners value, so the API can later find it for the JS-scritp
 			spinner.valueProperty().addListener( (observable, oldValue, newValue) 
@@ -80,10 +83,14 @@ public class ToolPanelView implements Initializable{
 	}
 
 	private void clearGrid(){
-		Platform.runLater( () -> tools_grid.getChildren().clear() );
+		Platform.runLater( () -> {
+			mRows = 0;
+			tools_grid.getChildren().clear();
+		} );
 	}
 	
 	@FXML protected void test(ActionEvent e){
 		System.out.println();
 	}
+
 }

@@ -18,7 +18,7 @@ public class ClusteringUtils {
 
 	/**Fisher-Yates shuffles an array of Objects
 	 * 
-	 * @param elem The list that will be randomized
+	 * @param elem The list which's elements will be randomized
 	 * @param rng A random-number generator, derived from the {@link java.util.Random} class
 	 */
 	public static <T> void fyShuffle(T[] elem, Random rng){
@@ -32,6 +32,14 @@ public class ClusteringUtils {
 			elem[index] = elem[i];
 			elem[i] = temp;
 		}
+	}
+	
+	/**Fisher-Yates shuffles an array of Objects
+	 * 
+	 * @param elem The list which's elements will be randomized
+	 */
+	public static <T> void fyShuffle(T[] elem){
+		fyShuffle(elem, new Random() );
 	}
 	
 	/**Creates a list of n unique integers, in the range from min (inclusive) to max (exclusive)

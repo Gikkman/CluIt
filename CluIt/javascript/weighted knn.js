@@ -4,7 +4,7 @@ var k;
 var cursor;
 
 var fields = function() {
-	JFX_API.createField_IntegerSpinner("Neighbours", 1, 6, 3);
+	JFX_API.createField_IntegerSpinner("Neighbours with a really long name!", 1, 6, 3, 1);
 }
 
 var calculate = function() {
@@ -18,7 +18,7 @@ var calculate = function() {
 	cursor = 0;
 	addClusters();
 	
-	k = API.getFieldValue("Neighbours");
+	k = API.getFieldValue("Neighbours with a really long name!");
 	cluster();
 	
 	API.finish();

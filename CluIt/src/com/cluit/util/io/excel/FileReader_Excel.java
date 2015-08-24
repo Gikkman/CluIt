@@ -30,14 +30,13 @@ public class FileReader_Excel {
 	
 	private ArrayList<Pair<String, Object[]>> mData = new ArrayList<>();
 	
+	private FileReader_Excel(){	}
+	
 	/**Creates an XLS_Reader bound to a specific file.
 	 * To get the data from the file, the workbook must first be read (see {@link #loadBook()}). Then, a sheet must be loaded (see {@link #loadSheet(int)}).
 	 * 
 	 * @param file
 	 */
-	private FileReader_Excel(){
-	}
-	
 	public static FileReader_Excel create(File file) throws EncryptedDocumentException, InvalidFormatException, IOException{
 		if( !file.exists() )
 			throw new FileNotFoundException("The requested file "+file+" does not exist!");
