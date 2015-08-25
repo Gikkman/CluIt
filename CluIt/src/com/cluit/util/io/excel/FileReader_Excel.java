@@ -33,7 +33,7 @@ public class FileReader_Excel {
 	private FileReader_Excel(){	}
 	
 	/**Creates an XLS_Reader bound to a specific file.
-	 * To get the data from the file, the workbook must first be read (see {@link #loadBook()}). Then, a sheet must be loaded (see {@link #loadSheet(int)}).
+	 * To get the data from the file, the workbook must first be read. Then, a sheet must be loaded (see {@link #loadSheet(int)}).
 	 * 
 	 * @param file
 	 */
@@ -52,20 +52,28 @@ public class FileReader_Excel {
 		return reader;
 	}
 	
+	
+	
 	public FileReader_Excel loadSheet(int index) throws IOException{
 		if(index >= workbook.getNumberOfSheets() )
 			throw new IOException("The requested sheet "+(index+1)+" is out of bounds. The current workbook only contains "+workbook.getNumberOfSheets()+" sheets");
 		
 		ArrayList<Pair<String, Object[]>> data = new ArrayList<>();
-		currentSheet = workbook.getSheetAt(index);	
+		currentSheet = workbook.getSheetAt(index);		
+		
 		Row row;
 		Object val;
 		
 		int rows = currentSheet.getPhysicalNumberOfRows() ;
-		int cols = currentSheet.getRow(0).getPhysicalNumberOfCells() ; 
-		
+		int firstRow = currentSheet.getFirstRowNum();
+		int cols = 0;
+		try{
+			cols = currentSheet.getRow( firstRow ).getPhysicalNumberOfCells();
+		} catch (NullPointerException e){
+			throw new IOException( "The requested sheet does not have any data in it. Please choose another sheet");
+		}
 		//First, we add the labels to each column. We also create the double[] which will accompany the label.
-		row = currentSheet.getRow(0);
+		row = currentSheet.getRow(firstRow);
 		for(int i = 0; i < cols; i++){
 			data.add(i, new Pair<String, Object[]>(row.getCell(i).getStringCellValue(), new Object[rows-1]) );
 		}
@@ -248,5 +256,33 @@ public class FileReader_Excel {
 		}
 		
 		return out;
+	}
+
+	/**Releases the file handle on the workbook
+	 */
+	public void unload() {
+		if( workbook != null){
+			try {
+				workbook.close();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		workbook = null;
+		currentSheet = null;
+	}
+
+	/**Returns an array of strings, which are the names of all sheets. Might return NULL, if the workbook was not loaded correctly
+	 */
+	public String[] getSheets() {
+		if( workbook == null )
+			return null;
+		
+		String[] names = new String[ workbook.getNumberOfSheets() ];
+		for(int i = 0; i < names.length; i++){
+			names[i] = workbook.getSheetName(i);
+		}
+		return names;
 	}
 }

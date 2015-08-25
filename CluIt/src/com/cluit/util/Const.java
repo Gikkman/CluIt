@@ -31,4 +31,6 @@ public final class Const {
 	public static final String METHOD_ADD_CHECKBOX = "method_add_checkbox_invocation";
 	public static final String METHOD_CLEAR_TOOLS_PANE = "method_clear_all_tools_from_tools_pane";
 	
+	public static final String METHOD_UNLOAD_EXCEL_SHEET = "method_unload_excel_file_to_release_lock";
+	
 }
