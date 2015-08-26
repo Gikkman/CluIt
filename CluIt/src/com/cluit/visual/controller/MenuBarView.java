@@ -7,8 +7,11 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
+import java.net.URL;
+
 import com.cluit.util.Const;
 import com.cluit.util.AoP.MethodMapper;
+import com.cluit.visual.application.Main;
 
 public class MenuBarView {
 	
@@ -16,7 +19,10 @@ public class MenuBarView {
 		//TODO: Make window unique (i.e. disallow multiples)
 		try{    
             Stage stage = new Stage();
-            Parent root = FXMLLoader.load(getClass().getResource("../application/view/ExcelImporter.fxml"));    
+            System.out.println( Main.class );
+            
+            URL url = Main.class.getResource("view/ExcelImporter.fxml");            
+            Parent root = FXMLLoader.load( url );    
 	        Scene scene = new Scene(root);
 	        stage.setTitle("Excel Importer");
 	        stage.setScene(scene); 

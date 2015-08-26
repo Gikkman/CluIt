@@ -20,7 +20,7 @@ public class VariableSingleton {
 	 * 
 	 * @param key
 	 */
-	public int getInt(String key){
+	public synchronized int getInt(String key){
 		if( mIntMap.containsKey(key) )
 			return mIntMap.get(key);
 		return Integer.MIN_VALUE;
@@ -30,7 +30,7 @@ public class VariableSingleton {
 	 * 
 	 * @param key
 	 */
-	public double getDouble(String key){
+	public synchronized double getDouble(String key){
 		if( mDobuleMap.containsKey(key) )
 			return mDobuleMap.get(key);
 		return Double.NEGATIVE_INFINITY;
@@ -40,7 +40,7 @@ public class VariableSingleton {
 	 * 
 	 * @param key
 	 */
-	public boolean getBool(String key){
+	public synchronized boolean getBool(String key){
 		if( mBoolMap.containsKey(key) )
 			return mBoolMap.get(key);
 		return false;
@@ -50,7 +50,7 @@ public class VariableSingleton {
 	 * 
 	 * @param key
 	 */
-	public String getString(String key){
+	public synchronized String getString(String key){
 		return mStringMap.get(key);
 	}
 	
@@ -58,27 +58,27 @@ public class VariableSingleton {
 	 * 
 	 * @param key
 	 */
-	public Object getObject(String key){
+	public synchronized Object getObject(String key){
 		return mObjectMap.get(key);		
 	}
 	
-	public void putInt(String key, int value){
+	public synchronized void putInt(String key, int value){
 		mIntMap.put(key, value);
 	}
 	
-	public void putDouble(String key, double value){
+	public synchronized void putDouble(String key, double value){
 		mDobuleMap.put(key, value);
 	}
 	
-	public void putBool(String key, boolean value){
+	public synchronized void putBool(String key, boolean value){
 		mBoolMap.put(key, value);
 	}
 	
-	public void putString(String key, String value){
+	public synchronized void putString(String key, String value){
 		mStringMap.put(key, value);
 	}
 	
-	public void putObject(String key, Object value){
+	public synchronized void putObject(String key, Object value){
 		mObjectMap.put(key, value);
 	}	
 }

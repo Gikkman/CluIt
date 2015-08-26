@@ -14,22 +14,21 @@ import java.io.FileNotFoundException;
 import java.net.URL;
 import java.util.ResourceBundle;
 
-import com.cluit.main.Overseer;
+import com.cluit.main.ClusteringEngine;
 import com.cluit.util.Const;
-import com.cluit.util.AoP.Invocation;
 import com.cluit.util.AoP.MethodMapper;
 import com.cluit.util.AoP.VariableSingleton;
 import com.cluit.util.visuals.IntegerSpinnersConfigurator;
 
 public class ControlPanelView implements Initializable {
-	 @FXML private ComboBox<String> comboBox_Algorithm;
-	 @FXML private CheckBox checkBox_Normalize;
-	 @FXML private Button button_OK;
-	 @FXML private Spinner<Integer> spinner_NumberClusters;
+	@FXML private ComboBox<String> comboBox_Algorithm;
+	@FXML private CheckBox checkBox_Normalize;
+	@FXML private Button button_OK;
+	@FXML private Spinner<Integer> spinner_NumberClusters;
 	 
-	 private Overseer mOverseer;
+	private ClusteringEngine mCluEngine;
 	 
-	 private String   mComboOldValue = "";
+	private String   mComboOldValue = "";
 	 
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
@@ -55,33 +54,29 @@ public class ControlPanelView implements Initializable {
 		if( val == null || val.equals(mComboOldValue) )
 			return;
 		
-		MethodMapper.invoke(Const.METHOD_CLEAR_TOOLS_PANE);
-		
 		File algorithmFile = new File( Const.DIR_JAVASCRIPT + val + ".js" );		
 		VariableSingleton.getInstance().putObject( Const.V_KEY_COMBOBOX_JAVASCRIPT_FILE, algorithmFile);
 		
-		if( mOverseer != null )
-			mOverseer.queueMessage( Overseer.Message.TERMINATE_MESSAGE );
-		mOverseer = new Overseer();
-		mOverseer.start();
-		mOverseer.queueMessage( Overseer.Message.INIT_MESSAGE );
+		if( mCluEngine != null && mCluEngine.isAlive() )
+			mCluEngine.queueMessage( ClusteringEngine.Message.TERMINATE_MESSAGE );
+		mCluEngine = new ClusteringEngine();
+		mCluEngine.start();
+		mCluEngine.queueMessage( ClusteringEngine.Message.INIT_MESSAGE );
 		
 		mComboOldValue = val;
 	}
 	
 	@FXML protected void button_OK_Clicked(ActionEvent event){		
 		button_OK.setDisable( true );
-		MethodMapper.addMethod(Const.METHOD_DONE_BUTTON_REACTIVATE, new Invocation() {			
-			@Override
-			public void execute(Object... args) {
+		MethodMapper.addMethod(Const.METHOD_DONE_BUTTON_REACTIVATE, (args) -> {
 				try { Thread.sleep(1000); } 
 				catch (InterruptedException e) { }
 				button_OK.setDisable(false);
 				MethodMapper.removeMethod(Const.METHOD_DONE_BUTTON_REACTIVATE);
 			}
-		});	
+		);	
 		
-		mOverseer.queueMessage( Overseer.Message.CLUSTER_MESSAGE );
+		mCluEngine.queueMessage( ClusteringEngine.Message.CLUSTER_MESSAGE );
 				
 	}
 	

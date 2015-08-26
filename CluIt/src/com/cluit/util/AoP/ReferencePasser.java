@@ -12,9 +12,9 @@ public class ReferencePasser {
 	 * @param value The object for which a reference should be stored
 	 * @return True if the reference was successful stored (False if the key conflicted)
 	 */
-	public static <T> boolean storeReference (String key, T value){
+	public static <T> void storeReference (String key, T value){
 		
-		return MethodMapper.addMethod(key, new ReferenceWrapper<T>(value) );	
+		MethodMapper.addMethod(key, new ReferenceWrapper<T>(value) );	
 		
 	}
 	

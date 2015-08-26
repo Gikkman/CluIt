@@ -4,7 +4,7 @@ var k;
 var cursor;
 
 var fields = function() {
-	JFX_API.createField_IntegerSpinner("Neighbours", 1, 6, 3, 1);
+	JFX_API.createField_IntegerSpinner("Neighbours", 1, 6, 1, 1);
 }
 
 var calculate = function() {

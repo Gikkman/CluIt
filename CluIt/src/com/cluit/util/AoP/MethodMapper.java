@@ -15,12 +15,8 @@ public class MethodMapper {
 	 * @param method 
 	 * @return True if key was not present in the map
 	 */
-	public static synchronized boolean addMethod(String key, Invocation method){
-		if( map.containsKey(key) ){
-			return false;
-		}
+	public static synchronized void addMethod(String key, Invocation method){
 		map.put(key, method);
-		return true;
 	}
 	
 	/**Removes a command and the corresponding key

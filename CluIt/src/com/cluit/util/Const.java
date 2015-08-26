@@ -16,7 +16,7 @@ public final class Const {
 	public static final String STRING_JAVASCRIPT_ADD_FIELDS_FUNCTION = "fields";
 	
 	public static final String REFERENCE_API_SPACE = "API_pointspace_reference";	
-	public static final String REFERENCE_POINTCLUSTERING_POINTSPACE = "Pointcluster_pointspace_reference";
+	public static final String REFERENCE_CLUSTERING_DATA_BLOCK = "clustering_data_block_refernence";
 	
 	public static final String METHOD_DONE_BUTTON_REACTIVATE = "method_reactive_OK_button";
 	public static final String METHOD_JS_SCRIPT_STEP = "metod_js_script_step";
@@ -31,6 +31,8 @@ public final class Const {
 	public static final String METHOD_ADD_CHECKBOX = "method_add_checkbox_invocation";
 	public static final String METHOD_CLEAR_TOOLS_PANE = "method_clear_all_tools_from_tools_pane";
 	
+	public static final String METHOD_RENDERING_ENGINE_PAINT = "method_rendering_engine_paint_results";
+
 	public static final String METHOD_UNLOAD_EXCEL_SHEET = "method_unload_excel_file_to_release_lock";
 	
 }

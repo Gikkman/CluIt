@@ -45,19 +45,8 @@ public class API {
 		*/
 	}
 	/**Finalized the clustering by calling the Finish-method in the Overseer-class, and passing the membership array as an argument*/
-	public void finish(){
-		Entry[] entries = mSpace.getAllEntries();
-		int[] memberships = new int[entries.length];
-		
-		for(int i = 0; i < memberships.length; i++){
-			int membership = mSpace.getEntryMembership(entries[i]);
-			if( membership == -1)
-				System.out.println("Entry "+i+" is not clustered, FYI "+com.cluit.util.methods.MiscUtils.getStackPos());
-			else
-				memberships[i] = membership; 
-		}
-		
-		MethodMapper.invoke(Const.METHOD_JS_SCRIPT_FINISH, entries, memberships );
+	public void finish(){		
+		MethodMapper.invoke(Const.METHOD_JS_SCRIPT_FINISH, mSpace );
 	}
 	/**Debug method. If API.test() is called by Javascript, "Test completed" is printed into the console  */
 	public void test(){

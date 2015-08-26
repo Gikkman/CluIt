@@ -154,6 +154,24 @@ public class FileReader_Excel {
 		return out;
 	}
 	
+	/**Returns a String[] containing the labels of the non-filtered columns.
+	 * The returned String[] can be empty if no data's been loaded by the XLS_Reader.
+	 * 
+	 * @return
+	 */
+	public String[] getFilteredLabels() {
+		ArrayList<String> out = new ArrayList<>();
+		int colFilterIndex = 0;
+		for( int i = 0; i < mData.size(); i++){
+			if( colFilterIndex < colFilter.length && colFilter[colFilterIndex] == i){
+				colFilterIndex++;
+				continue;
+			}
+			out.add( mData.get(i).l );
+		}
+		return out.toArray( new String[0] );
+	}
+	
 	@Deprecated
 	public FileReader_Excel setRowFilter(int ... rows){
 		rowFilter = rows;
@@ -234,7 +252,7 @@ public class FileReader_Excel {
 			throw new IOException("The column filter cancels out all data. Nothing can be loaded");
 		
 		double val = 0;
-		for(int y = 0; y < rows; y++){	
+		for(int y = currentSheet.getFirstRowNum(); y < rows; y++){	
 			if( rowFilterIndex < rowFilter.length && y == rowFilter[rowFilterIndex] ){
 				rowFilterIndex++;
 				continue;
