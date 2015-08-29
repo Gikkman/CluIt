@@ -14,11 +14,11 @@ public class Main extends Application {
 	@Override
 	public void start(Stage primaryStage) {
 		try {
-			primaryStage.setMinWidth(800);
-			primaryStage.setMinHeight(650);
+			primaryStage.setMinWidth(815);
+			primaryStage.setMinHeight(660);
 			
 			Parent root = FXMLLoader.load(getClass().getResource("view/MainWindow.fxml"));    
-	        Scene scene = new Scene(root, 600, 500);
+	        Scene scene = new Scene(root, 615, 510);
 	        primaryStage.setTitle("FXML Welcome");
 	        primaryStage.setScene(scene);
 	        

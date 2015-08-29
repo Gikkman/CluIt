@@ -32,6 +32,9 @@ public final class Const {
 	public static final String METHOD_CLEAR_TOOLS_PANE = "method_clear_all_tools_from_tools_pane";
 	
 	public static final String METHOD_RENDERING_ENGINE_PAINT = "method_rendering_engine_paint_results";
+	public static final String METHOD_RENDERING_TABS_CALLBACK = "method_rendering_tabs_callback";
+	
+	public static final String MULTI_METHOD_PAINT_TABS = "multi_method_paint_tabs_key_code";
 
 	public static final String METHOD_UNLOAD_EXCEL_SHEET = "method_unload_excel_file_to_release_lock";
 	

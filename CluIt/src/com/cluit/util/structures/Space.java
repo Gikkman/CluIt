@@ -132,6 +132,15 @@ public class Space {
 		return com.cluit.util.methods.ClusteringUtils.eucDistance( c1.getCentoid() , c2.getCentoid() );
 	}
 	
+	public void updateCentoids() {
+		for( Cluster c : cluster_to_id.keySet() )
+			c.calculateCentoid();
+	}
+	
+	public double[] clusterCentoid(int cluster) {
+		return cluster_to_id.inverse().get(cluster).getCentoid().getAllEntries();
+	}
+	
 	public Entry[] getFreeEntries(){ return free_entrys.toArray( new Entry[0] ); }
 	public Entry[] getAllEntries(){  return entry_to_id.keySet().toArray( new Entry[0] ); }
 	public Entry[] getCludEntried(){ return entry_to_cluster.keySet().toArray( new Entry[0] ); }

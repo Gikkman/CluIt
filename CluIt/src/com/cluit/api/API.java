@@ -45,7 +45,9 @@ public class API {
 		*/
 	}
 	/**Finalized the clustering by calling the Finish-method in the Overseer-class, and passing the membership array as an argument*/
-	public void finish(){		
+	public void finish(){	
+		mSpace.updateCentoids();
+		
 		MethodMapper.invoke(Const.METHOD_JS_SCRIPT_FINISH, mSpace );
 	}
 	/**Debug method. If API.test() is called by Javascript, "Test completed" is printed into the console  */

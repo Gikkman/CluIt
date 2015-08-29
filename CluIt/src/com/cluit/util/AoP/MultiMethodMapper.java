@@ -46,6 +46,9 @@ public class MultiMethodMapper {
 			Map<String, Invocation> inner = map.get(key);
 			if( inner.containsKey(id) ){
 				inner.remove(id);
+				if( inner.size() == 0 ){
+					map.remove(key);
+				}
 				return true;
 			}
 			else {
@@ -57,8 +60,8 @@ public class MultiMethodMapper {
 		}
 	}
 	
-	/**Invokes the methods mapped to 'key'.
-	 * The user is responsible for casting and ordering the arguments correctly
+	/**Invokes the methods mapped to 'key'. There is no guarantees about the order of which invocations are done
+	 * The user is responsible for casting and ordering the arguments correctly.
 	 * 
 	 * @param key
 	 * @param args

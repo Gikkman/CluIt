@@ -1,10 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.text.*?>
+<?import javafx.scene.control.*?>
 <?import java.lang.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.layout.GridPane?>
 
 
-<GridPane fx:id="grid_pane" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/8.0.40" fx:controller="com.cluit.visual.application.view.tabs.TableTabController">
-	<!-- TODO Add Nodes -->
-</GridPane>
+<ScrollPane fitToHeight="true" fitToWidth="true" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.cluit.visual.application.view.tabs.TableTabController">
+   <content>
+      <AnchorPane>
+         <children>
+            <Group fx:id="group" />
+            <Button layoutX="8.0" layoutY="22.0" mnemonicParsing="false" onAction="#clear_tab" text="Clear" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" />
+         </children>
+      </AnchorPane>
+   </content>
+</ScrollPane>

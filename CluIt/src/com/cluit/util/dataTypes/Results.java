@@ -10,4 +10,17 @@ public class Results {
 		mResultSpace =  resultSpace;
 		mInputData = inputData;
 	}
+
+	public int numberOfClusters() {
+		return mResultSpace.getNumberOfClusters();
+	}
+
+	public String[] getLabels() {
+		return mInputData.getLabels();
+	}
+
+	public double[] getCentoid(int cluster){
+		mResultSpace.updateCentoids();
+		return mResultSpace.clusterCentoid(cluster);
+	}
 }

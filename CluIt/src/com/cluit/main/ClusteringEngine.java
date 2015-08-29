@@ -156,6 +156,10 @@ public class ClusteringEngine extends Thread {
 	}
 	
 	private void paint(Entry[] entries, int[] membership){
-		MiscUtils.colorPixels(entries, membership);
+		try { 
+			MiscUtils.colorPixels(entries, membership);
+		} catch (Exception e){
+			e.printStackTrace();
+		}
 	}
 }

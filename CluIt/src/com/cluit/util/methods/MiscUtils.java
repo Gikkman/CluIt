@@ -67,7 +67,7 @@ public class MiscUtils {
 	 * @param points
 	 * @param clusterMembership
 	 */
-	public static void colorPixels(Entry[] points, int[] clusterMembership){
+	public static void colorPixels(Entry[] points, int[] clusterMembership) throws Exception{
 		int highestX = 1, highestY = 1;
 		for(Entry e : points){
 			if( e.getEntry(0) > highestX ) highestX = (int) e.getEntry(0);
@@ -76,7 +76,7 @@ public class MiscUtils {
 		try {
 			img = BMP_Image.create(filename, highestX+1, highestY+1 );
 		} catch (IOException e) {
-			e.printStackTrace();
+			throw e;
 		}
 		
 		for(int i = 0; i < points.length; i++){
