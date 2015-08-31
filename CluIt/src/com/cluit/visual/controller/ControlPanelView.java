@@ -39,6 +39,8 @@ public class ControlPanelView implements Initializable {
 			MethodMapper.invoke(Const.METHOD_EXCEPTION_GENERAL, "Could not update list of availible Javascripts", e);
 		}
 		
+		comboBox_Algorithm.setVisibleRowCount(10);
+		
 		IntegerSpinnersConfigurator.configure(spinner_NumberClusters);
 		spinner_NumberClusters.valueProperty().addListener(( obs, oldValue, newValue) -> 
 															 VariableSingleton.getInstance().putInt(Const.V_KEY_SPINNER_NUMBER_OF_CLUSTERS, newValue) );
@@ -109,10 +111,13 @@ public class ControlPanelView implements Initializable {
 			fileNames[i] = files[i].getName().substring(0, nameLenght-3);
 		}
 		
+		
 		//TODO: Clean this up.Causes "index exceeds maxCellCount" now and again, if the user removes the last file from the list during runtime
 		String current = comboBox_Algorithm.getValue();
 		comboBox_Algorithm.getItems().clear();
 		comboBox_Algorithm.getItems().addAll( fileNames );
+		
+		comboBox_Algorithm.setVisibleRowCount( comboBox_Algorithm.getItems().size() );
 		
 		if( comboBox_Algorithm.getItems().size() == 0)
 			comboBox_Algorithm.setValue("");
