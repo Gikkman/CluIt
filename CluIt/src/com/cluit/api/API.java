@@ -1,5 +1,7 @@
 package com.cluit.api;
 
+import java.util.HashMap;
+
 import com.cluit.util.Const;
 import com.cluit.util.AoP.MethodMapper;
 import com.cluit.util.AoP.ReferencePasser;
@@ -19,6 +21,7 @@ import com.cluit.util.structures.Space;
  */
 public class API {
 	private Space mSpace;
+	private HashMap<String, Double> mMiscData = new HashMap<>();
 	
 	private API() {
 		mSpace = ReferencePasser.getReference(Const.REFERENCE_API_SPACE);
@@ -48,7 +51,7 @@ public class API {
 	public void finish(){	
 		mSpace.updateCentoids();
 		
-		MethodMapper.invoke(Const.METHOD_JS_SCRIPT_FINISH, mSpace );
+		MethodMapper.invoke(Const.METHOD_JS_SCRIPT_FINISH, mSpace, mMiscData );
 	}
 	/**Debug method. If API.test() is called by Javascript, "Test completed" is printed into the console  */
 	public void test(){
@@ -125,5 +128,9 @@ public class API {
 	
 	public Object getFieldValue(String name){
 		return VariableSingleton.getInstance().getObject(Const.V_KEY_JS_REFERENCE+name);
+	}
+	
+	public void addMiscData(String ID, double value){
+		mMiscData.put(ID, value);
 	}
 }

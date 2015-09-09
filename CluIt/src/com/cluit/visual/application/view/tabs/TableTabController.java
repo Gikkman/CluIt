@@ -5,6 +5,7 @@ import javafx.fxml.FXML;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
+import javafx.geometry.Pos;
 import javafx.geometry.VPos;
 import javafx.scene.Group;
 import javafx.scene.control.Button;
@@ -13,6 +14,7 @@ import javafx.scene.control.Separator;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
+import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 
 import java.net.URL;
@@ -22,8 +24,7 @@ import java.util.HashMap;
 import java.util.ResourceBundle;
 
 import com.cluit.util.dataTypes.Results;
-
-//TODO: Watch the GridView example and implement this class that way. This is so dirty and bad...
+import com.cluit.util.structures.Pair;
 
 public class TableTabController extends _AbstractTableTab{	
 	private final int LABELS_COLUMN = 0, HEADER_ROW = 0, CLUSTER_NAME_ROW = 1, HORIZONTAL_SEPARATOR_ROW = 2, DATA_ROW_BEGINS = 3,
@@ -35,6 +36,7 @@ public class TableTabController extends _AbstractTableTab{
 	
 	private final boolean DEBUG_MODE = false;
 	private final HashMap<String, Integer> label_to_row = new HashMap<>();
+	private final ArrayList< GridPane > mPanes = new ArrayList<>();
 	
 	private boolean first = true;
 	private GridPane mLabelGrid;
@@ -70,32 +72,39 @@ public class TableTabController extends _AbstractTableTab{
 		if( first )
 			createBaseLayout();
 		
+		VBox vbox = new VBox();
+		vbox.setAlignment( Pos.CENTER );
+		
 		GridPane grid = new GridPane();
 		commonGridSetup(grid, r.numberOfClusters(), HAS_TEXT);
 		
 		int[] labelIndices = getLabelIndices( r.getLabels() );	
-		grid.getChildren().addAll( getDataLabels(r, labelIndices) );
-		grid.getChildren().add( getClearButton( grid, r.numberOfClusters() - 1 ) );
+		grid.getChildren().addAll( 	getDataLabels(r, labelIndices) );
+		grid.getChildren().add( 	getClearButton( vbox, r.numberOfClusters() ) );
 		
-		wrap_pane.getChildren().add(grid);
+		vbox.getChildren().add(grid);	
+		if( r.hasMiscData() )
+			vbox.getChildren().addAll( getMiscDataLabels(r) );
+		
+		wrap_pane.getChildren().add(vbox);
+		mPanes.add(  grid );
 	}
 
-	
-	private Button getClearButton(GridPane grid, int column) {
+	private Button getClearButton(VBox vbox, int numberOfClusters) {
 		Button button = new Button("X");
 		button.setMaxSize(5, 5);		
 		button.setFont( new Font(4) );
 		
-		GridPane.setConstraints(button, column, 0, 1, 1, HPos.RIGHT, VPos.CENTER, Priority.NEVER, Priority.NEVER);
+		GridPane.setConstraints(button, numberOfClusters - 1, 0, 1, 1, HPos.RIGHT, VPos.CENTER, Priority.NEVER, Priority.NEVER);
 		
-		button.setOnAction( (ae) -> grid.getChildren().clear() );
+		button.setOnAction( (ae) -> vbox.getChildren().clear() );
 		
 		return button;
 	}
 
 	/**Fetches the row indices for the entries data labels
 	 * 
-	 * @param labels The name of the fields for which we are searchin indices
+	 * @param labels The name of the fields for which we are searching indices
 	 * @return
 	 */
 	private int[] getLabelIndices(String[] labels) {
@@ -145,6 +154,23 @@ public class TableTabController extends _AbstractTableTab{
 		
 		return dataLabels;
 	}
+	
+	private ArrayList<Label> getMiscDataLabels(Results r) {
+		ArrayList<Label> miscDataLabels = new ArrayList<>();
+		ArrayList<Pair<String, Double>> miscData = r.getMiscData();
+		
+		miscDataLabels.add(new Label(" ") ); //Adds an empty row
+		
+		for( int i = 0; i < miscData.size(); i++){
+			Pair<String, Double> data = miscData.get(i);
+			
+			Label label = new Label(data.l +": " + data.r);
+			
+			miscDataLabels.add(label);
+		}
+		
+		return miscDataLabels;
+	}
 
 	/**************************************************************************************************************************/
 	/**************************************************************************************************************************/
@@ -183,6 +209,13 @@ public class TableTabController extends _AbstractTableTab{
 		mLabelGrid.getChildren().add(label);
 		
 		label_to_row.put(field, mNextLabelRow);
+		
+		//Add blank spacing to already existing Grids. This'll move the misc-info downwards
+		for( GridPane pane : mPanes ){
+			Label blank = new Label(" ");
+			GridPane.setConstraints(blank, 0, mNextLabelRow+DATA_ROW_BEGINS, 1, 1, HPos.LEFT, VPos.CENTER, Priority.NEVER, Priority.NEVER);
+			pane.getChildren().add(blank);
+		}
 		
 		return mNextLabelRow++;
 	}

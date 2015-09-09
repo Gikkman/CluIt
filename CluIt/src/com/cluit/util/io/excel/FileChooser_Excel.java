@@ -9,7 +9,6 @@ public class FileChooser_Excel {
 	private final File mLocation;
 	
 	public FileChooser_Excel(String location){
-		//TODO: Should the program store the last chosen directory in a prefs?
 		mLocation = new File(location);
 	}
 	

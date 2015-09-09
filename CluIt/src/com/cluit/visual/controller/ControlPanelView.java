@@ -112,7 +112,8 @@ public class ControlPanelView implements Initializable {
 		}
 		
 		
-		//TODO: Clean this up.Causes "index exceeds maxCellCount" now and again, if the user removes the last file from the list during runtime
+		//Causes "index exceeds maxCellCount" now and again, if the user removes the last file from the list during runtime.
+		//There is nothing I can do about it though, it is reported as a bug
 		String current = comboBox_Algorithm.getValue();
 		comboBox_Algorithm.getItems().clear();
 		comboBox_Algorithm.getItems().addAll( fileNames );

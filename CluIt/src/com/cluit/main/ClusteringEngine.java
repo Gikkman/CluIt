@@ -3,6 +3,7 @@ package com.cluit.main;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
@@ -122,8 +123,10 @@ public class ClusteringEngine extends Thread {
 	 * 
 	 * @param args The Space, after all clustering is done
 	 */
+	@SuppressWarnings("unchecked")
 	private void clusteringFinished(Object ... args) {
 		Space space = (Space) args[0];
+		HashMap<String, Double> map = (HashMap<String, Double> ) args[1];
 		Data  data  =  ReferencePasser.getReference( Const.REFERENCE_CLUSTERING_DATA_BLOCK );
 		
 		Entry[] entries = space.getAllEntries();
@@ -139,7 +142,7 @@ public class ClusteringEngine extends Thread {
 		
 		paint(entries, memberships);
 		
-		Results results = new Results(data, space);
+		Results results = new Results(data, space, map);
 		MethodMapper.invoke(Const.METHOD_RENDERING_ENGINE_PAINT, results);
 		
 		MethodMapper.removeMethod(Const.METHOD_JS_SCRIPT_STEP);

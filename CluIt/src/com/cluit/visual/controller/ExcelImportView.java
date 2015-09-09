@@ -102,8 +102,7 @@ public class ExcelImportView implements Initializable{
 				MethodMapper.invoke(Const.METHOD_INFORMATION_EXCEL, e.getMessage()+"\n\nCould not import data from the specified Excel file. Please double check that all values within the selected data columns are numeric (or calculated) values. The import cannot handle strings, blanks, errors or the similar.\n");
 				return;
 			}
-			
-			//TODO: Suspend the button for a  short while before hiding the window, for cool FXs
+
 			button_import.getScene().getWindow().hide();
 		}
 	}

@@ -283,7 +283,6 @@ public class FileReader_Excel {
 			try {
 				workbook.close();
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}

@@ -21,6 +21,8 @@ var calculate = function() {
 	k = API.getFieldValue("Neighbours");
 	cluster();
 	
+	API.addMiscData("Output", cursor);
+	
 	API.finish();
 }
 
