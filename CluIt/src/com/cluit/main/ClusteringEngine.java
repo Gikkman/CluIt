@@ -13,13 +13,12 @@ import javax.script.ScriptException;
 import com.cluit.main.javascript.JavascriptEngine;
 import com.cluit.util.Const;
 import com.cluit.util.AoP.MethodMapper;
-import com.cluit.util.AoP.ReferencePasser;
 import com.cluit.util.AoP.VariableSingleton;
 import com.cluit.util.dataTypes.Data;
 import com.cluit.util.dataTypes.Entry;
 import com.cluit.util.dataTypes.Results;
+import com.cluit.util.dataTypes.Space;
 import com.cluit.util.methods.MiscUtils;
-import com.cluit.util.structures.Space;
 
 public class ClusteringEngine extends Thread {
 	public static enum Message {INIT_MESSAGE, CLUSTER_MESSAGE, TERMINATE_MESSAGE };
@@ -95,19 +94,18 @@ public class ClusteringEngine extends Thread {
 			doInit();
 		
 		//Fetch the data that should have been imported. First, check if something exists, then cast it to Data
-		Object fetch = VariableSingleton.getInstance().getObject(Const.V_IMPORTED_EXCEL_DATA);
-		if( fetch == null ){
+		Data data = VariableSingleton.getInstance().getData();
+		if( data == null ){
 			MethodMapper.invoke(Const.METHOD_INFORMATION_EXCEL, "Data from an Excel file must be loaded before clustering can be performed.\nThe Import view can be found under Show -> Excel Import");
 			return;
 		}
-		Data inputData = (Data) fetch;
 		
 		//Create the space, store the space reference for the API and the data reference for the result
-		Entry[] entries = MiscUtils.entriesFromFeatureMatrix( (double[][]) inputData.getData() );
+		Entry[] entries = MiscUtils.entriesFromFeatureMatrix( (double[][]) data.getDoublesMatrix() );
 		int dimensions = entries[0].getDimensions();	
-		ReferencePasser.storeReference(	Const.REFERENCE_API_SPACE, Space.create(dimensions, entries) );
-		ReferencePasser.storeReference( Const.REFERENCE_CLUSTERING_DATA_BLOCK, inputData);
 		
+		VariableSingleton.getInstance().setSpace( Space.create(dimensions, entries) );
+				
 		//Create methods that'll be called upon algorithm step and finish
 		MethodMapper.addMethod(Const.METHOD_JS_SCRIPT_STEP,   (args) -> clusteringStep(args) );
 		MethodMapper.addMethod(Const.METHOD_JS_SCRIPT_FINISH,(args) -> clusteringFinished(args) );
@@ -127,7 +125,7 @@ public class ClusteringEngine extends Thread {
 	private void clusteringFinished(Object ... args) {
 		Space space = (Space) args[0];
 		HashMap<String, Double> map = (HashMap<String, Double> ) args[1];
-		Data  data  =  ReferencePasser.getReference( Const.REFERENCE_CLUSTERING_DATA_BLOCK );
+		Data  data  =  VariableSingleton.getInstance().getData();
 		
 		Entry[] entries = space.getAllEntries();
 		int[] memberships = new int[entries.length];
@@ -142,8 +140,9 @@ public class ClusteringEngine extends Thread {
 		
 		paint(entries, memberships);
 		
+		//Sets the results of this clustering. This'll fire all Results listeners
 		Results results = new Results(data, space, map);
-		MethodMapper.invoke(Const.METHOD_RENDERING_ENGINE_PAINT, results);
+		VariableSingleton.getInstance().setResults(results);
 		
 		MethodMapper.removeMethod(Const.METHOD_JS_SCRIPT_STEP);
 		MethodMapper.removeMethod(Const.METHOD_JS_SCRIPT_FINISH);

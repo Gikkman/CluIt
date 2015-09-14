@@ -30,6 +30,7 @@ public class TableTabController extends _AbstractTableTab{
 	private final int LABELS_COLUMN = 0, HEADER_ROW = 0, CLUSTER_NAME_ROW = 1, HORIZONTAL_SEPARATOR_ROW = 2, DATA_ROW_BEGINS = 3,
 					  DECIMALS_KEPT = 2;
 	private final boolean HAS_TEXT = true, HAS_NO_TEXT = false;
+	private final String DATA_LABEL = "datalabel";
 	
 	@FXML Group group;
 	HBox wrap_pane;
@@ -60,6 +61,7 @@ public class TableTabController extends _AbstractTableTab{
 		super.initialize(location, resources);
 		wrap_pane = new HBox();
 		group.getChildren().add(wrap_pane);
+
 	}
 
 	@Override
@@ -73,7 +75,7 @@ public class TableTabController extends _AbstractTableTab{
 			createBaseLayout();
 		
 		VBox vbox = new VBox();
-		vbox.setAlignment( Pos.CENTER );
+		vbox.setAlignment( Pos.TOP_CENTER );
 		
 		GridPane grid = new GridPane();
 		commonGridSetup(grid, r.numberOfClusters(), HAS_TEXT);
@@ -85,6 +87,7 @@ public class TableTabController extends _AbstractTableTab{
 		vbox.getChildren().add(grid);	
 		if( r.hasMiscData() )
 			vbox.getChildren().addAll( getMiscDataLabels(r) );
+		vbox.getChildren().addAll( getSquaredErrors(r) );
 		
 		wrap_pane.getChildren().add(vbox);
 		mPanes.add(  grid );
@@ -155,6 +158,23 @@ public class TableTabController extends _AbstractTableTab{
 		return dataLabels;
 	}
 	
+	private ArrayList<Label> getSquaredErrors(Results r) {
+		ArrayList<Label> errorLabels = new ArrayList<>();
+		double[] errors = r.getSquaredErrors();
+		
+		errorLabels.add(new Label(" ") ); //Adds an empty row
+		for(int i = 0; i < errors.length; i++){
+			Label label = new Label( String.format("SSE Clu"+i+": %10.4f", errors[i]) );
+			skinDataLabel(label);
+			
+			
+			
+			errorLabels.add(label);
+		}
+		
+		return errorLabels;
+	}
+	
 	private ArrayList<Label> getMiscDataLabels(Results r) {
 		ArrayList<Label> miscDataLabels = new ArrayList<>();
 		ArrayList<Pair<String, Double>> miscData = r.getMiscData();
@@ -165,6 +185,7 @@ public class TableTabController extends _AbstractTableTab{
 			Pair<String, Double> data = miscData.get(i);
 			
 			Label label = new Label(data.l +": " + data.r);
+			skinDataLabel(label);
 			
 			miscDataLabels.add(label);
 		}
@@ -179,7 +200,7 @@ public class TableTabController extends _AbstractTableTab{
 	private void createBaseLayout(){
 		mLabelGrid = new GridPane();
 		mLabelGrid.setMinWidth( 50 );
-		mLabelGrid.setMaxWidth( 100 );
+		mLabelGrid.setMaxWidth( 200 );
 		commonGridSetup( mLabelGrid, 1, HAS_NO_TEXT );		
 				
 		wrap_pane.getChildren().add(mLabelGrid);
@@ -203,6 +224,8 @@ public class TableTabController extends _AbstractTableTab{
 	
 	private int addLabel(String field) {
 		Label label = new Label(field);
+		skinDataLabel(label);
+		
 		label.setPadding( new Insets(0,0,0,10));
 		GridPane.setConstraints(label, LABELS_COLUMN, mNextLabelRow + DATA_ROW_BEGINS, 1, 1, HPos.LEFT, VPos.CENTER, Priority.NEVER, Priority.NEVER);
 		
@@ -229,6 +252,8 @@ public class TableTabController extends _AbstractTableTab{
 		value = value.substring(0, substringPoint);
 		
 		Label n = new Label(value);
+		skinDataLabel(n);
+		
 		GridPane.setConstraints(n, column, row + DATA_ROW_BEGINS, 1, 1, HPos.CENTER, VPos.CENTER, Priority.NEVER, Priority.NEVER );
 		return n;
 	}
@@ -246,6 +271,7 @@ public class TableTabController extends _AbstractTableTab{
 	 */
 	private Label getMainHeader(int columnsToSpan, boolean text) {
 		Label heading = new Label(text ? "Run "+ mNextRun++ : " ");
+		skinDataLabel(heading);
 		
 		GridPane.setConstraints(heading, 0, HEADER_ROW, columnsToSpan, 1, HPos.CENTER, VPos.CENTER, Priority.NEVER, Priority.NEVER, new Insets(8) );
 		return heading;
@@ -261,6 +287,7 @@ public class TableTabController extends _AbstractTableTab{
 		
 		for( int i = 0; i < amount; i++){
 			subHeadings[i] = new Label(text ? "Cluster " + i : " ");
+			skinDataLabel(subHeadings[i]);
 			GridPane.setConstraints(subHeadings[i], i, CLUSTER_NAME_ROW, 1, 1, HPos.CENTER, VPos.CENTER, Priority.NEVER, Priority.NEVER, new Insets(3) );
 		}
 		return subHeadings;
@@ -286,6 +313,10 @@ public class TableTabController extends _AbstractTableTab{
 		Separator separator = new Separator( Orientation.VERTICAL );
 		GridPane.setConstraints(separator, column, 0, 1,  GridPane.REMAINING, HPos.LEFT, VPos.TOP, Priority.NEVER, Priority.NEVER, new Insets(0, 5, 0, 5) );
 		return separator;
+	}
+	
+	private void skinDataLabel(Label label){
+		label.getStyleClass().add(DATA_LABEL);
 	}
 
 	static int idx = 1;

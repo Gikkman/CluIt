@@ -134,12 +134,31 @@ public class ClusteringUtils {
 		 */
 		double out = 0;
 		for( int i = 0; i < pointA.getDimensions(); i++){
-			double temp = pointA.getEntry(i) - pointB.getEntry(i);
+			double temp = pointA.getCoordinateAt(i) - pointB.getCoordinateAt(i);
 			temp *= temp;
 			out += temp;
 		}		
 		out = Math.sqrt(out);
 				
+		return out;
+	}
+	
+	/**Calculates the sum of squared error distances within a cluster.<br>
+	 * The calculation is performed the following way: For each member, calculate euclidian distance from the member to the centoid and square it. Then, add all these squared distances together.
+	 * 
+	 * @param centoid The clusters centoid
+	 * @param members The clusters member entries
+	 * @return
+	 */
+	public static double sumOfSquareErrors(Entry centoid, Entry[] members){
+		double out = 0;
+		double eucDist = 0;
+		
+		for(Entry e : members){
+			eucDist = eucDistance(centoid, e);
+			out += (eucDist*eucDist);
+		}
+		
 		return out;
 	}
 	

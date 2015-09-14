@@ -1,4 +1,4 @@
-package com.cluit.util.structures;
+package com.cluit.util.dataTypes;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -9,7 +9,6 @@ import java.util.Set;
 
 import com.cluit.util.Const;
 import com.cluit.util.AoP.MethodMapper;
-import com.cluit.util.dataTypes.Entry;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 
@@ -104,10 +103,21 @@ public class Space {
 		return addEntryToCluster(entry, clu);
 	}
 
+	/**Checks which cluster the argument entry is member of.
+	 * 
+	 * @param e
+	 * @return The name of the cluster <b>OR</b> -1 (if it isn't member in any cluster)
+	 */
 	public int getEntryMembership(Entry e){
 		return cluster_to_id.getOrDefault( entry_to_cluster.get(e), -1 );
 	}
 	
+	/**Calculates the distance between to different entries
+	 * 
+	 * @param e1
+	 * @param e2
+	 * @return The euclidian distance between the entries
+	 */
 	public double getDistance(Entry e1, Entry e2){
 		if( !entry_to_id.containsKey(e1) )
 			return exception( "The entry "+e1+" does not exist in the current space." ); 
@@ -119,6 +129,12 @@ public class Space {
 		return distances[entry1][entry2];
 	}
 	
+	/**Calculates the distance between two clusters
+	 * 
+	 * @param cluster1 ID for cluster 1
+	 * @param cluster2 ID for cluster 2
+	 * @return The euclidian distance between the clusters
+	 */
 	public double getDistance(int cluster1, int cluster2){
 		if( cluster1 >= nextClusterID )
 			return exception( "The requested cluster "+cluster1+" does not exist. The cluster named "+cluster2+" does not exist");
@@ -137,13 +153,18 @@ public class Space {
 			c.calculateCentoid();
 	}
 	
-	public double[] clusterCentoid(int cluster) {
-		return cluster_to_id.inverse().get(cluster).getCentoid().getAllEntries();
+	public Entry clusterCentoid(int cluster) {
+		return cluster_to_id.inverse().get(cluster).getCentoid();
 	}
 	
 	public Entry[] getFreeEntries(){ return free_entrys.toArray( new Entry[0] ); }
 	public Entry[] getAllEntries(){  return entry_to_id.keySet().toArray( new Entry[0] ); }
-	public Entry[] getCludEntried(){ return entry_to_cluster.keySet().toArray( new Entry[0] ); }
+	public Entry[] getClusteredEntries(){ return entry_to_cluster.keySet().toArray( new Entry[0] ); }
+	
+	public Entry[] getEntriesInCluster(int cluster){ return cluster_to_id.inverse().get(cluster).getMembers(); }
+	public Entry getCentoid(int cluster){ return cluster_to_id.inverse().get(cluster).getCentoid(); }
+	
+	public double getSquaredError(int cluster){ return cluster_to_id.inverse().get(cluster).getSquaredError(); }
 	
 	public int getNumberOfEntries()  { return nextEntryID; };
 	public int getNumberOfClusters() { return nextClusterID; };

@@ -4,12 +4,11 @@ import java.util.HashMap;
 
 import com.cluit.util.Const;
 import com.cluit.util.AoP.MethodMapper;
-import com.cluit.util.AoP.ReferencePasser;
 import com.cluit.util.AoP.VariableSingleton;
 import com.cluit.util.dataTypes.Entry;
+import com.cluit.util.dataTypes.Space;
 import com.cluit.util.structures.KeyPriorityQueue_Max;
 import com.cluit.util.structures.KeyPriorityQueue_Min;
-import com.cluit.util.structures.Space;
 
 /**This class is intended to be used as the API between CluIt and Javascript. All communication with the clustering space goes via an instance
  * of this class. This class also handles the "Finished" function, which the Javascript can call to signal that the algorithm is done.
@@ -24,9 +23,9 @@ public class API {
 	private HashMap<String, Double> mMiscData = new HashMap<>();
 	
 	private API() {
-		mSpace = ReferencePasser.getReference(Const.REFERENCE_API_SPACE);
+		mSpace = VariableSingleton.getInstance().getSpace();
 		if( mSpace == null ) {
-			MethodMapper.invoke(Const.METHOD_EXCEPTION_GENERAL, "API couldn't fetch a viable clustering algorithm object", new Exception() );
+			MethodMapper.invoke(Const.METHOD_EXCEPTION_GENERAL, "API couldn't fetch a viable clustering space object", new Exception() );
 		}
 	}
 	
@@ -94,7 +93,7 @@ public class API {
 	}
 	
 	public Entry[] getClusteredEntries(){
-		return mSpace.getCludEntried();
+		return mSpace.getClusteredEntries();
 	}
 	
 	public boolean isClustered(Entry e){
@@ -128,6 +127,10 @@ public class API {
 	
 	public Object getFieldValue(String name){
 		return VariableSingleton.getInstance().getObject(Const.V_KEY_JS_REFERENCE+name);
+	}
+	
+	public double calcSquaredError(int cluster){
+		return mSpace.getSquaredError(cluster);
 	}
 	
 	public void addMiscData(String ID, double value){

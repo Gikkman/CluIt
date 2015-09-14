@@ -10,6 +10,6 @@ public class Data {
 	}
 	
 	public String[]   getLabels(){ return mLabels; }
-	public double[][] getData()  { return mData;   }
+	public double[][] getDoublesMatrix()  { return mData;   }
 	
 }

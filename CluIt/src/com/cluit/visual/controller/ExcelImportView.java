@@ -97,7 +97,7 @@ public class ExcelImportView implements Initializable{
 				//anything in the variable singleton (to prevent the user from running a clustering algorithm with no valid data).
 				double[][] data = mReader.getDoubleValues();
 				String[] labels = mReader.getFilteredLabels();
-				VariableSingleton.getInstance().putObject(Const.V_IMPORTED_EXCEL_DATA, new Data(labels, data) );
+				VariableSingleton.getInstance().setData( new Data(labels, data) );
 			} catch (ClassCastException | IOException e){
 				MethodMapper.invoke(Const.METHOD_INFORMATION_EXCEL, e.getMessage()+"\n\nCould not import data from the specified Excel file. Please double check that all values within the selected data columns are numeric (or calculated) values. The import cannot handle strings, blanks, errors or the similar.\n");
 				return;

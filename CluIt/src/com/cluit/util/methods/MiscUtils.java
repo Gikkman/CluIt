@@ -70,8 +70,8 @@ public class MiscUtils {
 	public static void colorPixels(Entry[] points, int[] clusterMembership) throws Exception{
 		int highestX = 1, highestY = 1;
 		for(Entry e : points){
-			if( e.getEntry(0) > highestX ) highestX = (int) e.getEntry(0);
-			if( e.getEntry(1) > highestY ) highestY = (int) e.getEntry(1);
+			if( e.getCoordinateAt(0) > highestX ) highestX = (int) e.getCoordinateAt(0);
+			if( e.getCoordinateAt(1) > highestY ) highestY = (int) e.getCoordinateAt(1);
 		}
 		try {
 			img = BMP_Image.create(filename, highestX+1, highestY+1 );
@@ -81,7 +81,7 @@ public class MiscUtils {
 		
 		for(int i = 0; i < points.length; i++){
 			Entry p = points[i];
-			double[] dim = p.getAllEntries();
+			double[] dim = p.getCoordinates();
 			
 			RGB_Pixel px = img.getPixel((int) dim[0], (int) dim[1]);
 			

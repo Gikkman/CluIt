@@ -6,7 +6,6 @@ public final class Const {
 	public static final String V_KEY_COMBOBOX_JAVASCRIPT_FILE = "file_javascriptFileCombobox";
 	public static final String V_KEY_SPINNER_NUMBER_OF_CLUSTERS = "int_numberOfClusters";
 	public static final String V_KEY_JS_REFERENCE = "name_js_reference";
-	public static final String V_IMPORTED_EXCEL_DATA = "double[]_imported_excel_data";
 	
 	public static final String DIR_JAVASCRIPT = "javascript\\";
 	public static final String DIR_EXCEL = "excel\\";
@@ -16,7 +15,6 @@ public final class Const {
 	public static final String STRING_JAVASCRIPT_ADD_FIELDS_FUNCTION = "fields";
 	
 	public static final String REFERENCE_API_SPACE = "API_pointspace_reference";	
-	public static final String REFERENCE_CLUSTERING_DATA_BLOCK = "clustering_data_block_refernence";
 	
 	public static final String METHOD_DONE_BUTTON_REACTIVATE = "method_reactive_OK_button";
 	public static final String METHOD_JS_SCRIPT_STEP = "metod_js_script_step";
@@ -31,10 +29,7 @@ public final class Const {
 	public static final String METHOD_ADD_CHECKBOX = "method_add_checkbox_invocation";
 	public static final String METHOD_CLEAR_TOOLS_PANE = "method_clear_all_tools_from_tools_pane";
 	
-	public static final String METHOD_RENDERING_ENGINE_PAINT = "method_rendering_engine_paint_results";
 	public static final String METHOD_RENDERING_TABS_CALLBACK = "method_rendering_tabs_callback";
-	
-	public static final String MULTI_METHOD_PAINT_TABS = "multi_method_paint_tabs_key_code";
 
 	public static final String METHOD_UNLOAD_EXCEL_SHEET = "method_unload_excel_file_to_release_lock";
 	

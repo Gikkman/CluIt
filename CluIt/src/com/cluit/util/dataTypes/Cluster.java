@@ -1,4 +1,4 @@
-package com.cluit.util.structures;
+package com.cluit.util.dataTypes;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -6,8 +6,9 @@ import java.util.Set;
 
 import com.cluit.util.Const;
 import com.cluit.util.AoP.MethodMapper;
-import com.cluit.util.dataTypes.Entry;
 import com.cluit.util.methods.ClusteringUtils;
+import com.cluit.util.structures.KeyPriorityQueue_Max;
+import com.cluit.util.structures.Pair;
 
 public class Cluster {
 	
@@ -57,7 +58,7 @@ public class Cluster {
 		
 		for( Entry p : distanceQueue.values() ){
 			for( int i = 0; i < p.getDimensions(); i++ )
-				newCentoidCoordinates[i] += p.getEntry(i);
+				newCentoidCoordinates[i] += p.getCoordinateAt(i);
 		}
 		
 		for( int i = 0; i < newCentoidCoordinates.length; i++)
@@ -152,6 +153,20 @@ public class Cluster {
 		return members.size() > 0 ? out.substring(0, out.length() - 3) + " ]" : "[ ]";
 	}
 	
+	/**Calculates the sum of squared errors for this cluster
+	 * 
+	 * @return
+	 */
+	public double getSquaredError(){
+		double out = 0;
+		double dist = 0;
+		for(Entry e : members ){
+			dist = ClusteringUtils.eucDistance(centoid, e);
+			out += (dist*dist);
+		}
+		return out;			
+	}
+	
 	/**Update each member's distance to the centoid
 	 * 
 	 */
@@ -160,7 +175,7 @@ public class Cluster {
 		distanceQueue.clear();
 		
 		for(Entry p : list){
-			double newDistance = com.cluit.util.methods.ClusteringUtils.eucDistance(centoid, p);
+			double newDistance = ClusteringUtils.eucDistance(centoid, p);
 			distanceQueue.add(newDistance, p);
 		}
 	}

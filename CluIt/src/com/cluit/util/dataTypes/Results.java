@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import com.cluit.util.structures.Pair;
-import com.cluit.util.structures.Space;
 
 public class Results {
 	private Space mResultSpace;
@@ -27,7 +26,7 @@ public class Results {
 
 	public double[] getCentoid(int cluster){
 		mResultSpace.updateCentoids();
-		return mResultSpace.clusterCentoid(cluster);
+		return mResultSpace.clusterCentoid(cluster).getCoordinates();
 	}
 	
 	public boolean hasMiscData(){
@@ -39,6 +38,16 @@ public class Results {
 		
 		for( String key : mMiscData.keySet() )
 			out.add( new Pair<String, Double>(key, mMiscData.get(key) ) );
+		
+		return out;
+	}
+	
+	public double[] getSquaredErrors(){
+		double[] out = new double[ mResultSpace.getNumberOfClusters() ];
+		
+		for( int i = 0; i < out.length; i++ ){
+			out [i] = mResultSpace.getSquaredError(i);
+		}
 		
 		return out;
 	}

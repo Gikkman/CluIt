@@ -91,7 +91,7 @@ public class ToolPanelView implements Initializable{
 	
 	private static int idx = 0;
 	@FXML protected void test(ActionEvent e){
-		MethodMapper.invoke(Const.METHOD_RENDERING_ENGINE_PAINT, idx++ );
+		System.out.println("ToolPanelView Test " + idx++);
 	}
 
 }

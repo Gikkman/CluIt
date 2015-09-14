@@ -30,7 +30,7 @@ var calculate = function() {
 var addClusters = function() {
 	for( var i = 0; i < numberOfClusters; i++ ){
 		var e = entries[ getCursor() ];
-		var cluster = API.addCluster( e.getAllEntries() );
+		var cluster = API.addCluster( e.getCoordinates() );
 		API.addEntryToCluster(e, cluster);		
 	}
 }

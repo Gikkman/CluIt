@@ -15,7 +15,6 @@ import java.util.ResourceBundle;
 
 import com.cluit.util.Const;
 import com.cluit.util.AoP.MethodMapper;
-import com.cluit.util.AoP.MultiMethodMapper;
 import com.cluit.util.io.jar.JarResoruceLister;
 import com.cluit.visual.application.Main;
 
@@ -48,15 +47,8 @@ public class TabPaneView implements Initializable{
 			
 			}
 			
-			//Link the paintTab method to tabs
-			MethodMapper.addMethod(Const.METHOD_RENDERING_ENGINE_PAINT, (args) -> paintTabs(args) );
-			
 		} catch (URISyntaxException | IOException e) {
 			e.printStackTrace();
 		}
-	}
-
-	private void paintTabs(Object[] args) {
-		MultiMethodMapper.invoke(Const.MULTI_METHOD_PAINT_TABS, args);
 	}	
 }

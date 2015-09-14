@@ -149,7 +149,7 @@ public class FileReader_Excel {
 	public String[] getLabels(){
 		String[] out = new String[mData.size()];
 		for(int i = 0; i < mData.size(); i++){
-			out[i] = mData.get(i).l;
+			out[i] = mData.get(i).l.replace("\n", " ");
 		}
 		return out;
 	}
@@ -161,13 +161,14 @@ public class FileReader_Excel {
 	 */
 	public String[] getFilteredLabels() {
 		ArrayList<String> out = new ArrayList<>();
+		String[] labels = getLabels();
 		int colFilterIndex = 0;
 		for( int i = 0; i < mData.size(); i++){
 			if( colFilterIndex < colFilter.length && colFilter[colFilterIndex] == i){
 				colFilterIndex++;
 				continue;
 			}
-			out.add( mData.get(i).l );
+			out.add( labels[i] );
 		}
 		return out.toArray( new String[0] );
 	}
@@ -265,9 +266,17 @@ public class FileReader_Excel {
 					continue;
 				}
 				try{
-					val = (double) mData.get(x).r[y];
+					Object obj = mData.get(x).r[y];
+					
+					if( obj.equals( "" ) ) //If the data in excel was NULL, it comes out as "". In that case, we interpret it as 0
+						val = 0;	
+					else
+						val = (double) obj;
+
 				} catch(ClassCastException e){
-					throw new ClassCastException("Cannot convert the value in row "+(y+1)+" column "+(x+1)+" to a double. Please check your data block");
+					@SuppressWarnings("unused")
+					Object obj = mData.get(x).r[y];
+					throw new ClassCastException("Cannot convert the value in row "+(y+2)+" column "+(x+1)+" to a double. Please check your data block");
 				}
 				out[y-rowFilterIndex][x-colFilterIndex] = val;
 			}

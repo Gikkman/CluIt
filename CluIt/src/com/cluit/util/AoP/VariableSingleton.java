@@ -1,7 +1,13 @@
 package com.cluit.util.AoP;
 
+import java.beans.PropertyChangeListener;
 import java.util.HashMap;
 import java.util.Map;
+
+import com.cluit.util.dataTypes.Data;
+import com.cluit.util.dataTypes.Results;
+import com.cluit.util.dataTypes.Space;
+import com.cluit.util.structures.TypedObservableObjectWrapper;
 
 public class VariableSingleton {
 	private static final VariableSingleton INSTANCE = new VariableSingleton();
@@ -11,8 +17,12 @@ public class VariableSingleton {
 	private final Map<String, Boolean> 	mBoolMap 	= new HashMap<String, Boolean>();
 	private final Map<String, String> 	mStringMap 	= new HashMap<String, String> ();
 	private final Map<String, Object> 	mObjectMap 	= new HashMap<String, Object> ();
+
+	private TypedObservableObjectWrapper<Space>  mObservableSpace  = new TypedObservableObjectWrapper<Space> (null);
+	private TypedObservableObjectWrapper<Data>   mObservableData   = new TypedObservableObjectWrapper<Data>  (null);
+	private TypedObservableObjectWrapper<Results> mObservableResult= new TypedObservableObjectWrapper<Results>(null);
 	
-	public static VariableSingleton getInstance(){
+	public static VariableSingleton getInstance(){		
 		return INSTANCE;
 	}
 	
@@ -81,4 +91,58 @@ public class VariableSingleton {
 	public synchronized void putObject(String key, Object value){
 		mObjectMap.put(key, value);
 	}	
+	
+	/*********************** SPACE ****************************/
+	
+	public synchronized void setSpace(Space space){
+		mObservableSpace.setValue(space);
+	}
+	
+	public synchronized Space getSpace(){
+		return mObservableSpace.getValue();
+	}
+	
+	public synchronized void setSpaceListener(PropertyChangeListener listener){
+		mObservableSpace.addPropertyChangeListener(listener);
+	}
+	
+	public synchronized void removeSpaceListener(PropertyChangeListener listener){
+		mObservableSpace.removePropertyChangeListener(listener);
+	}
+	
+	/*********************** DATA **********************************/
+	
+	public synchronized void setData(Data data){
+		mObservableData.setValue(data);
+	}
+	
+	public synchronized Data getData(){
+		return mObservableData.getValue();
+	}
+	
+	public synchronized void setDataListener(PropertyChangeListener listener){
+		mObservableData.addPropertyChangeListener(listener);
+	}
+	
+	public synchronized void removeDataListener(PropertyChangeListener listener){
+		mObservableData.removePropertyChangeListener(listener);
+	}
+	
+	/*********************** RESULT **********************************/
+	
+	public synchronized void setResults(Results results){
+		mObservableResult.setValue(results);
+	}
+	
+	public synchronized Results getResults(){
+		return mObservableResult.getValue();
+	}
+	
+	public synchronized void setResultListener(PropertyChangeListener listener){
+		mObservableResult.addPropertyChangeListener(listener);
+	}
+	
+	public synchronized void removeResultListener(PropertyChangeListener listener){
+		mObservableResult.removePropertyChangeListener(listener);
+	}
 }

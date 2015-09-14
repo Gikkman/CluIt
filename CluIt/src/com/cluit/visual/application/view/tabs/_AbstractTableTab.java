@@ -6,8 +6,7 @@ import javafx.fxml.Initializable;
 import java.net.URL;
 import java.util.ResourceBundle;
 
-import com.cluit.util.Const;
-import com.cluit.util.AoP.MultiMethodMapper;
+import com.cluit.util.AoP.VariableSingleton;
 import com.cluit.util.dataTypes.Results;
 
 public abstract class _AbstractTableTab implements Initializable{
@@ -19,16 +18,16 @@ public abstract class _AbstractTableTab implements Initializable{
 	
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
-		MultiMethodMapper.addMethod(Const.MULTI_METHOD_PAINT_TABS, tabID, (args) -> backgroundPaint(args) );		
+		VariableSingleton.getInstance().setResultListener( (evt) -> backgroundPaint( evt.getNewValue() ) );
 	}
 	
-	private void backgroundPaint(Object[] args){
-		if( args[0] instanceof Results ){
-			Results r = (Results) args[0];
+	private void backgroundPaint(Object args){
+		if( args instanceof Results ){
+			Results r = (Results) args;
 			Platform.runLater( () -> paintThisTab(r) );			
 		}
 		else{
-			int i = (int) args[0];
+			int i = (int) args;
 			Platform.runLater( () -> DEBUG_paintThisTab(i) );		
 		}
 	}
