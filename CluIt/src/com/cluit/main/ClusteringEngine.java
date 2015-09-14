@@ -138,7 +138,8 @@ public class ClusteringEngine extends Thread {
 				memberships[i] = membership; 
 		}
 		
-		paint(entries, memberships);
+		if( entries[0].getDimensions() == 2)
+			paint(entries, memberships);
 		
 		//Sets the results of this clustering. This'll fire all Results listeners
 		Results results = new Results(data, space, map);
