@@ -161,17 +161,37 @@ public class TableTabController extends _AbstractTableTab{
 	private ArrayList<Label> getSquaredErrors(Results r) {
 		ArrayList<Label> errorLabels = new ArrayList<>();
 		double[] errors = r.getSquaredErrors();
-		
+		double totalErrors = 0;
 		errorLabels.add(new Label(" ") ); //Adds an empty row
+		
+		//Calculate the number of digits in the largest error.
+		//This'll be used to place the numbers in the labels correctly
+		double largestNr = 0;
+		for(double d : errors){
+			if( Math.abs(d) > largestNr )
+				largestNr = Math.abs(d);
+		}
+		int offset = (int) (Math.log10(largestNr) + 6); 
+		
 		for(int i = 0; i < errors.length; i++){
-			Label label = new Label( String.format("SSE Clu"+i+": %10.4f", errors[i]) );
+			Label label = new Label( String.format("SSE Clu"+i+": %"+offset+".4f", errors[i]) );
 			skinDataLabel(label);
 			
-			
+			totalErrors += errors[i];
 			
 			errorLabels.add(label);
 		}
 		
+		Label blank = new Label(" ");
+		Label total = new Label( "Total SSE" );
+		Label val   = new Label( String.format("%.4f", totalErrors) );
+		
+		total.setStyle("-fx-underline: true;");
+		skinDataLabel(blank);
+		skinDataLabel(total);
+		skinDataLabel(val);
+
+		errorLabels.add(blank); errorLabels.add(total); errorLabels.add(val);
 		return errorLabels;
 	}
 	
@@ -235,9 +255,7 @@ public class TableTabController extends _AbstractTableTab{
 		
 		//Add blank spacing to already existing Grids. This'll move the misc-info downwards
 		for( GridPane pane : mPanes ){
-			Label blank = new Label(" ");
-			GridPane.setConstraints(blank, 0, mNextLabelRow+DATA_ROW_BEGINS, 1, 1, HPos.LEFT, VPos.CENTER, Priority.NEVER, Priority.NEVER);
-			pane.getChildren().add(blank);
+			pane.getChildren().add( getEmptyRow(mNextLabelRow) );
 		}
 		
 		return mNextLabelRow++;
@@ -260,6 +278,7 @@ public class TableTabController extends _AbstractTableTab{
 	
 	private Label getEmptyRow(int row){
 		Label n = new Label(" ");
+		skinDataLabel(n);
 		GridPane.setConstraints(n, 0, row + DATA_ROW_BEGINS, GridPane.REMAINING, 1, HPos.CENTER, VPos.CENTER, Priority.NEVER, Priority.NEVER );
 		return n;
 	}
@@ -317,6 +336,10 @@ public class TableTabController extends _AbstractTableTab{
 	
 	private void skinDataLabel(Label label){
 		label.getStyleClass().add(DATA_LABEL);
+		GridPane.setColumnSpan(label, GridPane.REMAINING);
+		GridPane.setHgrow(label, Priority.NEVER);
+		GridPane.setVgrow(label, Priority.NEVER);
+		GridPane.setHalignment(label, HPos.CENTER);
 	}
 
 	static int idx = 1;
