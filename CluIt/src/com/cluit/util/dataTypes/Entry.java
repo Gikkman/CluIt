@@ -9,14 +9,26 @@ import java.util.Arrays;
  */
 public class Entry {
 	
-private final double[] coords;
+	private final double[] coords;
+	private final int ID;
 	
-	/**Creates a new Entry with the given coordinates
+
+	/**Constructor for creating entries which don't represent elements in the object space. Primarily for representing cluster centoids.
 	 * 
 	 * @param coordinates
 	 */
-	public Entry(double... coordinates){
-		coords = coordinates;
+	public Entry(double ... coordinates) {
+		this(-1, coordinates);
+	}
+	
+	/**Creates a new Entry with the given coordinates. If the entry is not derived from an element (ie, is a cluster centoid), the ID can be set to anything
+	 * 
+	 * @param ID  This entries ID (ie, which element from the element collection was this entry generated from) 
+	 * @param coordinates This entries different features (will be used as coordiantes in the data space)
+	 */
+	public Entry(int id, double... coordinates){
+		this.ID = id;
+		this.coords = coordinates;
 	}
 	
 	/**Copy constructor.<br> 
@@ -26,8 +38,10 @@ private final double[] coords;
 	 * @param e
 	 */
 	public Entry(Entry e) {
-		coords = Arrays.copyOf(e.getCoordinates(), e.getDimensions());
+		this.ID = e.getID();
+		this.coords = Arrays.copyOf(e.getCoordinates(), e.getDimensions());
 	}
+
 
 	/**Fetches the data at a given coordinate
 	 * 
@@ -44,6 +58,10 @@ private final double[] coords;
 	
 	public final int getDimensions(){
 		return coords.length;
+	}
+	
+	public final int getID(){
+		return ID;
 	}
 	
 	@Override

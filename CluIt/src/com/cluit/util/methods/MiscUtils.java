@@ -36,7 +36,7 @@ public class MiscUtils {
 	public static Entry[] entriesFromFeatureMatrix(double[][] data){
 		ArrayList<Entry> points = new ArrayList<Entry>();
 		for(int i = 0; i < data.length; i++)
-			points.add( new Entry( data[i] ) );
+			points.add( new Entry( i, data[i] ) );
 		return points.toArray( new Entry[0] );
 	}	
 

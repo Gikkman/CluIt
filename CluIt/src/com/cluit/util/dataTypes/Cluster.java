@@ -64,7 +64,7 @@ public class Cluster {
 		for( int i = 0; i < newCentoidCoordinates.length; i++)
 			newCentoidCoordinates[i] /= distanceQueue.size();
 		
-		centoid = new Entry( newCentoidCoordinates );	
+		centoid = new Entry(newCentoidCoordinates );	
 		
 		updateMemberDistances();
 	}

@@ -30,6 +30,8 @@ public class ClusteringEngine extends Thread {
 	private long 			 mJsFileEditedDate = 0;
 	private JavascriptEngine mJavascriptEngine;
 	
+	private Data mDataCache;
+	
 	public ClusteringEngine() {
 		this.setDaemon(true);
 	}
@@ -94,14 +96,22 @@ public class ClusteringEngine extends Thread {
 			doInit();
 		
 		//Fetch the data that should have been imported. First, check if something exists, then cast it to Data
-		Data data = VariableSingleton.getInstance().getData();
-		if( data == null ){
+		mDataCache = VariableSingleton.getInstance().getData();
+		if( mDataCache == null ){
 			MethodMapper.invoke(Const.METHOD_INFORMATION_EXCEL, "Data from an Excel file must be loaded before clustering can be performed.\nThe Import view can be found under Show -> Excel Import");
 			return;
 		}
 		
+		//Normalize data (if the user wishes it)
+		double[][] calcData = null;
+		if( VariableSingleton.getInstance().getBool( Const.V_KEY_CHECKBOX_NORMALIZE) ){
+			calcData = mDataCache.getNormalizedData();
+		} else {
+			calcData = mDataCache.getData();
+		}
+		
 		//Create the space, store the space reference for the API and the data reference for the result
-		Entry[] entries = MiscUtils.entriesFromFeatureMatrix( (double[][]) data.getDoublesMatrix() );
+		Entry[] entries = MiscUtils.entriesFromFeatureMatrix( calcData );
 		int dimensions = entries[0].getDimensions();	
 		
 		VariableSingleton.getInstance().setSpace( Space.create(dimensions, entries) );
@@ -112,7 +122,8 @@ public class ClusteringEngine extends Thread {
 		
 		mJavascriptEngine.performClustering();
 	}
-	
+
+
 	private void doTerminate(){
 		mIsAlive = false;
 	}
@@ -125,24 +136,12 @@ public class ClusteringEngine extends Thread {
 	private void clusteringFinished(Object ... args) {
 		Space space = (Space) args[0];
 		HashMap<String, Double> map = (HashMap<String, Double> ) args[1];
-		Data  data  =  VariableSingleton.getInstance().getData();
 		
-		Entry[] entries = space.getAllEntries();
-		int[] memberships = new int[entries.length];
-		
-		for(int i = 0; i < memberships.length; i++){
-			int membership = space.getEntryMembership(entries[i]);
-			if( membership == -1)
-				System.out.println("Entry "+i+" is not clustered, FYI "+com.cluit.util.methods.MiscUtils.getStackPos());
-			else
-				memberships[i] = membership; 
-		}
-		
-		if( entries[0].getDimensions() == 2)
-			paint(entries, memberships);
+		if( space.getDimensions() == 2)
+			paintBmp(space);
 		
 		//Sets the results of this clustering. This'll fire all Results listeners
-		Results results = new Results(data, space, map);
+		Results results = new Results(mDataCache, space, map);
 		VariableSingleton.getInstance().setResults(results);
 		
 		MethodMapper.removeMethod(Const.METHOD_JS_SCRIPT_STEP);
@@ -156,6 +155,29 @@ public class ClusteringEngine extends Thread {
 			return;
 		
 		paint(entries, membership);
+	}
+	
+	////////////////////////////////////////////////////////////////////////////////////
+	//									PAINTING
+	////////////////////////////////////////////////////////////////////////////////////
+	private void paintBmp(Space space) {
+		Entry[] entries = space.getAllEntries();
+		int[] memberships = new int[entries.length];
+		
+		for(int i = 0; i < memberships.length; i++){
+			int membership = space.getEntryMembership(entries[i]);
+			if( membership == -1)
+				System.out.println("Entry "+i+" is not clustered, FYI "+com.cluit.util.methods.MiscUtils.getStackPos());
+			else
+				memberships[i] = membership; 
+		}
+		
+		for(int i = 0; i < entries.length; i++){
+			entries[i] = new Entry(i, mDataCache.getEntryData(entries[i].getID()));
+		}
+		
+		if( entries[0].getDimensions() == 2)
+			paint(entries, memberships);
 	}
 	
 	private void paint(Entry[] entries, int[] membership){

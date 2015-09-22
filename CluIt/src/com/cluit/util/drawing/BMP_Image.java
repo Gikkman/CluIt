@@ -156,17 +156,17 @@ public class BMP_Image {
 	    final int width = img.getWidth();
 	    final int height = img.getHeight();    
 	    
-	    RGB_Pixel[][] result = new RGB_Pixel[height][width];
+	    RGB_Pixel[][] result = new RGB_Pixel[width][height];
 	    int r = 0, g = 0, b = 0;
-         for (int pixel = 0, row = 0, col = 0; pixel < pixels.length; pixel++) {
+         for (int pixel = 0, y = 0, x = 0; pixel < pixels.length; pixel++) {
             r = (( pixels[pixel] & 0xff0000) >> 16); // red
             g = (( pixels[pixel] & 0x00ff00) >> 8); // green
             b = (( pixels[pixel] & 0x0000ff) ); 	// blue
-            result[col][row] = new RGB_Pixel(r, g, b);
-            col++;
-            if (col == width) {
-               col = 0;
-               row++;
+            result[x][y] = new RGB_Pixel(r, g, b);
+            x++;
+            if (x == width) {
+               x = 0;
+               y++;
             }
          }
 		return result;

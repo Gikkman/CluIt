@@ -28,7 +28,7 @@ public class DataTabController implements Initializable{
 			
 		table.setEditable(false);
 		table.setId("data-table");
-		table.setItems(rows);	
+		table.setItems(rows);
 				
 		VariableSingleton.getInstance().setDataListener( (evt) -> newDataLoaded( (Data) evt.getNewValue() ) ); 	
 	};
@@ -39,21 +39,35 @@ public class DataTabController implements Initializable{
 	}
 	
 	private void paintTab(Data data){
-		table.getColumns().addAll( getColumns( data.getLabels() ) );
-		rows.addAll( boxDoubles( data.getDoublesMatrix() ) );
+		//TODO: Add reference data
+		table.getColumns().addAll( getDataColumns( data.getLabels() ) );
+		
+		
+		if( data.hasReferenceData() ){			
+			table.getColumns().add( getEmptyColumn() );
+			
+			int idx = data.getLabels().length+1; //+1 to compensate for the empty separator column
+			table.getColumns().addAll( getReferenceColumns( idx, data.getReferenceLabels() ) );
+			
+			rows.addAll( boxDoubles( data.getData(), data.getReferenceData() ) );
+		} else {
+			rows.addAll( boxDoubles( data.getData() ) );
+		}		
+	}
+
+	private ArrayList<TableColumn<Double[], String>> getDataColumns( String[] labels) {
+		return getReferenceColumns(0, labels);
 	}
 	
-	
-	private ArrayList<TableColumn<Double[], String>> getColumns(String[] labels) {
+	private ArrayList<TableColumn<Double[], String>> getReferenceColumns(int idx, String[] labels) {
 		ArrayList<TableColumn<Double[], String>> out = new ArrayList<>();
 		
 		for( int i = 0; i < labels.length; i++ ){
-			out.add( getNewColumn( labels[i], i) );	
+			out.add( getNewColumn( labels[i], i+idx) );	
 		}
 		
 		return out;
 	}
-
 
 	private ArrayList<Double[]> boxDoubles(double[][] data) {
 		ArrayList<Double[]> out = new ArrayList<>();
@@ -63,6 +77,33 @@ public class DataTabController implements Initializable{
 			
 			for( int i = 0; i < row.length; i++){
 				boxedRow[i] = row[i];
+			}
+			
+			out.add(boxedRow);
+		}
+		
+		return out;
+	}
+	
+	private ArrayList<Double[]> boxDoubles(double[][] data, double[][] refData) {
+		ArrayList<Double[]> out = new ArrayList<>();
+		
+		//TODO: Might need to find the longest refData row... This'll assume that the first row's length is equal to the longest one's
+		int rowLenght = data[0].length + refData[0].length + 1;	//+1 for the empty separator column. It will be filled with null
+		
+		for( int row = 0; row < data.length; row++){
+			Double[] boxedRow = new Double[ rowLenght ];
+			
+			for( int i = 0; i < rowLenght; i++){
+				int dataCellIdx = i;
+				int refDataCellIdx = i - data[row].length - 1; //-1 since we've skipped the empty separator column	
+				
+				if( i < data[row].length )
+					boxedRow[i] = data[row][dataCellIdx];
+				else if( i > data[row].length ){
+					if( row < refData.length &&  refDataCellIdx < refData[row].length )
+						boxedRow[i] = refData[row][ refDataCellIdx ];
+				}
 			}
 			
 			out.add(boxedRow);
@@ -88,13 +129,24 @@ public class DataTabController implements Initializable{
 		col.setCellValueFactory( new Callback< CellDataFeatures<Double[],String>, ObservableValue<String> >() {
 			@Override
 			public ObservableValue<String> call(CellDataFeatures<Double[], String> param) {
-				String string = String.format("%.3f", param.getValue()[index]);
+				Double val = param.getValue().length > index ? param.getValue()[index] : null;
+				String string = val != null ? String.format("%.3f", val) : " ";
 				ReadOnlyStringWrapper d =  new ReadOnlyStringWrapper( string );
 				return d;
 			}					
 		} );
 		
 		col.setMinWidth(50);
+		col.setSortable(false);
+		
+		return col;
+	}
+	
+	private TableColumn<Double[], String> getEmptyColumn(){
+		TableColumn<Double[], String> col = new TableColumn<Double[], String>(" ");
+		
+		col.setMinWidth(25);
+		col.setSortable(false);
 		
 		return col;
 	}

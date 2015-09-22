@@ -161,5 +161,52 @@ public class ClusteringUtils {
 		
 		return out;
 	}
+
+	/**Complexity: O( 2 * N )
+	 */
+	public static double[] normalize(double[] in){	
+		double min = Double.POSITIVE_INFINITY, max = Double.NEGATIVE_INFINITY;
+		
+		//Find minimum and maximum value in the array
+		for( double val : in ){
+			if( val > max )
+				max = val;
+			if( val < min )
+				min = val;
+		}
+		
+		return normalize(in, min, max);	
+	}
 	
+	/**Complexity: O( N )
+	 */
+	public static double[] normalize(double[] in, double min, double max){
+		//Create normalized data
+		double[] out = new double[ in.length ];	
+		for( int i = 0; i < out.length; i++){
+			out[i] = normalize(in[i], min, max);
+		}
+		
+		return out;
+	}
+	
+	/**Complexity: O( 1 )
+	 */
+	public static double normalize(double in, double min, double max){
+		return (in - min) / (max - min);
+	}
+
+	/**Transposes a matrix, making each column a row and each row a columns.
+	 * Thanks to <a href="http://stackoverflow.com/users/2216621/rob-watts">Rob Watts</a href> for the code
+	 * 
+	 * @param m
+	 * @return
+	 */
+	 public static double[][] transposeMatrix(double [][] m){
+	        double[][] temp = new double[m[0].length][m.length];
+	        for (int i = 0; i < m.length; i++)
+	            for (int j = 0; j < m[0].length; j++)
+	                temp[j][i] = m[i][j];
+	        return temp;
+	 }	
 }

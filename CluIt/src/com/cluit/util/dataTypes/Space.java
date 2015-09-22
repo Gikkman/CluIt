@@ -166,6 +166,7 @@ public class Space {
 	
 	public double getSquaredError(int cluster){ return cluster_to_id.inverse().get(cluster).getSquaredError(); }
 	
+	public int getDimensions() {return dimensions; }
 	public int getNumberOfEntries()  { return nextEntryID; };
 	public int getNumberOfClusters() { return nextClusterID; };
 	public boolean isClustered(Entry e) { return !free_entrys.contains(e); }

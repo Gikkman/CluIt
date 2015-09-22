@@ -94,6 +94,7 @@ public class VariableSingleton {
 	
 	/*********************** SPACE ****************************/
 	
+
 	public synchronized void setSpace(Space space){
 		mObservableSpace.setValue(space);
 	}
@@ -102,11 +103,13 @@ public class VariableSingleton {
 		return mObservableSpace.getValue();
 	}
 	
-	public synchronized void setSpaceListener(PropertyChangeListener listener){
+	@SuppressWarnings("unused")
+	private synchronized void setSpaceListener(PropertyChangeListener listener){
 		mObservableSpace.addPropertyChangeListener(listener);
 	}
 	
-	public synchronized void removeSpaceListener(PropertyChangeListener listener){
+	@SuppressWarnings("unused")
+	private synchronized void removeSpaceListener(PropertyChangeListener listener){
 		mObservableSpace.removePropertyChangeListener(listener);
 	}
 	

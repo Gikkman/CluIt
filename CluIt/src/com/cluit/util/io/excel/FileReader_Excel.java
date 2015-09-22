@@ -80,16 +80,18 @@ public class FileReader_Excel {
 		
 		//Iterate through each cell in each row, and fetch the data. We make sure also make sure that each row contains the same amount of elements
 		//For each cell, we assign the value to the correct label, at the correct position
-		int y = 1, x = 0;
+		//
+		//The wierd y - value shenanigans here is to compensate for the case where the data doesn't begin on the very top row
+		int y = 1 + firstRow, x = 0;
 		try{ 
-			for( y = 1; y < rows; y++){
+			for( ; y < rows+firstRow; y++){
 				row = currentSheet.getRow(y);
 				if( row.getPhysicalNumberOfCells() != cols){
-					throw new IOException("The number of cells in row "+(y+1)+" ("+row.getPhysicalNumberOfCells()+") does not match the assumed number of cells ("+cols+").\nPlease make sure that the data in the desired sheet block is exactly rectangular.");
+					throw new IOException("The number of cells in row "+(y+1+firstRow)+" ("+row.getPhysicalNumberOfCells()+") does not match the assumed number of cells ("+cols+").\nPlease make sure that the data in the desired sheet block is exactly rectangular.");
 				}
 				for( x = 0; x < cols; x++){
 					val = getCellValue( row.getCell(x) );
-					data.get(x).r[y-1] = val;
+					data.get(x).r[y-1-firstRow] = val;
 				}			
 			}
 		} catch ( IOException e){
