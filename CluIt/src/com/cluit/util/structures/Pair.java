@@ -1,15 +1,15 @@
 package com.cluit.util.structures;
 
 public class Pair <L, R> {
-	public L l;
-	public R r;
+	public L left;
+	public R right;
 	
 	public Pair(L l, R r){
-		this.l = l;
-		this.r = r;
+		this.left = l;
+		this.right = r;
 	}
 	
 	public String toString(){
-		return "["+l+":"+r+"]";
+		return "["+left+":"+right+"]";
 	}
 }

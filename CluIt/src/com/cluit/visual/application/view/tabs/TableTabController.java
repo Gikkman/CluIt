@@ -3,11 +3,11 @@ package com.cluit.visual.application.view.tabs;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.geometry.HPos;
-import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.geometry.VPos;
 import javafx.scene.Group;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.Separator;
@@ -19,38 +19,33 @@ import javafx.scene.text.Font;
 
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.ResourceBundle;
 
 import com.cluit.util.dataTypes.Results;
 import com.cluit.util.structures.Pair;
+import com.cluit.visual.widget.DataTable;
 
 public class TableTabController extends _AbstractTableTab{	
-	private final int LABELS_COLUMN = 0, HEADER_ROW = 0, CLUSTER_NAME_ROW = 1, HORIZONTAL_SEPARATOR_ROW = 2, DATA_ROW_BEGINS = 3,
-					  DECIMALS_KEPT = 2;
-	private final boolean HAS_TEXT = true, HAS_NO_TEXT = false;
-	private final String DATA_LABEL = "datalabel";
-	
 	@FXML Group group;
 	HBox wrap_pane;
 	
-	private final boolean DEBUG_MODE = false;
-	private final HashMap<String, Integer> label_to_row = new HashMap<>();
-	private final ArrayList< GridPane > mPanes = new ArrayList<>();
+	private final HashMap<String, Integer> mLabelToRow    = new HashMap<>();
+	private final ArrayList< DataTable >   mDataTables    = new ArrayList<>();
+	private final ArrayList< DataTable >   mRefDataTables = new ArrayList<>();
 	
-	private boolean first = true;
-	private GridPane mLabelGrid;
-	private int 	 mNextLabelRow = 0; 	
-	private int 	 mNextRun = 1;
+	private boolean   first = true;
+	private DataTable mLabelTable;
+	private int 	  mNextLabelIndex = 0; 	
+	private int 	  mNextRun = 1;
 
 	@FXML protected void clear_tab(ActionEvent ae){
 		group.getChildren().clear();
 		wrap_pane = new HBox();
 		group.getChildren().add(wrap_pane);
 		
-		label_to_row.clear();
-		mNextLabelRow = 0;
+		mLabelToRow.clear();
+		mNextLabelIndex = 0;
 		mNextRun = 1;
 		
 		first = true;
@@ -74,90 +69,120 @@ public class TableTabController extends _AbstractTableTab{
 		if( first )
 			createBaseLayout();
 		
+		//This VBox encloses the entire result group, with the grid and the labels and buttons and such
 		VBox vbox = new VBox();
 		vbox.setAlignment( Pos.TOP_CENTER );
 		
-		GridPane grid = new GridPane();
-		commonGridSetup(grid, r.numberOfClusters(), HAS_TEXT);
+		vbox.getChildren().add( getDataTable( r ) );
 		
-		int[] labelIndices = getLabelIndices( r.getLabels() );	
-		grid.getChildren().addAll( 	getDataLabels(r, labelIndices) );
-		grid.getChildren().add( 	getClearButton( vbox, r.numberOfClusters() ) );
+		//The reference part contains the mean values of reference variables related to a certain cluster
 		
-		vbox.getChildren().add(grid);	
+				
+		//Misc data is the user designated data, assigned from a JS file
 		if( r.hasMiscData() )
 			vbox.getChildren().addAll( getMiscDataLabels(r) );
 		vbox.getChildren().addAll( getSquaredErrors(r) );
 		
+		//The wrap pane is the basis for the tab.
+		//We also keep a collection of all grids, so we can extend it later on if new variables are added (and we need to move the misc data down)
 		wrap_pane.getChildren().add(vbox);
-		mPanes.add(  grid );
 	}
 
+	private Node getDataTable(Results r) {
+		//The grid part contains the cluster's centoid data, as well as the "X" button
+		String[] subH = new String[  r.numberOfClusters() ];
+		for(int i = 0; i < subH.length; i++)
+			subH[i] = "Cluster " + i;
+		
+		DataTable dataTable = new DataTable("Run " + mNextRun++, subH);
+			
+		//Fetch the labels. Inform the data table of the label-row relationships
+		String[] labels = r.getLabels();
+		dataTable.setLabelRowRelationship( getLabelRowRelationship( labels ) );
+		dataTable.setTotalLabelCount( mLabelToRow.size() );
+		//For each cluster, we create a list of Label - Data pairs, where the label denotes what feature we are looking at
+		//and the Data represents that clusters centoid for the current feature
+		for( int col = 0; col < r.numberOfClusters(); col++){
+			ArrayList<Pair<String, String>> labelDataPairs = new ArrayList<Pair<String, String>>();		
+			double[] clusterCentoid = r.getCentoid(col);
+			
+			for(int j = 0; j < labels.length; j++){
+				Pair<String, String> pair = new Pair<String, String>(labels[j], String.valueOf(clusterCentoid[j]) );
+				labelDataPairs.add(pair);
+			}
+			
+			dataTable.setColumnData(col, mLabelToRow.size(), labelDataPairs);
+		}
+		
+		mDataTables.add(dataTable);
+		return dataTable;
+	}
+
+	private ArrayList<Pair<String, Integer>> getLabelRowRelationship(String[] labels) {
+		ArrayList<Pair<String, Integer>> relations = new ArrayList<Pair<String, Integer>>();
+		
+		for( int i = 0; i < labels.length; i++){
+			String  currLabel = labels[i];
+			Integer currIndex = mLabelToRow.get(currLabel);
+			
+			if( currIndex == null ){
+				currIndex = addNewDataLabel( currLabel );
+			}
+			
+			Pair<String, Integer> pair = new Pair<String, Integer>( currLabel, currIndex);
+			relations.add( pair );
+		}
+		
+		return relations;
+	}
+
+	private int addNewDataLabel(String label) {
+		//Register a new relationship within this tab
+		mLabelToRow.put(label, mNextLabelIndex);
+		
+		//Paint the new label at the bottom of the label table
+		mLabelTable.appendText(label);
+		
+		//Add empty spaces to all other data tables
+		for( DataTable t : mDataTables)
+			t.addEmptyRow();
+		
+		return mNextLabelIndex++;
+	}
+
+	//A button that removes all results from a perticular run
 	private Button getClearButton(VBox vbox, int numberOfClusters) {
 		Button button = new Button("X");
 		button.setMaxSize(5, 5);		
 		button.setFont( new Font(4) );
 		
-		GridPane.setConstraints(button, numberOfClusters - 1, 0, 1, 1, HPos.RIGHT, VPos.CENTER, Priority.NEVER, Priority.NEVER);
+		//Locate the button in the top right corner of the grid
+		GridPane.setConstraints(button, numberOfClusters - 1, 0, 1, 1, HPos.RIGHT, VPos.TOP, Priority.NEVER, Priority.NEVER);
 		
 		button.setOnAction( (ae) -> vbox.getChildren().clear() );
 		
 		return button;
 	}
 
-	/**Fetches the row indices for the entries data labels
+	/**Creates the basic layout, with the left label grid and the similar
 	 * 
-	 * @param labels The name of the fields for which we are searching indices
-	 * @return
 	 */
-	private int[] getLabelIndices(String[] labels) {
-		int[] indices = new int[ labels.length ];
-		Integer index = null;
+	private void createBaseLayout() {
+		mLabelTable = new DataTable(" ", " ");	//We want the extra spacing that having a heading gives, to keep in line with the data labels
+		wrap_pane.getChildren().add(mLabelTable);
 		
-		for( int i = 0; i < labels.length; i++ ){
-			index = label_to_row.get( labels[i] );
-			if( index == null ){
-				index = addLabel( labels[i] );	
-			}	
-			indices[i] = index;
-		}
+		wrap_pane.setMinWidth(1);
+		wrap_pane.getChildren().add( new Separator(Orientation.VERTICAL) );
 		
-		return indices;
+		first = false;
 	}
 	
-	/**Creates the data labels, that can be painted into the HBOX
+	/**Creates labels with the squared error sums for the different clusters, as well as creates one total squared error, which is the sum
+	 * of the squared error from the different clusters
 	 * 
-	 * @param r The result data
-	 * @param labelIndices The index-array that we got from {@link TableTabController.getLabelIndices }
+	 * @param r
 	 * @return
 	 */
-	private ArrayList<Label> getDataLabels(Results r, int[] labelIndices) {
-		ArrayList<Label> dataLabels = new ArrayList<>();
-		
-		//First we add all the data labels
-		for( int col = 0; col < r.numberOfClusters(); col++ ){
-			double[] data = r.getCentoid(col);
-			for( int row = 0; row < data.length; row++ ){
-				dataLabels.add( getDataCell(labelIndices[row], col, data[row] ) );
-			}
-		}
-		
-		Arrays.sort(labelIndices);
-		//Then, we add empty labels for those rows that does not contain data
-		int row = 0, index = 0;
-		while( row < mNextLabelRow ){
-			if( index < labelIndices.length && labelIndices[index] == row ){
-				index++;
-			}
-			else {
-				dataLabels.add( getEmptyRow(row) );
-			}
-			row++;
-		}
-		
-		return dataLabels;
-	}
-	
 	private ArrayList<Label> getSquaredErrors(Results r) {
 		ArrayList<Label> errorLabels = new ArrayList<>();
 		double[] errors = r.getSquaredErrors();
@@ -175,7 +200,7 @@ public class TableTabController extends _AbstractTableTab{
 		
 		for(int i = 0; i < errors.length; i++){
 			Label label = new Label( String.format("SSE Clu"+i+": %"+offset+".4f", errors[i]) );
-			skinDataLabel(label);
+			DataTable.skinDataLabel(label);
 			
 			totalErrors += errors[i];
 			
@@ -187,9 +212,9 @@ public class TableTabController extends _AbstractTableTab{
 		Label val   = new Label( String.format("%.4f", totalErrors) );
 		
 		total.setStyle("-fx-underline: true;");
-		skinDataLabel(blank);
-		skinDataLabel(total);
-		skinDataLabel(val);
+		DataTable.skinDataLabel(blank);
+		DataTable.skinDataLabel(total);
+		DataTable.skinDataLabel(val);
 
 		errorLabels.add(blank); errorLabels.add(total); errorLabels.add(val);
 		return errorLabels;
@@ -204,8 +229,8 @@ public class TableTabController extends _AbstractTableTab{
 		for( int i = 0; i < miscData.size(); i++){
 			Pair<String, Double> data = miscData.get(i);
 			
-			Label label = new Label(data.l +": " + data.r);
-			skinDataLabel(label);
+			Label label = new Label(data.left +": " + data.right);
+			DataTable.skinDataLabel(label);
 			
 			miscDataLabels.add(label);
 		}
@@ -217,139 +242,13 @@ public class TableTabController extends _AbstractTableTab{
 	/**************************************************************************************************************************/
 	/**************************************************************************************************************************/
 	
-	private void createBaseLayout(){
-		mLabelGrid = new GridPane();
-		mLabelGrid.setMinWidth( 50 );
-		mLabelGrid.setMaxWidth( 200 );
-		commonGridSetup( mLabelGrid, 1, HAS_NO_TEXT );		
-				
-		wrap_pane.getChildren().add(mLabelGrid);
-		first = false;
-	}
 	
-	private void commonGridSetup(GridPane grid, int columnsToSpan, boolean createText) {
-		setupGaps( grid );
-		grid.getChildren().add(    getMainHeader(columnsToSpan, createText) ); 
-		grid.getChildren().addAll( getSubHeaders(columnsToSpan, createText) ); 
-		grid.getChildren().add( getHorizontalSeparator(HORIZONTAL_SEPARATOR_ROW) );
-		grid.getChildren().add( getVerticalSeparator( columnsToSpan ) );
-		
-		grid.setGridLinesVisible(DEBUG_MODE);
-	}
-
-	private void setupGaps(GridPane grid) {
-		grid.setHgap(10);
-		grid.setVgap(2);
-	}
-	
-	private int addLabel(String field) {
-		Label label = new Label(field);
-		skinDataLabel(label);
-		
-		label.setPadding( new Insets(0,0,0,10));
-		GridPane.setConstraints(label, LABELS_COLUMN, mNextLabelRow + DATA_ROW_BEGINS, 1, 1, HPos.LEFT, VPos.CENTER, Priority.NEVER, Priority.NEVER);
-		
-		mLabelGrid.getChildren().add(label);
-		
-		label_to_row.put(field, mNextLabelRow);
-		
-		//Add blank spacing to already existing Grids. This'll move the misc-info downwards
-		for( GridPane pane : mPanes ){
-			pane.getChildren().add( getEmptyRow(mNextLabelRow) );
-		}
-		
-		return mNextLabelRow++;
-	}
-	
-	private Label getDataCell(int row, int column, double data){
-		String value = String.valueOf(data);
-		
-		//This logic checks if we can keep up to the desired number of decimals, or if that would move us outside the string array
-		int decimalPos = value.indexOf(".") + DECIMALS_KEPT + 1 ;
-		int substringPoint = decimalPos > value.length() ? value.length() : decimalPos;		
-		value = value.substring(0, substringPoint);
-		
-		Label n = new Label(value);
-		skinDataLabel(n);
-		
-		GridPane.setConstraints(n, column, row + DATA_ROW_BEGINS, 1, 1, HPos.CENTER, VPos.CENTER, Priority.NEVER, Priority.NEVER );
-		return n;
-	}
-	
-	private Label getEmptyRow(int row){
-		Label n = new Label(" ");
-		skinDataLabel(n);
-		GridPane.setConstraints(n, 0, row + DATA_ROW_BEGINS, GridPane.REMAINING, 1, HPos.CENTER, VPos.CENTER, Priority.NEVER, Priority.NEVER );
-		return n;
-	}
-
-	/**Creates the main header (i.e. the heading saying "Run X")
-	 * 
-	 * @param columnsToSpan How many sub headings will here be (indicates how many columns this heading has to span)
-	 * @return
-	 */
-	private Label getMainHeader(int columnsToSpan, boolean text) {
-		Label heading = new Label(text ? "Run "+ mNextRun++ : " ");
-		skinDataLabel(heading);
-		
-		GridPane.setConstraints(heading, 0, HEADER_ROW, columnsToSpan, 1, HPos.CENTER, VPos.CENTER, Priority.NEVER, Priority.NEVER, new Insets(8) );
-		return heading;
-	}
-
-	/**Creates the cluster headings (i.e. the headings saying "Cluster 1  Cluster 2  ...  Cluster n" )
-	 * 
-	 * @param columnsToSpan How many clusters were there, and how many sub headings do we have to create
-	 * @return
-	 */
-	private Label[] getSubHeaders(int amount, boolean text) {
-		Label[] subHeadings = new Label[amount];
-		
-		for( int i = 0; i < amount; i++){
-			subHeadings[i] = new Label(text ? "Cluster " + i : " ");
-			skinDataLabel(subHeadings[i]);
-			GridPane.setConstraints(subHeadings[i], i, CLUSTER_NAME_ROW, 1, 1, HPos.CENTER, VPos.CENTER, Priority.NEVER, Priority.NEVER, new Insets(3) );
-		}
-		return subHeadings;
-	}
-
-	/**Creates a horizontal separator, spanning all available columns
-	 * 
-	 * @param row Which row should the separator be added to
-	 * @return
-	 */
-	private Separator getHorizontalSeparator(int row) {
-		Separator separator = new Separator();	
-		GridPane.setConstraints(separator, 0, row, GridPane.REMAINING,  1, HPos.LEFT, VPos.CENTER, Priority.NEVER, Priority.NEVER, new Insets(3, 0, 3, 0) );
-		return separator;
-	}
-	
-	/**Creates a vertical separator, spanning all available rows
-	 * 
-	 * @param column Which column should the separator be added to
-	 * @return
-	 */
-	private Separator getVerticalSeparator(int column){
-		Separator separator = new Separator( Orientation.VERTICAL );
-		GridPane.setConstraints(separator, column, 0, 1,  GridPane.REMAINING, HPos.LEFT, VPos.TOP, Priority.NEVER, Priority.NEVER, new Insets(0, 5, 0, 5) );
-		return separator;
-	}
-	
-	private void skinDataLabel(Label label){
-		label.getStyleClass().add(DATA_LABEL);
-		GridPane.setColumnSpan(label, GridPane.REMAINING);
-		GridPane.setHgrow(label, Priority.NEVER);
-		GridPane.setVgrow(label, Priority.NEVER);
-		GridPane.setHalignment(label, HPos.CENTER);
-	}
 
 	static int idx = 1;
 	@Override
 	protected void DEBUG_paintThisTab(int i) {
 		if( first )
 			createBaseLayout();
-		
-		GridPane g = new GridPane();
-		commonGridSetup(g, idx++, true);
-		wrap_pane.getChildren().add(g);
+		addNewDataLabel("HEJ");
 	}
 }

@@ -3,6 +3,7 @@ package com.cluit.util.dataTypes;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import com.cluit.util.methods.MiscUtils;
 import com.cluit.util.structures.Pair;
 
 public class Results {
@@ -10,10 +11,17 @@ public class Results {
 	private Data  mInputData;
 	private HashMap<String, Double> mMiscData;
 	
+	private Entry[]  centoidCache = null;
+	private double[] squaredErrorCache = null;
+	
 	public Results(Data inputData, Space resultSpace, HashMap<String, Double> misc){
 		mResultSpace =  resultSpace;
 		mInputData = inputData;
 		mMiscData = misc;
+		
+		
+		calculateCentoidCache();
+		calculateSquaredErrorCache();
 	}
 
 	public int numberOfClusters() {
@@ -24,15 +32,46 @@ public class Results {
 		return mInputData.getLabels();
 	}
 
-	public double[] getCentoid(int cluster){
-		mResultSpace.updateCentoids();
-		return mResultSpace.clusterCentoid(cluster).getCoordinates();
+	public boolean hasReferenceData(){
+		return mInputData.hasReferenceData();
 	}
+	
+	public int referenceDataAmount(){
+		return mInputData.getReferenceLabels().length;
+	}
+	
+	public String[] getReferenceLabels(){
+		return mInputData.getReferenceLabels();
+	}
+	
+	public double[][] getReferenceDataMeans(){
+		double[][] out = new double[ mResultSpace.getNumberOfClusters()][ referenceDataAmount() ];	
+		
+		for(int i = 0; i < mResultSpace.getNumberOfClusters(); i++){ 
+			int[] entryIDs = getEntryIDsFromCluster(i);
+			
+			for(int j = 0; j < referenceDataAmount(); j++ ){
+				
+				for(int id : entryIDs){
+					out[i][j] += mInputData.getReferenceData()[j][id];
+				}
+				
+				out[i][j] /= entryIDs.length;
+				
+			}
+		}
+		return out;
+	}	
+	
 	
 	public boolean hasMiscData(){
 		return mMiscData.size() > 0;
 	}
 	
+	/**Fetches a collection of String - Double pairs. These pairs are set by the user within JS files
+	 * 
+	 * @return
+	 */
 	public ArrayList<Pair<String, Double>> getMiscData(){
 		ArrayList<Pair<String, Double>> out = new ArrayList<Pair<String, Double>>();
 		
@@ -42,13 +81,88 @@ public class Results {
 		return out;
 	}
 	
+	/**Fetches the centoid for a given cluster
+	 * 
+	 * @param cluster
+	 * @return
+	 */
+	public double[] getCentoid(int cluster){
+		return centoidCache[cluster].getCoordinates();
+	}
+	
+	/**Fetches the squared error for a given cluster
+	 * 
+	 * @param cluster
+	 * @return
+	 */
+	public double getSquaredError(int cluster){
+		return squaredErrorCache[cluster];
+	}
+	
+	/**Fetches the squared errors for all clusters
+	 * 
+	 * @return An ordered array of doubles, where element i represents the squared error for cluster i
+	 */
 	public double[] getSquaredErrors(){
-		double[] out = new double[ mResultSpace.getNumberOfClusters() ];
+		return squaredErrorCache;
+	}
+	
+	public double[][] getInputData(){
+		return mInputData.getData();
+	}
+	
+	public double[][] getReferenceData(){
+		return mInputData.getReferenceData();
+	}
+	//*******************************************************************************************************
+	//region								PRIVATE			
+	//*******************************************************************************************************
+
+	/* Since there is a chance that the result space is normalized, we have to "denormalize" all the data from the result space.
+	 * 
+	 * Therefore, this class does a lot of calculations by extracting entry membership from the Space, and then fetching the
+	 * original entries from the Data and performs calculations of those original entries.
+	 * 
+	 * Several of the calculated values are cached, since they might be used several times (and they are relatively small) 
+	 */	
+	private void calculateCentoidCache() {
+		centoidCache = new Entry[ mResultSpace.getNumberOfClusters() ];
+		for( int i = 0; i < mResultSpace.getNumberOfClusters(); i++){	
+			Entry[] unnormalizedEntries = getUnnormalizedEntries(i);
+			centoidCache[i] = Cluster.calculateCentoid( unnormalizedEntries );
+		}		
+	}
+	
+	private void calculateSquaredErrorCache() {
+		squaredErrorCache = new double[ mResultSpace.getNumberOfClusters() ];		
+		for( int i = 0; i < mResultSpace.getNumberOfClusters(); i++ ){
+			Entry[] unnormalizedEntries = getUnnormalizedEntries(i);
+			squaredErrorCache [i] = Cluster.calculateSquaredError(centoidCache[i], unnormalizedEntries);
+		}
+	}
+	
+	private Entry[] getUnnormalizedEntries(int fromCluster){
+		int[] clusterIDs = getEntryIDsFromCluster(fromCluster);
 		
-		for( int i = 0; i < out.length; i++ ){
-			out [i] = mResultSpace.getSquaredError(i);
+		double[][] coords = new double[ clusterIDs.length ][ mResultSpace.getDimensions() ];
+		for(int j = 0; j < coords.length; j++){
+			coords[j] = mInputData.getEntry( clusterIDs[j] );
+		}			
+		return MiscUtils.entriesFromFeatureMatrix(coords);
+	}
+	
+	private int[] getEntryIDsFromCluster(int cluster){
+		Entry[] entries = mResultSpace.getEntriesInCluster(cluster);
+		int[] out = new int[ entries.length ];
+		
+		for(int i = 0; i < out.length; i++){
+			out[i] = entries[i].getID();
 		}
 		
 		return out;
 	}
+
+	//endregion *********************************************************************************************
+	//*******************************************************************************************************
+
 }

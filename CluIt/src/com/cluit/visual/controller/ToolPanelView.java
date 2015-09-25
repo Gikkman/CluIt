@@ -92,6 +92,7 @@ public class ToolPanelView implements Initializable{
 	private static int idx = 0;
 	@FXML protected void test(ActionEvent e){
 		System.out.println("ToolPanelView Test " + idx++);
+		VariableSingleton.getInstance().setResults(null);
 	}
 
 }

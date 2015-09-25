@@ -10,7 +10,10 @@ import com.cluit.util.AoP.VariableSingleton;
 import com.cluit.util.dataTypes.Results;
 
 public abstract class _AbstractTableTab implements Initializable{
+	private static int DEBUG_INT = 0;
+	
 	protected final String tabID;
+	
 	
 	public _AbstractTableTab() {
 		tabID = getTabID();
@@ -22,13 +25,12 @@ public abstract class _AbstractTableTab implements Initializable{
 	}
 	
 	private void backgroundPaint(Object args){
-		if( args instanceof Results ){
+		if( args != null && args instanceof Results ){
 			Results r = (Results) args;
 			Platform.runLater( () -> paintThisTab(r) );			
 		}
-		else{
-			int i = (int) args;
-			Platform.runLater( () -> DEBUG_paintThisTab(i) );		
+		else{			
+			Platform.runLater( () -> DEBUG_paintThisTab(DEBUG_INT++) );		
 		}
 	}
 	

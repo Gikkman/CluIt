@@ -23,8 +23,7 @@ public class Data {
 		mReferenceData = referenceData;
 	}
 	
-	public String[]   getLabels(){ return mLabels; }
-	public double[][] getData()  { return mData;   }
+	
 	
 	public String[] getReferenceLabels(){ return mReferenceLabels; }
 	public double[][] getReferenceData(){ return mReferenceData; }
@@ -33,9 +32,12 @@ public class Data {
 		return mData.length;
 	}
 	
-	public double[] getEntryData(int entry){
+	public double[] getEntry(int entry){
 		return mData[ entry ];
 	}
+	
+	public String[]   getLabels(){ return mLabels; }
+	public double[][] getData()  { return mData;   }
 	
 	public double[][] getNormalizedData() {
 		/* The data is sorted in feature vectors (each row represents an item, each culumn a feature in the items)

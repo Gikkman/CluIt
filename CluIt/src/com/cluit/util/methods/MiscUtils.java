@@ -90,4 +90,22 @@ public class MiscUtils {
 		}
 		img.write();
 	}
+	
+	public static String doubleArray(int ... in){
+		String out = "[ ";
+		for(int d : in){
+			out+= (d+" , ");
+		}
+		//Magic number 2 stems from the wish to remove the ", " from the end of the string.
+		//If the for-loop was never entered however, out.lenght == 2. In that case, we do nothing 
+		out = out.substring(0, out.length()-2 > 0 ? out.length()-2 : 2); 
+		return out + "]";
+	}
+	
+	public static Double[] boxDoubleArray(double ... in){
+		Double[] out = new Double[in.length];
+		for(int i = 0; i < in.length; i++)
+			out[i] = in[i];
+		return out;
+	}
 }

@@ -173,7 +173,7 @@ public class ClusteringEngine extends Thread {
 		}
 		
 		for(int i = 0; i < entries.length; i++){
-			entries[i] = new Entry(i, mDataCache.getEntryData(entries[i].getID()));
+			entries[i] = new Entry(i, mDataCache.getEntry(entries[i].getID()));
 		}
 		
 		if( entries[0].getDimensions() == 2)

@@ -153,16 +153,16 @@ public class Space {
 			c.calculateCentoid();
 	}
 	
-	public Entry clusterCentoid(int cluster) {
+	public final Entry clusterCentoid(int cluster) {
 		return cluster_to_id.inverse().get(cluster).getCentoid();
 	}
 	
-	public Entry[] getFreeEntries(){ return free_entrys.toArray( new Entry[0] ); }
-	public Entry[] getAllEntries(){  return entry_to_id.keySet().toArray( new Entry[0] ); }
-	public Entry[] getClusteredEntries(){ return entry_to_cluster.keySet().toArray( new Entry[0] ); }
+	public final Entry[] getFreeEntries(){ return free_entrys.toArray( new Entry[0] ); }
+	public final Entry[] getAllEntries(){  return entry_to_id.keySet().toArray( new Entry[0] ); }
+	public final Entry[] getClusteredEntries(){ return entry_to_cluster.keySet().toArray( new Entry[0] ); }
 	
-	public Entry[] getEntriesInCluster(int cluster){ return cluster_to_id.inverse().get(cluster).getMembers(); }
-	public Entry getCentoid(int cluster){ return cluster_to_id.inverse().get(cluster).getCentoid(); }
+	public final Entry[] getEntriesInCluster(int cluster){ return cluster_to_id.inverse().get(cluster).getMembers(); }
+	public final Entry getCentoid(int cluster){ return cluster_to_id.inverse().get(cluster).getCentoid(); }
 	
 	public double getSquaredError(int cluster){ return cluster_to_id.inverse().get(cluster).getSquaredError(); }
 	

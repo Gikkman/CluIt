@@ -91,7 +91,7 @@ public class FileReader_Excel {
 				}
 				for( x = 0; x < cols; x++){
 					val = getCellValue( row.getCell(x) );
-					data.get(x).r[y-1-firstRow] = val;
+					data.get(x).right[y-1-firstRow] = val;
 				}			
 			}
 		} catch ( IOException e){
@@ -151,7 +151,7 @@ public class FileReader_Excel {
 	public String[] getLabels(){
 		String[] out = new String[mData.size()];
 		for(int i = 0; i < mData.size(); i++){
-			out[i] = mData.get(i).l.replace("\n", " ");
+			out[i] = mData.get(i).left.replace("\n", " ");
 		}
 		return out;
 	}
@@ -213,7 +213,7 @@ public class FileReader_Excel {
 		//Each element in mData corresponst to one row. 
 		//Since we already know that all rows are of the same lenght, we simply fetch the lenght of row 0
 		int cols = mData.size();
-		int rows = mData.get(0).r.length;
+		int rows = mData.get(0).right.length;
 		
 		//To create feature vectors, we have to create rows of doubles out of the columns in mData
 		Object[][] out = new Object[rows - rowFilter.length][cols - colFilter.length];
@@ -231,7 +231,7 @@ public class FileReader_Excel {
 					continue;
 				}
 				
-				val = mData.get(x).r[y];
+				val = mData.get(x).right[y];
 				out[y-rowFilterIndex][x-colFilterIndex] = val;
 			}
 		}
@@ -247,7 +247,7 @@ public class FileReader_Excel {
 		//Each element in mData corresponst to one row. 
 		//Since we already know that all rows are of the same lenght, we simply fetch the lenght of row 0
 		int cols = mData.size();
-		int rows = mData.get(0).r.length;
+		int rows = mData.get(0).right.length;
 		
 		//To create feature vectors, we have to create rows of doubles out of the columns in mData
 		double[][] out = new double[rows - rowFilter.length][cols - colFilter.length];
@@ -268,7 +268,7 @@ public class FileReader_Excel {
 					continue;
 				}
 				try{
-					Object obj = mData.get(x).r[y];
+					Object obj = mData.get(x).right[y];
 					
 					if( obj.equals( "" ) ) //If the data in excel was NULL, it comes out as "". In that case, we interpret it as 0
 						val = 0;	
@@ -277,7 +277,7 @@ public class FileReader_Excel {
 
 				} catch(ClassCastException e){
 					@SuppressWarnings("unused")
-					Object obj = mData.get(x).r[y];
+					Object obj = mData.get(x).right[y];
 					throw new ClassCastException("Cannot convert the value in row "+(y+2)+" column "+(x+1)+" to a double. Please check your data block");
 				}
 				out[y-rowFilterIndex][x-colFilterIndex] = val;

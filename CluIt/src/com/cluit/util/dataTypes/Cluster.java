@@ -10,15 +10,20 @@ import com.cluit.util.methods.ClusteringUtils;
 import com.cluit.util.structures.KeyPriorityQueue_Max;
 import com.cluit.util.structures.Pair;
 
-public class Cluster {
-	
-	
+public class Cluster {	
+	//*******************************************************************************************************
+	//region								VARIABLES		
+	//*******************************************************************************************************
 	private Entry centoid;
 	public Pair<Double, Entry> cache = new Pair<Double, Entry>( 0.0, new Entry() );
 	
 	private final int dimensions;
 	private final Set<Entry> members   = new HashSet<>();
 	private final KeyPriorityQueue_Max<Entry> distanceQueue = new KeyPriorityQueue_Max<Entry>();
+	
+	//endregion *********************************************************************************************
+	//region								CUNSTRUCTOR		
+	//*******************************************************************************************************
 	/**
 	 * 
 	 * @param position
@@ -32,6 +37,57 @@ public class Cluster {
 		this.dimensions = centoid.getDimensions();
 	};
 	
+	//endregion *********************************************************************************************
+	//region								STATIC METHODS	
+	//*******************************************************************************************************
+	
+	/**Calculates a central point (centoid) from a collection of entries. Not that all entries must have the same dimensionality.
+	 * 
+	 * @param entries
+	 * @return A new entry, with a position that is the mean of all parameter entries (NULL if entries.lenght == 0)
+	 */
+	public static Entry calculateCentoid(Entry[] entries){
+		if( entries.length == 0)
+			return null;
+		
+		//Fetch dimensionality for the entries and set up the coordinate array
+		int dim = entries[0].getDimensions();
+		double[] centoidCoordinates = new double[dim];
+		
+		//Add all entries positions together (for example, add all entries x-values together in one array slot, 
+		//and all y-values together in the next array slot).
+		for( Entry p : entries ){
+			for( int i = 0; i < p.getDimensions(); i++ )
+				centoidCoordinates[i] += p.getCoordinateAt(i);
+		}
+		
+		//Divide each position by the number of entries (to get the mean of each dimension's position
+		for( int i = 0; i < centoidCoordinates.length; i++)
+			centoidCoordinates[i] /= entries.length;
+		
+		return new Entry(centoidCoordinates);
+	}	
+	
+	/**Calculates the sum of squared errors for a given set of entries, given a centoid.<br>
+	 * The calculation is simply: For each point, calculate the euclidian distance from that point to the centoid, and square the distance
+	 * 
+	 * @param centoid The mean position of the entries (see @link {@link Cluster.calculateCentoid} )
+	 * @param entries
+	 * @return
+	 */
+	public static double calculateSquaredError(Entry centoid, Entry[] entries){
+		double out = 0;
+		double dist = 0;
+		for(Entry e : entries ){
+			dist = ClusteringUtils.eucDistance(centoid, e);
+			out += (dist);
+		}
+		return out;
+	}
+	
+	//endregion *********************************************************************************************
+	//region								PUBLIC			
+	//*******************************************************************************************************
 	public int getNumberOfMembers(){
 		return distanceQueue.size() == members.size() ? distanceQueue.size() : -1;
 	}
@@ -93,8 +149,8 @@ public class Cluster {
 			return false;
 		}
 		double dist;
-		if( e == cache.r )
-			dist = cache.l;
+		if( e == cache.right )
+			dist = cache.left;
 		else
 			dist = ClusteringUtils.eucDistance(e, centoid);
 		boolean a = distanceQueue.put(dist, e);
@@ -137,12 +193,20 @@ public class Cluster {
 	public boolean isMember(Entry e) {
 		return members.contains(e);
 	}
-
+	
 	/**Fetches an array of all entries that are present within this cluster. This array can have a lenght of 0, in case no
 	 * entries are registered within this cluster
 	 */
 	public Entry[] getMembers() {
 		return members.toArray( new Entry[0] );
+	}
+	
+	/**Calculates the sum of squared errors for this cluster
+	 * 
+	 * @return
+	 */
+	public double getSquaredError(){
+		return Cluster.calculateSquaredError(centoid, getMembers())	;	
 	}
 	
 	public String toString(){
@@ -152,21 +216,10 @@ public class Cluster {
 		}
 		return members.size() > 0 ? out.substring(0, out.length() - 3) + " ]" : "[ ]";
 	}
-	
-	/**Calculates the sum of squared errors for this cluster
-	 * 
-	 * @return
-	 */
-	public double getSquaredError(){
-		double out = 0;
-		double dist = 0;
-		for(Entry e : members ){
-			dist = ClusteringUtils.eucDistance(centoid, e);
-			out += (dist*dist);
-		}
-		return out;			
-	}
-	
+
+	//endregion *********************************************************************************************
+	//region								PRIVATE			
+	//*******************************************************************************************************
 	/**Update each member's distance to the centoid
 	 * 
 	 */
@@ -179,9 +232,10 @@ public class Cluster {
 			distanceQueue.add(newDistance, p);
 		}
 	}
-	
 	private int API_Exeption(String s){
 		MethodMapper.invoke(Const.METHOD_EXCEPTION_GENERAL, "Error in Cluster.java! " + s +" " + com.cluit.util.methods.MiscUtils.getStackPos(), new Exception() );
 		return -1;
 	}
+	//endregion *********************************************************************************************
+	//*******************************************************************************************************
 }
