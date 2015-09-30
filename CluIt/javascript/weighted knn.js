@@ -28,7 +28,7 @@ var calculate = function() {
 var addClusters = function() {
 	for( var i = 0; i < numberOfClusters; i++ ){
 		var e = entries[ getCursor() ];
-		var cluster = API.addCluster( e.getAllEntries() );
+		var cluster = API.addCluster( e.getCoordinates() );
 		API.addEntryToCluster(e, cluster);		
 	}
 }
@@ -104,12 +104,10 @@ var castVotes = function(e, voters) {
 	var draw = false;
 	var ballot = new Array( numberOfClusters+1 ).join('0').split('').map(parseFloat)
 	var totalDist = 0;
-	print(voters +" E: "+e);
 	//Calculate total distance to all voters. Will be used for weighting their votes
 	for each( var voter in voters ){
 		totalDist += API.getDistance(e, voter);
 	}
-	print(totalDist);
 	//Each voter casts a vote for his cluster
 	for each (var voter in voters){
 		var cluster = API.getEntryMembership(voter);

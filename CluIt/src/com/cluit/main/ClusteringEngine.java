@@ -16,12 +16,13 @@ import com.cluit.util.AoP.MethodMapper;
 import com.cluit.util.AoP.VariableSingleton;
 import com.cluit.util.dataTypes.Data;
 import com.cluit.util.dataTypes.Entry;
+import com.cluit.util.dataTypes.ExperimentBundle;
 import com.cluit.util.dataTypes.Results;
 import com.cluit.util.dataTypes.Space;
 import com.cluit.util.methods.MiscUtils;
 
 public class ClusteringEngine extends Thread {
-	public static enum Message {INIT_MESSAGE, CLUSTER_MESSAGE, TERMINATE_MESSAGE };
+	public static enum Message {INIT_MESSAGE, RUNQUEUE_MESSAGE, ENQUEUE_MESSAGE, CLUSTER_MESSAGE, TERMINATE_MESSAGE };
 	
 	private final BlockingQueue<Message> mQueue = new LinkedBlockingQueue<>();
 	
@@ -69,6 +70,13 @@ public class ClusteringEngine extends Thread {
 		case TERMINATE_MESSAGE:
 			doTerminate();
 			break;
+		case ENQUEUE_MESSAGE:
+			doEnqueueExperiment();
+			break;
+		case RUNQUEUE_MESSAGE:
+			doRunQueue();
+			MethodMapper.invoke(Const.METHOD_DONE_BUTTON_REACTIVATE);
+			break;
 		}
 	}
 
@@ -87,42 +95,28 @@ public class ClusteringEngine extends Thread {
 	}
 	
 	private void doCluster(){	
-		//Error handling, make sure that the JS file is intact
-		if( !mJsFile.exists() || !mJsFile.isFile() ){
-			MethodMapper.invoke(Const.METHOD_EXCEPTION_JS, "The Javascript file "+mJsFile+" could not be evaluated!" + new IOException() );
+		ExperimentBundle bundle = getExperimentBundle();
+		if(bundle == null)
 			return;
-		}
-		if( mJsFile.lastModified() != mJsFileEditedDate )
-			doInit();
 		
-		//Fetch the data that should have been imported. First, check if something exists, then cast it to Data
-		mDataCache = VariableSingleton.getInstance().getData();
-		if( mDataCache == null ){
-			MethodMapper.invoke(Const.METHOD_INFORMATION_EXCEL, "Data from an Excel file must be loaded before clustering can be performed.\nThe Import view can be found under Show -> Excel Import");
-			return;
-		}
-		
-		//Normalize data (if the user wishes it)
-		double[][] calcData = null;
-		if( VariableSingleton.getInstance().getBool( Const.V_KEY_CHECKBOX_NORMALIZE) ){
-			calcData = mDataCache.getNormalizedData();
-		} else {
-			calcData = mDataCache.getData();
-		}
-		
-		//Create the space, store the space reference for the API and the data reference for the result
-		Entry[] entries = MiscUtils.entriesFromFeatureMatrix( calcData );
-		int dimensions = entries[0].getDimensions();	
-		
-		VariableSingleton.getInstance().setSpace( Space.create(dimensions, entries) );
-				
-		//Create methods that'll be called upon algorithm step and finish
-		MethodMapper.addMethod(Const.METHOD_JS_SCRIPT_STEP,   (args) -> clusteringStep(args) );
-		MethodMapper.addMethod(Const.METHOD_JS_SCRIPT_FINISH,(args) -> clusteringFinished(args) );
-		
-		mJavascriptEngine.performClustering();
+		performClustering(bundle);
 	}
 
+	private void doEnqueueExperiment(){
+		ExperimentBundle bundle = getExperimentBundle();
+		if( bundle == null )
+			return;
+		
+		VariableSingleton.getInstance().enqueueExperiment(bundle);
+	}
+	
+	private void doRunQueue(){
+		VariableSingleton singleton = VariableSingleton.getInstance();
+		while( singleton.getExperimentQueueSize() > 0){
+			ExperimentBundle bundle = singleton.pollNextExperimentBundle();
+			performClustering(bundle);
+		}
+	}
 
 	private void doTerminate(){
 		mIsAlive = false;
@@ -158,7 +152,61 @@ public class ClusteringEngine extends Thread {
 	}
 	
 	////////////////////////////////////////////////////////////////////////////////////
-	//									PAINTING
+	//								COLLECT EXPERIMENT BUNDLE
+	////////////////////////////////////////////////////////////////////////////////////
+	private ExperimentBundle getExperimentBundle(){
+		//Error handling, make sure that the JS file is intact
+		if( !mJsFile.exists() || !mJsFile.isFile() ){
+			MethodMapper.invoke(Const.METHOD_EXCEPTION_JS, "The Javascript file "+mJsFile+" could not be evaluated!" + new IOException() );
+			return null;
+		}
+		if( mJsFile.lastModified() != mJsFileEditedDate )
+			doInit();
+		
+		//Fetch the data that should have been imported and check if something exists and that it is valid
+		mDataCache = VariableSingleton.getInstance().getData();
+		if( mDataCache == null || mDataCache.getLabels().length == 0 ){
+			MethodMapper.invoke(Const.METHOD_INFORMATION_EXCEL, "Data from an Excel file must be loaded before clustering can be performed.\nThe Import view can be found under Show -> Excel Import\n\nAnother error might be that no features was chosen for import. Make sure that at least 1 element in the CLUSTER row is selected");
+			return null;
+		}		
+		//Normalize data (if the user wishes it)
+		double[][] calcData = null;
+		if( VariableSingleton.getInstance().getBool( Const.V_KEY_CHECKBOX_NORMALIZE) ){
+			calcData = mDataCache.getNormalizedData();
+		} else {
+			calcData = mDataCache.getData();
+		}
+		
+		//Create the calculation space
+		Entry[] entries = MiscUtils.entriesFromFeatureMatrix( calcData );
+		int dimensions = entries[0].getDimensions();	
+		Space space = Space.create(dimensions, entries);
+		
+		//Lastly, create the experiment bundle object and enqueue it
+		ExperimentBundle bundle = ExperimentBundle.create()
+									.setData(mDataCache)
+									.setJavascriptFile(mJsFile)
+									.setSpace(space)
+									.setUserDefinedData( VariableSingleton.getInstance().getUserDefinedMap() )
+									.setNumberOfClusters( VariableSingleton.getInstance().getInt( Const.V_KEY_SPINNER_NUMBER_OF_CLUSTERS ) );
+		return bundle;
+	}
+	
+
+	private void performClustering(ExperimentBundle bundle) {
+		mDataCache = bundle.getData();
+		//Create methods that'll be called upon algorithm step and finish
+		MethodMapper.addMethod(Const.METHOD_JS_SCRIPT_STEP,   (args) -> clusteringStep(args) );
+		MethodMapper.addMethod(Const.METHOD_JS_SCRIPT_FINISH,(args) -> clusteringFinished(args) );
+		
+		//Add the experiment bundle to the FRONT of the experiment queue (So it'll be the first one to be performed)
+		VariableSingleton.getInstance().enqueueExperiment_FRONT(bundle);
+		
+		mJavascriptEngine.performClustering();
+	}
+		
+	////////////////////////////////////////////////////////////////////////////////////
+	//region								PAINTING
 	////////////////////////////////////////////////////////////////////////////////////
 	private void paintBmp(Space space) {
 		Entry[] entries = space.getAllEntries();
@@ -187,4 +235,7 @@ public class ClusteringEngine extends Thread {
 			e.printStackTrace();
 		}
 	}
+	
+	//endregion
+	////////////////////////////////////////////////////////////////////////////////////
 }

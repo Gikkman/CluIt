@@ -2,23 +2,19 @@ package com.cluit.visual.application.view.tabs;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.geometry.HPos;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
-import javafx.geometry.VPos;
 import javafx.scene.Group;
 import javafx.scene.Node;
-import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.Separator;
-import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
-import javafx.scene.text.Font;
 
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.ResourceBundle;
 
@@ -28,25 +24,48 @@ import com.cluit.visual.widget.DataTable;
 
 public class TableTabController extends _AbstractTableTab{	
 	@FXML Group group;
-	HBox wrap_pane;
 	
-	private final HashMap<String, Integer> mLabelToRow    = new HashMap<>();
+	HBox wrap_pane;
+	VBox label_box;
+	
+	
+	private final HashMap<String, Integer> mDataLabelToRow = new HashMap<>();
+	private final HashMap<String, Integer> mRefLabelToRow  = new HashMap<>();
 	private final ArrayList< DataTable >   mDataTables    = new ArrayList<>();
 	private final ArrayList< DataTable >   mRefDataTables = new ArrayList<>();
 	
 	private boolean   first = true;
 	private DataTable mLabelTable;
+	private DataTable mRefLabelTable;
+	
 	private int 	  mNextLabelIndex = 0; 	
+	private int 	  mNextRefLabelIndex = 0;
 	private int 	  mNextRun = 1;
 
 	@FXML protected void clear_tab(ActionEvent ae){
 		group.getChildren().clear();
-		wrap_pane = new HBox();
-		group.getChildren().add(wrap_pane);
 		
-		mLabelToRow.clear();
+		wrap_pane.getChildren().clear();
+		label_box.getChildren().clear();
+		
+		wrap_pane = new HBox();
+		label_box = new VBox();
+		
+		group.getChildren().add(wrap_pane);
+		group.getChildren().add(label_box);
+		
+		mDataLabelToRow.clear();
+		mRefLabelToRow.clear();
+		
+		mDataTables.clear();
+		mRefDataTables.clear();
+		
 		mNextLabelIndex = 0;
+		mNextRefLabelIndex = 0;
 		mNextRun = 1;
+		
+		mLabelTable = null;
+		mRefLabelTable = null;
 		
 		first = true;
 	}
@@ -56,7 +75,6 @@ public class TableTabController extends _AbstractTableTab{
 		super.initialize(location, resources);
 		wrap_pane = new HBox();
 		group.getChildren().add(wrap_pane);
-
 	}
 
 	@Override
@@ -70,25 +88,34 @@ public class TableTabController extends _AbstractTableTab{
 			createBaseLayout();
 		
 		//This VBox encloses the entire result group, with the grid and the labels and buttons and such
+		HBox hbox = new HBox();
 		VBox vbox = new VBox();
 		vbox.setAlignment( Pos.TOP_CENTER );
+		hbox.getChildren().add(vbox);
+		hbox.getChildren().add( new Separator(Orientation.VERTICAL) );
 		
-		vbox.getChildren().add( getDataTable( r ) );
+		vbox.getChildren().add( getDataTable( r, hbox ) );
 		
 		//The reference part contains the mean values of reference variables related to a certain cluster
+		if( r.hasReferenceData() )
+			vbox.getChildren().add( getReferenceTable( r ) );
 		
+		//Create an empty space, to get some spacing
+		vbox.getChildren().add( new Label(" "));
 				
 		//Misc data is the user designated data, assigned from a JS file
 		if( r.hasMiscData() )
 			vbox.getChildren().addAll( getMiscDataLabels(r) );
+		
 		vbox.getChildren().addAll( getSquaredErrors(r) );
 		
 		//The wrap pane is the basis for the tab.
 		//We also keep a collection of all grids, so we can extend it later on if new variables are added (and we need to move the misc data down)
-		wrap_pane.getChildren().add(vbox);
+		wrap_pane.getChildren().add(hbox);
+		
 	}
-
-	private Node getDataTable(Results r) {
+	
+	private Node getDataTable(Results r, Pane pane) {
 		//The grid part contains the cluster's centoid data, as well as the "X" button
 		String[] subH = new String[  r.numberOfClusters() ];
 		for(int i = 0; i < subH.length; i++)
@@ -99,7 +126,8 @@ public class TableTabController extends _AbstractTableTab{
 		//Fetch the labels. Inform the data table of the label-row relationships
 		String[] labels = r.getLabels();
 		dataTable.setLabelRowRelationship( getLabelRowRelationship( labels ) );
-		dataTable.setTotalLabelCount( mLabelToRow.size() );
+		dataTable.setTotalLabelCount( mDataLabelToRow.size() );
+		
 		//For each cluster, we create a list of Label - Data pairs, where the label denotes what feature we are looking at
 		//and the Data represents that clusters centoid for the current feature
 		for( int col = 0; col < r.numberOfClusters(); col++){
@@ -111,11 +139,62 @@ public class TableTabController extends _AbstractTableTab{
 				labelDataPairs.add(pair);
 			}
 			
-			dataTable.setColumnData(col, mLabelToRow.size(), labelDataPairs);
+			dataTable.setColumnData(col, mDataLabelToRow.size(), labelDataPairs);
 		}
+		
+		dataTable.addCloseButton(pane);
 		
 		mDataTables.add(dataTable);
 		return dataTable;
+	}
+	
+	private Node getReferenceTable(Results r) {
+		String[] subH = new String[  r.numberOfClusters() ];
+		for(int i = 0; i < subH.length; i++)
+			subH[i] = "Cluster " + i;
+		
+		DataTable refTable = new DataTable();
+		refTable.addHiddenClusterHeaders(subH);
+		
+		//Fetch the reference labels
+		String[] refLabels = r.getReferenceLabels();
+		refTable.setLabelRowRelationship( getReferenceRowRelationship( refLabels ) );
+		refTable.setTotalLabelCount( mRefLabelToRow.size() );
+		
+		//For each cluster, we add the reference data means as labels, and link that data to the corresponding label
+		double[][] refMeans = r.getReferenceDataMeans();
+		for( int col = 0; col < r.numberOfClusters(); col++){
+			ArrayList<Pair<String, String>> pairs = new ArrayList< Pair<String, String>>();
+			double[] thisCol = refMeans[col];
+			for(int j = 0; j < refLabels.length; j++){
+				Pair<String, String> pair = new Pair<String, String>(refLabels[j], String.valueOf(thisCol[j]) );
+				pairs.add(pair);
+			}
+			
+			refTable.setColumnData(col, mRefLabelToRow.size(), pairs);
+		}
+				
+		mRefDataTables.add(refTable);
+		return refTable;
+	}
+
+
+	private Collection<Pair<String, Integer>> getReferenceRowRelationship(String[] refLabels) {
+		ArrayList<Pair<String, Integer>> relations = new ArrayList<Pair<String, Integer>>();
+		
+		for( int i = 0; i < refLabels.length; i++){
+			String  currLabel = refLabels[i];
+			Integer currIndex = mRefLabelToRow.get(currLabel);
+			
+			if( currIndex == null ){
+				currIndex = addNewRefLabel( currLabel );
+			}
+			
+			Pair<String, Integer> pair = new Pair<String, Integer>( currLabel, currIndex);
+			relations.add( pair );
+		}
+		
+		return relations;
 	}
 
 	private ArrayList<Pair<String, Integer>> getLabelRowRelationship(String[] labels) {
@@ -123,7 +202,7 @@ public class TableTabController extends _AbstractTableTab{
 		
 		for( int i = 0; i < labels.length; i++){
 			String  currLabel = labels[i];
-			Integer currIndex = mLabelToRow.get(currLabel);
+			Integer currIndex = mDataLabelToRow.get(currLabel);
 			
 			if( currIndex == null ){
 				currIndex = addNewDataLabel( currLabel );
@@ -138,7 +217,7 @@ public class TableTabController extends _AbstractTableTab{
 
 	private int addNewDataLabel(String label) {
 		//Register a new relationship within this tab
-		mLabelToRow.put(label, mNextLabelIndex);
+		mDataLabelToRow.put(label, mNextLabelIndex);
 		
 		//Paint the new label at the bottom of the label table
 		mLabelTable.appendText(label);
@@ -149,34 +228,45 @@ public class TableTabController extends _AbstractTableTab{
 		
 		return mNextLabelIndex++;
 	}
-
-	//A button that removes all results from a perticular run
-	private Button getClearButton(VBox vbox, int numberOfClusters) {
-		Button button = new Button("X");
-		button.setMaxSize(5, 5);		
-		button.setFont( new Font(4) );
+	
+	private Integer addNewRefLabel(String currLabel) {
+		//Register a new relationship within this tab
+		mRefLabelToRow.put(currLabel, mNextRefLabelIndex);
 		
-		//Locate the button in the top right corner of the grid
-		GridPane.setConstraints(button, numberOfClusters - 1, 0, 1, 1, HPos.RIGHT, VPos.TOP, Priority.NEVER, Priority.NEVER);
+		//Paint the new label at the bottom of the reference label table
+		mRefLabelTable.appendText(currLabel);
 		
-		button.setOnAction( (ae) -> vbox.getChildren().clear() );
+		//Add empty spaces to all other ref data tables
+		for( DataTable t : mRefDataTables)
+			t.addEmptyRow();
 		
-		return button;
+		return mNextRefLabelIndex++;
 	}
 
 	/**Creates the basic layout, with the left label grid and the similar
 	 * 
 	 */
 	private void createBaseLayout() {
+		label_box = new VBox();
+		wrap_pane.getChildren().add(label_box);
+		
 		mLabelTable = new DataTable(" ", " ");	//We want the extra spacing that having a heading gives, to keep in line with the data labels
-		wrap_pane.getChildren().add(mLabelTable);
+		mRefLabelTable = new DataTable();
+		mRefLabelTable.addHiddenClusterHeaders(" ");
+		
+		label_box.getChildren().add(mLabelTable);
+		label_box.getChildren().add(mRefLabelTable);
 		
 		wrap_pane.setMinWidth(1);
-		wrap_pane.getChildren().add( new Separator(Orientation.VERTICAL) );
+		addVerticalSeparator();
 		
 		first = false;
 	}
 	
+	private void addVerticalSeparator() {
+		wrap_pane.getChildren().add( new Separator(Orientation.VERTICAL) );		
+	}
+
 	/**Creates labels with the squared error sums for the different clusters, as well as creates one total squared error, which is the sum
 	 * of the squared error from the different clusters
 	 * 

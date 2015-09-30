@@ -3,6 +3,7 @@ package com.cluit.visual.controller;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
@@ -15,6 +16,7 @@ import java.net.URL;
 import java.util.ResourceBundle;
 
 import com.cluit.main.ClusteringEngine;
+import com.cluit.main.ClusteringEngine.Message;
 import com.cluit.util.Const;
 import com.cluit.util.AoP.MethodMapper;
 import com.cluit.util.AoP.VariableSingleton;
@@ -23,8 +25,11 @@ import com.cluit.util.visuals.IntegerSpinnersConfigurator;
 public class ControlPanelView implements Initializable {
 	@FXML private ComboBox<String> comboBox_Algorithm;
 	@FXML private CheckBox checkBox_Normalize;
-	@FXML private Button button_OK;
 	@FXML private Spinner<Integer> spinner_NumberClusters;
+	
+	@FXML private Button button_OK;
+	@FXML private Button button_RunQueue;
+	@FXML private Button button_Queue;
 	 
 	private ClusteringEngine mCluEngine;
 	 
@@ -58,28 +63,30 @@ public class ControlPanelView implements Initializable {
 		
 		File algorithmFile = new File( Const.DIR_JAVASCRIPT + val + ".js" );		
 		VariableSingleton.getInstance().putObject( Const.V_KEY_COMBOBOX_JAVASCRIPT_FILE, algorithmFile);
+		VariableSingleton.getInstance().clearUserDefinedMap();
 		
-		if( mCluEngine != null && mCluEngine.isAlive() )
-			mCluEngine.queueMessage( ClusteringEngine.Message.TERMINATE_MESSAGE );
-		mCluEngine = new ClusteringEngine();
-		mCluEngine.start();
+		if( mCluEngine == null){
+			mCluEngine = new ClusteringEngine();
+			mCluEngine.start();
+		}
 		mCluEngine.queueMessage( ClusteringEngine.Message.INIT_MESSAGE );
 		
 		mComboOldValue = val;
 	}
 	
-	@FXML protected void button_OK_Clicked(ActionEvent event){		
-		button_OK.setDisable( true );
-		MethodMapper.addMethod(Const.METHOD_DONE_BUTTON_REACTIVATE, (args) -> {
-				try { Thread.sleep(1000); } 
-				catch (InterruptedException e) { }
-				button_OK.setDisable(false);
-				MethodMapper.removeMethod(Const.METHOD_DONE_BUTTON_REACTIVATE);
-			}
-		);	
-		
-		mCluEngine.queueMessage( ClusteringEngine.Message.CLUSTER_MESSAGE );
+	@FXML protected void button_OK_Clicked(ActionEvent event){				
+		addReenableMethod(button_OK, button_RunQueue);		
+		mCluEngine.queueMessage( Message.CLUSTER_MESSAGE );
 				
+	}
+	
+	@FXML protected void button_Queue_Clicked(ActionEvent event){
+		mCluEngine.queueMessage( Message.ENQUEUE_MESSAGE );
+	}
+	
+	@FXML protected void button_RunQueue_Clicked(ActionEvent event){
+		addReenableMethod(button_OK, button_Queue, button_RunQueue);
+		mCluEngine.queueMessage( Message.RUNQUEUE_MESSAGE );
 	}
 	
 	@FXML protected void test() throws FileNotFoundException{
@@ -126,5 +133,24 @@ public class ControlPanelView implements Initializable {
 			comboBox_Algorithm.setValue( fileNames[0] );
 		else
 			comboBox_Algorithm.setValue( current );
+	}
+
+	/**Disables the argument nodes and adds a method to the method mapper for reenabling them again after the action is finished
+	 * 
+	 * @param nodes
+	 */
+	private void addReenableMethod(Node ... nodes){
+		for( Node n : nodes )
+			n.setDisable(true);
+		
+		MethodMapper.addMethod(Const.METHOD_DONE_BUTTON_REACTIVATE, (args) -> {
+			try { Thread.sleep(1000); } 
+			catch (InterruptedException e) { }
+			for( Node n : nodes ){
+				n.setDisable(false);
+			}
+			MethodMapper.removeMethod(Const.METHOD_DONE_BUTTON_REACTIVATE);
+		}
+	);	
 	}
 }

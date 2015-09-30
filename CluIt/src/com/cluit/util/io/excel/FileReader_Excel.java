@@ -251,8 +251,8 @@ public class FileReader_Excel {
 		
 		//To create feature vectors, we have to create rows of doubles out of the columns in mData
 		double[][] out = new double[rows - rowFilter.length][cols - colFilter.length];
-		if( out.length == 0 || out[0].length == 0 )
-			throw new IOException("The column filter cancels out all data. Nothing can be loaded");
+//		if( out.length == 0 || out[0].length == 0 )
+//			throw new IOException("The column filter cancels out all data. Nothing can be loaded");
 		
 		double val = 0;
 		for(int y = currentSheet.getFirstRowNum(); y < rows; y++){	

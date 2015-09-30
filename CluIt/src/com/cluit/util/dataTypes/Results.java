@@ -44,16 +44,21 @@ public class Results {
 		return mInputData.getReferenceLabels();
 	}
 	
+	/**For each cluster, fetch the mean for each reference label
+	 * 
+	 *  
+	 * @return A double matrix, ordered [cluster][label]
+	 */
 	public double[][] getReferenceDataMeans(){
 		double[][] out = new double[ mResultSpace.getNumberOfClusters()][ referenceDataAmount() ];	
-		
+		double[][] inData = mInputData.getReferenceData();
 		for(int i = 0; i < mResultSpace.getNumberOfClusters(); i++){ 
 			int[] entryIDs = getEntryIDsFromCluster(i);
 			
 			for(int j = 0; j < referenceDataAmount(); j++ ){
 				
 				for(int id : entryIDs){
-					out[i][j] += mInputData.getReferenceData()[j][id];
+					out[i][j] += inData[id][j];
 				}
 				
 				out[i][j] /= entryIDs.length;

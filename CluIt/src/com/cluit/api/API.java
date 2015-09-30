@@ -1,11 +1,13 @@
 package com.cluit.api;
 
 import java.util.HashMap;
+import java.util.Map;
 
 import com.cluit.util.Const;
 import com.cluit.util.AoP.MethodMapper;
 import com.cluit.util.AoP.VariableSingleton;
 import com.cluit.util.dataTypes.Entry;
+import com.cluit.util.dataTypes.ExperimentBundle;
 import com.cluit.util.dataTypes.Space;
 import com.cluit.util.structures.KeyPriorityQueue_Max;
 import com.cluit.util.structures.KeyPriorityQueue_Min;
@@ -19,14 +21,23 @@ import com.cluit.util.structures.KeyPriorityQueue_Min;
  *
  */
 public class API {
-	private Space mSpace;
+	private final int mNumberOfClusters;
+	private final Space mSpace;
+	private final Map<String, Object> mUserDefinedVariables;
+
 	private HashMap<String, Double> mMiscData = new HashMap<>();
 	
 	private API() {
-		mSpace = VariableSingleton.getInstance().getSpace();
+		ExperimentBundle bundle = VariableSingleton.getInstance().pollNextExperimentBundle();
+		
+		mSpace = bundle.getSpace();
 		if( mSpace == null ) {
 			MethodMapper.invoke(Const.METHOD_EXCEPTION_GENERAL, "API couldn't fetch a viable clustering space object", new Exception() );
 		}
+		
+		mUserDefinedVariables = bundle.getUserDefinedData();
+		
+		mNumberOfClusters = bundle.getNumberOfClusters();
 	}
 	
 	public static API create_this_API(){
@@ -73,7 +84,7 @@ public class API {
 	}
 	
 	public int getTargetNumberOfClusters(){
-		return VariableSingleton.getInstance().getInt(Const.V_KEY_SPINNER_NUMBER_OF_CLUSTERS);
+		return mNumberOfClusters;
 	}
 	
 	public int getCurrentNumberOfClusters(){
@@ -126,7 +137,7 @@ public class API {
 	}
 	
 	public Object getFieldValue(String name){
-		return VariableSingleton.getInstance().getObject(Const.V_KEY_JS_REFERENCE+name);
+		return mUserDefinedVariables.get(name);
 	}
 	
 	public double calcSquaredError(int cluster){

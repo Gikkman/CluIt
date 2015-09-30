@@ -4,12 +4,15 @@ import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.geometry.VPos;
 import javafx.scene.Node;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.Separator;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
+import javafx.scene.text.Font;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -61,17 +64,7 @@ public class DataTable extends GridPane {
 	//region								STATIC			
 	//*******************************************************************************************************
 	
-	private void setupGridProperties() {
-		super.setHgap(H_GAP);
-		super.setVgap(V_GAP);
-		
-		HBox.setHgrow(this, Priority.NEVER);
-		VBox.setVgrow(this, Priority.NEVER);
 
-		super.setMinWidth(MIN_WIDHT);
-		
-		super.setGridLinesVisible(true);
-	}
 
 	public static void skinDataLabel(Label label){
 		label.getStyleClass().add(DATA_LABEL);
@@ -134,13 +127,42 @@ public class DataTable extends GridPane {
 		appendText(" ");
 	}
 	
+	/**Crude hack for spacing creating columns with the correct width
+	 * 
+	 * @param headers
+	 */
+	public void addHiddenClusterHeaders(String ... headers){
+		increaseRowCount();
+		Label[] subHeaders = getSubHeaders(headers);
+		for( Label l : subHeaders ){
+			l.setMaxHeight(1);
+			l.setVisible(false);
+		}
+		add(subHeaders);
+	}
+	
+	public void setTotalLabelCount(int size) {
+		mRows += size;
+	}
+	
+	public void addCloseButton(Pane whatToClose){
+		Button button = new Button("X");
+		button.setMaxSize(5, 5);		
+		button.setFont( new Font(4) );
+		
+		//Locate the button in the top right corner of the grid
+		GridPane.setConstraints(button, mColumns - 1, 0, 1, 1, HPos.RIGHT, VPos.TOP, Priority.NEVER, Priority.NEVER);
+		
+		button.setOnAction( (ae) -> whatToClose.getChildren().clear() );
+		
+		add(button);
+	}
+	
 	//endregion *********************************************************************************************
 	//region								PRIVATE 		
 	//*******************************************************************************************************
 	private void add(Node node){
 		super.getChildren().add(node);
-		
-		
 	}
 	
 	private void add(Node ... nodes){
@@ -208,9 +230,15 @@ public class DataTable extends GridPane {
 	private void increaseRowCount() {
 		mRows++;
 	}
+	
+	private void setupGridProperties() {
+		super.setHgap(H_GAP);
+		super.setVgap(V_GAP);
+		
+		HBox.setHgrow(this, Priority.NEVER);
+		VBox.setVgrow(this, Priority.NEVER);
 
-	public void setTotalLabelCount(int size) {
-		mRows += size;
+		super.setMinWidth(MIN_WIDHT);
 	}
 	
 	//endregion *********************************************************************************************

@@ -197,6 +197,7 @@ public class ExcelImportView implements Initializable{
 		return indices;
 	}	
 	
+	@SuppressWarnings("unused")
 	private int[] getAllButSelectedIndices(LinkedList<CheckBox> checkboxList) {
 		//First, we fetch the indices of all unselected boxes.
 		//Then, we create a list that is (total size - unselected size) long. If this list's lenght is greater than 0, that means

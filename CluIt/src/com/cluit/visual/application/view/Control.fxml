@@ -62,7 +62,9 @@
                   <Insets left="10.0" right="10.0" />
                </padding>
             </GridPane>
-            <Button fx:id="button_OK" layoutX="207.0" layoutY="345.0" mnemonicParsing="false" onAction="#button_OK_Clicked" prefHeight="26.0" prefWidth="79.0" text="OK!" />
+            <Button fx:id="button_OK" layoutX="207.0" layoutY="345.0" mnemonicParsing="false" onAction="#button_OK_Clicked" prefHeight="26.0" prefWidth="79.0" text="Run" />
+            <Button fx:id="button_RunQueue" layoutX="14.0" layoutY="345.0" mnemonicParsing="false" onAction="#button_RunQueue_Clicked" prefHeight="26.0" prefWidth="79.0" text="Run queue" />
+            <Button fx:id="button_Queue" layoutX="111.0" layoutY="345.0" mnemonicParsing="false" onAction="#button_Queue_Clicked" prefHeight="26.0" prefWidth="79.0" text="Queue" />
          </children>
       </AnchorPane>
    </children>

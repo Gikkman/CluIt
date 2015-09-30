@@ -48,8 +48,8 @@ public class ToolPanelView implements Initializable{
 			
 			//Set the function for mapping this spinners value, so the API can later find it for the JS-scritp
 			spinner.valueProperty().addListener( (observable, oldValue, newValue) 
-					-> VariableSingleton.getInstance().putObject(Const.V_KEY_JS_REFERENCE+name, newValue) );
-			VariableSingleton.getInstance().putObject(Const.V_KEY_JS_REFERENCE+name, defautlValue);
+					-> VariableSingleton.getInstance().putUserDefinedValue(name, newValue) );
+			VariableSingleton.getInstance().putUserDefinedValue(name, defautlValue);
 			
 			addGridObject(name, spinner);			
 			
@@ -67,8 +67,8 @@ public class ToolPanelView implements Initializable{
 			checkbox.setSelected( defautlValue );
 			
 			checkbox.selectedProperty().addListener( (observable, oldValue, newValue) 
-					-> VariableSingleton.getInstance().putObject(Const.V_KEY_JS_REFERENCE+name, newValue) );
-			VariableSingleton.getInstance().putObject(Const.V_KEY_JS_REFERENCE+name, defautlValue);
+					-> VariableSingleton.getInstance().putUserDefinedValue(name, newValue) );
+			VariableSingleton.getInstance().putUserDefinedValue(name, defautlValue);
 			
 			addGridObject(name, checkbox);
 			

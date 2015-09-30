@@ -68,9 +68,9 @@
               </rowConstraints>
                <children>
                   <Label alignment="CENTER" prefHeight="40.0" prefWidth="80.0" text="Collumn Name" textAlignment="CENTER" wrapText="true" />
-                  <Label text="Import?" GridPane.rowIndex="1" />
+                  <Label text="Cluster var:" GridPane.rowIndex="1" />
                   <Separator orientation="VERTICAL" prefHeight="200.0" GridPane.columnIndex="1" GridPane.rowSpan="2147483647" />
-                  <Label text="Ref. Variable?" GridPane.rowIndex="2" />
+                  <Label text="Reference var:" GridPane.rowIndex="2" />
                </children>
                <padding>
                   <Insets bottom="15.0" />

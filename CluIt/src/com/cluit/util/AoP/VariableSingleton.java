@@ -1,10 +1,13 @@
 package com.cluit.util.AoP;
 
 import java.beans.PropertyChangeListener;
+import java.util.Deque;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.Map;
 
 import com.cluit.util.dataTypes.Data;
+import com.cluit.util.dataTypes.ExperimentBundle;
 import com.cluit.util.dataTypes.Results;
 import com.cluit.util.dataTypes.Space;
 import com.cluit.util.structures.TypedObservableObjectWrapper;
@@ -17,15 +20,22 @@ public class VariableSingleton {
 	private final Map<String, Boolean> 	mBoolMap 	= new HashMap<String, Boolean>();
 	private final Map<String, String> 	mStringMap 	= new HashMap<String, String> ();
 	private final Map<String, Object> 	mObjectMap 	= new HashMap<String, Object> ();
-
+	
+	private final Map<String, Object>   mUserDefinedVariables = new HashMap<>();
+	
 	private TypedObservableObjectWrapper<Space>  mObservableSpace  = new TypedObservableObjectWrapper<Space> (null);
 	private TypedObservableObjectWrapper<Data>   mObservableData   = new TypedObservableObjectWrapper<Data>  (null);
 	private TypedObservableObjectWrapper<Results> mObservableResult= new TypedObservableObjectWrapper<Results>(null);
+	
+	private Deque<ExperimentBundle> mExperimentQueue = new LinkedList<>();
 	
 	public static VariableSingleton getInstance(){		
 		return INSTANCE;
 	}
 	
+	////////////////////////////////////////////////////////////////////////////////////
+	//region							GETTING		
+	////////////////////////////////////////////////////////////////////////////////////	
 	/**Returns the value mapped to key (or Integer.MIN_VALUE, if key is not mapped to anything)
 	 * 
 	 * @param key
@@ -72,6 +82,10 @@ public class VariableSingleton {
 		return mObjectMap.get(key);		
 	}
 	
+	//endregion/////////////////////////////////////////////////////////////////////////
+	//
+	//region							PUTTING		
+	////////////////////////////////////////////////////////////////////////////////////
 	public synchronized void putInt(String key, int value){
 		mIntMap.put(key, value);
 	}
@@ -92,7 +106,10 @@ public class VariableSingleton {
 		mObjectMap.put(key, value);
 	}	
 	
-	/*********************** SPACE ****************************/
+	//endregion/////////////////////////////////////////////////////////////////////////
+	//
+	//region							SPACE		
+	////////////////////////////////////////////////////////////////////////////////////
 	
 
 	public synchronized void setSpace(Space space){
@@ -103,17 +120,10 @@ public class VariableSingleton {
 		return mObservableSpace.getValue();
 	}
 	
-	@SuppressWarnings("unused")
-	private synchronized void setSpaceListener(PropertyChangeListener listener){
-		mObservableSpace.addPropertyChangeListener(listener);
-	}
-	
-	@SuppressWarnings("unused")
-	private synchronized void removeSpaceListener(PropertyChangeListener listener){
-		mObservableSpace.removePropertyChangeListener(listener);
-	}
-	
-	/*********************** DATA **********************************/
+	//endregion/////////////////////////////////////////////////////////////////////////
+	//
+	//region							DATA		
+	////////////////////////////////////////////////////////////////////////////////////
 	
 	public synchronized void setData(Data data){
 		mObservableData.setValue(data);
@@ -131,7 +141,10 @@ public class VariableSingleton {
 		mObservableData.removePropertyChangeListener(listener);
 	}
 	
-	/*********************** RESULT **********************************/
+	//endregion/////////////////////////////////////////////////////////////////////////
+	//
+	//region							RESULT		
+	////////////////////////////////////////////////////////////////////////////////////
 	
 	public synchronized void setResults(Results results){
 		mObservableResult.setValue(results);
@@ -148,4 +161,51 @@ public class VariableSingleton {
 	public synchronized void removeResultListener(PropertyChangeListener listener){
 		mObservableResult.removePropertyChangeListener(listener);
 	}
+	//endregion/////////////////////////////////////////////////////////////////////////
+	//
+	//region							ExperimentQueue	
+	////////////////////////////////////////////////////////////////////////////////////
+	
+	public synchronized void enqueueExperiment(ExperimentBundle bundle){
+		mExperimentQueue.addLast(bundle);
+	}
+	
+	public synchronized void enqueueExperiment_FRONT(ExperimentBundle bundle){
+		mExperimentQueue.addFirst(bundle);
+	}
+	
+	
+	public synchronized ExperimentBundle peekNextExperimentBundle(){
+		return mExperimentQueue.peek();
+	}
+	
+	public synchronized ExperimentBundle pollNextExperimentBundle(){
+		return mExperimentQueue.poll();
+	}
+	
+	public synchronized int getExperimentQueueSize(){
+		return mExperimentQueue.size();
+	}
+	
+	
+	//endregion/////////////////////////////////////////////////////////////////////////
+	//
+	//region							User Defined Variable Fields		
+	////////////////////////////////////////////////////////////////////////////////////
+	public void putUserDefinedValue(String key, Object object){
+		mUserDefinedVariables.put(key, object);
+	}
+	
+	 /** 
+	 * @return A copy of the User Defined Map (the one that stores the JS defined variable fields)
+	 */
+	public Map<String, Object> getUserDefinedMap(){
+		return new HashMap<>( mUserDefinedVariables );
+	}
+	
+	public void clearUserDefinedMap(){
+		mUserDefinedVariables.clear();
+	}
+	//endregion/////////////////////////////////////////////////////////////////////////
+	//
 }
