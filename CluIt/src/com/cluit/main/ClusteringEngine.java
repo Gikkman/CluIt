@@ -152,7 +152,7 @@ public class ClusteringEngine extends Thread {
 	}
 	
 	////////////////////////////////////////////////////////////////////////////////////
-	//								COLLECT EXPERIMENT BUNDLE
+	//								COLLECT EXPERIMENT BUNDLE	
 	////////////////////////////////////////////////////////////////////////////////////
 	private ExperimentBundle getExperimentBundle(){
 		//Error handling, make sure that the JS file is intact
@@ -206,7 +206,7 @@ public class ClusteringEngine extends Thread {
 	}
 		
 	////////////////////////////////////////////////////////////////////////////////////
-	//region								PAINTING
+	//region								PAINTING	
 	////////////////////////////////////////////////////////////////////////////////////
 	private void paintBmp(Space space) {
 		Entry[] entries = space.getAllEntries();
@@ -221,7 +221,7 @@ public class ClusteringEngine extends Thread {
 		}
 		
 		for(int i = 0; i < entries.length; i++){
-			entries[i] = new Entry(i, mDataCache.getEntry(entries[i].getID()));
+			entries[i] = new Entry(i, mDataCache.getEntryData(entries[i].getID()));
 		}
 		
 		if( entries[0].getDimensions() == 2)

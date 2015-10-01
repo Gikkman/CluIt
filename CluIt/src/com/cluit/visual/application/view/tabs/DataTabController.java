@@ -39,7 +39,6 @@ public class DataTabController implements Initializable{
 	}
 	
 	private void paintTab(Data data){
-		//TODO: Add reference data
 		table.getColumns().addAll( getDataColumns( data.getLabels() ) );
 		
 		

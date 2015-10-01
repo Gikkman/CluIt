@@ -151,7 +151,7 @@ public class Results {
 		
 		double[][] coords = new double[ clusterIDs.length ][ mResultSpace.getDimensions() ];
 		for(int j = 0; j < coords.length; j++){
-			coords[j] = mInputData.getEntry( clusterIDs[j] );
+			coords[j] = mInputData.getEntryData( clusterIDs[j] );
 		}			
 		return MiscUtils.entriesFromFeatureMatrix(coords);
 	}

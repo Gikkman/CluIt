@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.ResourceBundle;
 
 import com.cluit.util.Const;
@@ -27,6 +28,7 @@ public class TabPaneView implements Initializable{
 			//First, we fetch all files from the tabs folder and store them in the fxmlFiles array list
 			ArrayList<String> fxmlFiles = new ArrayList<>();
 			String[] files = JarResoruceLister.getResourceListing(Main.class, "view/tabs/");
+			Arrays.sort(files);
 			
 			for(String s : files)
 				if( s.endsWith(".fxml") )

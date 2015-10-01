@@ -80,7 +80,7 @@ public class Cluster {
 		double dist = 0;
 		for(Entry e : entries ){
 			dist = ClusteringUtils.eucDistance(centoid, e);
-			out += (dist);
+			out += (dist*dist);
 		}
 		return out;
 	}

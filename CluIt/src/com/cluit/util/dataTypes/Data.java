@@ -5,41 +5,37 @@ import com.cluit.util.methods.ClusteringUtils;
 public class Data {
 	private String[]   mLabels;
 	private double[][] mData;
+	private double[][] mNormalizedData;
 	
-	private String[]   mReferenceLabels = {"Hello", "Shmoo"};
-	private double[][] mReferenceData = { {1.0 , 5.5}, {2.0}, {3.0}, {4.0}, {5.0}, {6.0} };
+	private String[]   mReferenceLabels;
+	private double[][] mReferenceData;
 	
 	public Data(String[] labels, double[][] data){
 		mLabels = labels;
 		mData   = data;
 	}
 	
-	public boolean hasReferenceData() {
-		return mReferenceLabels != null && mReferenceData != null;
+	public int getNumberOfEntries(){
+		return mData.length;
 	}
 	
+	public boolean hasReferenceData() {
+		return mReferenceLabels != null && mReferenceData != null;
+	}	
 	public void setReferenceData(String[] labels, double[][] referenceData){
 		mReferenceLabels = labels;
 		mReferenceData = referenceData;
 	}
 	
-	
-	
 	public String[] getReferenceLabels(){ return mReferenceLabels; }
 	public double[][] getReferenceData(){ return mReferenceData; }
-	
-	public int getNumberOfEntries(){
-		return mData.length;
-	}
-	
-	public double[] getEntry(int entry){
-		return mData[ entry ];
-	}
-	
+
 	public String[]   getLabels(){ return mLabels; }
 	public double[][] getData()  { return mData;   }
 	
 	public double[][] getNormalizedData() {
+		if( mNormalizedData != null )
+			return mNormalizedData;
 		/* The data is sorted in feature vectors (each row represents an item, each culumn a feature in the items)
 		 * However, we want to normalize the feature columns, to get all values for a given feature between 0 and 1.
 		 * To do that, we must first transpose the matrix so we can access the columns as though they were rows.
@@ -58,6 +54,14 @@ public class Data {
 		double[][] transponate = ClusteringUtils.transposeMatrix(mData);
 		for(int i = 0; i < transponate.length; i++)
 			transponate[i] = ClusteringUtils.normalize( transponate[i] );
-		return ClusteringUtils.transposeMatrix(transponate);
+		mNormalizedData = ClusteringUtils.transposeMatrix(transponate);
+		return mNormalizedData;
+	}
+
+	public double[] getEntryData(int entry){
+		return mData[ entry ];
+	}
+	public double[] getNormalizedEntryData( int entry ){
+		return getNormalizedData()[ entry ];
 	}
 }
