@@ -1,5 +1,7 @@
 package com.cluit.util.AoP;
 
+import javafx.scene.paint.Color;
+
 import java.beans.PropertyChangeListener;
 import java.util.Deque;
 import java.util.HashMap;
@@ -10,6 +12,7 @@ import com.cluit.util.dataTypes.Data;
 import com.cluit.util.dataTypes.ExperimentBundle;
 import com.cluit.util.dataTypes.Results;
 import com.cluit.util.dataTypes.Space;
+import com.cluit.util.preferences.PreferenceManager;
 import com.cluit.util.structures.TypedObservableObjectWrapper;
 
 public class VariableSingleton {
@@ -21,8 +24,11 @@ public class VariableSingleton {
 	private final Map<String, String> 	mStringMap 	= new HashMap<String, String> ();
 	private final Map<String, Object> 	mObjectMap 	= new HashMap<String, Object> ();
 	
-	private final Map<String, Object>   mUserDefinedVariables = new HashMap<>();
+	private final Map<String, TypedObservableObjectWrapper<Color>>	mColorMap		= new HashMap<>();
+	private final Map<Integer,TypedObservableObjectWrapper<String>>	mClusterNameMap = new HashMap<>();
 	
+	private final Map<String, Object>   mUserDefinedVariables = new HashMap<>();
+		
 	private TypedObservableObjectWrapper<Space>  mObservableSpace  = new TypedObservableObjectWrapper<Space> (null);
 	private TypedObservableObjectWrapper<Data>   mObservableData   = new TypedObservableObjectWrapper<Data>  (null);
 	private TypedObservableObjectWrapper<Results> mObservableResult= new TypedObservableObjectWrapper<Results>(null);
@@ -207,5 +213,53 @@ public class VariableSingleton {
 		mUserDefinedVariables.clear();
 	}
 	//endregion/////////////////////////////////////////////////////////////////////////
+	//
+	//region							Visualization variables			
+	////////////////////////////////////////////////////////////////////////////////////
+	/**Fetches the color for a given feature. This color is wrapped to make it observable. A class can add a 
+	 * <code>PropertyChangeListener</code> to the returned object.
+	 * <br><br>
+	 * Changes to the color persists throughout sessions. This is realized via that the object has a pre-attached change listener, 
+	 * which will update the associated user preferences
+	 * 
+	 * @param feature Name of the feature whose color you seek
+	 * @return
+	 */
+	public TypedObservableObjectWrapper<Color> getFeatureColor(String feature){
+		if( !mColorMap.containsKey(feature) ) {
+			Color color = PreferenceManager.getFeatureColor(feature);
+			
+			TypedObservableObjectWrapper<Color> observableColor = new TypedObservableObjectWrapper<Color>(color);
+			observableColor.addPropertyChangeListener( (event) -> PreferenceManager.setFeatureColor(feature, (Color) event.getNewValue()) );
+			
+			mColorMap.put(feature, observableColor);
+		}
+		
+		return mColorMap.get(feature);
+	}
+
+	/**Fetches the name for a given cluster index. This name is wrapped to make it observable. A class can add a 
+	 * <code>PropertyChangeListener</code> to the returned object.
+	 * <br><br>
+	 * Changes to the wrapped name persists throughout sessions. This is realized via that the object has a pre-attached change listener, 
+	 * which will update the associated user preferences
+	 * 
+	 * @param index Index of the cluster whose name you seek
+	 * @return
+	 */
+	public TypedObservableObjectWrapper<String> getClusterName(int index){
+		if( !mClusterNameMap.containsKey(index) ){
+			String name = PreferenceManager.getClusterName(index);
+			
+			TypedObservableObjectWrapper<String> observableName = new TypedObservableObjectWrapper<String>(name);
+			observableName.addPropertyChangeListener( (event) -> PreferenceManager.setClusterName(index, (String) event.getNewValue() ) );
+			
+			mClusterNameMap.put(index, observableName);
+		}
+		
+		return mClusterNameMap.get(index);
+	}
+	////////////////////////////////////////////////////////////////////////////////////
+	//endregion
 	//
 }

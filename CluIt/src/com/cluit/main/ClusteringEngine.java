@@ -171,7 +171,8 @@ public class ClusteringEngine extends Thread {
 		}		
 		//Normalize data (if the user wishes it)
 		double[][] calcData = null;
-		if( VariableSingleton.getInstance().getBool( Const.V_KEY_CHECKBOX_NORMALIZE) ){
+		boolean normalized = VariableSingleton.getInstance().getBool( Const.V_KEY_CHECKBOX_NORMALIZE);
+		if( normalized ){
 			calcData = mDataCache.getNormalizedData();
 		} else {
 			calcData = mDataCache.getData();
@@ -180,7 +181,7 @@ public class ClusteringEngine extends Thread {
 		//Create the calculation space
 		Entry[] entries = MiscUtils.entriesFromFeatureMatrix( calcData );
 		int dimensions = entries[0].getDimensions();	
-		Space space = Space.create(dimensions, entries);
+		Space space = Space.create(normalized, dimensions, entries);
 		
 		//Lastly, create the experiment bundle object and enqueue it
 		ExperimentBundle bundle = ExperimentBundle.create()

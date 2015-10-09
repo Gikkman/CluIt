@@ -124,6 +124,15 @@ public abstract class KeyPriorityQueue<E> implements Iterable<E> {
 		return queue.isEmpty();
 	}
 	
+	public boolean updateKey(E e, double newKey){
+		if( queue.contains(e) ){
+				remove(e);
+				add(newKey, e);
+				return true;
+		}
+		return false;
+	}
+	
 	protected class Node implements Comparator<Node>, Comparable<Node>{
 		E e;
 		double key;

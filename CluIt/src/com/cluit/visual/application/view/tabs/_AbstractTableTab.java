@@ -12,11 +12,10 @@ import com.cluit.util.dataTypes.Results;
 public abstract class _AbstractTableTab implements Initializable{
 	private static int DEBUG_INT = 0;
 	
-	protected final String tabID;
+
 	
 	
 	public _AbstractTableTab() {
-		tabID = getTabID();
 	}
 	
 	@Override
@@ -27,15 +26,14 @@ public abstract class _AbstractTableTab implements Initializable{
 	private void backgroundPaint(Object args){
 		if( args != null && args instanceof Results ){
 			Results r = (Results) args;
-			Platform.runLater( () -> paintThisTab(r) );			
+			Platform.runLater( () -> paintNewResults(r) );			
 		}
 		else{			
 			Platform.runLater( () -> DEBUG_paintThisTab(DEBUG_INT++) );		
 		}
 	}
 	
-	protected abstract String getTabID();
 
 	protected abstract void DEBUG_paintThisTab(int i);
-	protected abstract void paintThisTab(Results r);
+	protected abstract void paintNewResults(Results r);
 }

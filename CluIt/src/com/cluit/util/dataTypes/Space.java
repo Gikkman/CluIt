@@ -31,6 +31,7 @@ public class Space {
 	private final Set<Entry>				free_entrys			 = new HashSet<>();
 	
 	private final int 						dimensions;
+	private boolean							is_normalized = false; 
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
 	private double[][] 						distances;
@@ -71,6 +72,12 @@ public class Space {
 	
 	public static Space create(int dimensions, List<Entry> entries ){
 		return Space.create( dimensions, (Entry[]) entries.toArray() );
+	}
+	
+	public static Space create(boolean isNormalized, int dimensions, Entry ... entries){
+		Space out = create(dimensions, entries);	
+		out.is_normalized = isNormalized;
+		return out;
 	}
 	/*****************************************************************************************************************/
 	/*****************************************************************************************************************/
@@ -170,6 +177,7 @@ public class Space {
 	public int getNumberOfEntries()  { return nextEntryID; };
 	public int getNumberOfClusters() { return nextClusterID; };
 	public boolean isClustered(Entry e) { return !free_entrys.contains(e); }
+	public boolean isNormalized() { return is_normalized; }
 	/*****************************************************************************************************************/
 	/*****************************************************************************************************************/
 	/*****************************************************************************************************************/

@@ -76,14 +76,9 @@ public class TableTabController extends _AbstractTableTab{
 		wrap_pane = new HBox();
 		group.getChildren().add(wrap_pane);
 	}
-
-	@Override
-	protected String getTabID() {
-		return "tableTabController";
-	}
 	
 	@Override
-	protected void paintThisTab(Results r) {
+	protected void paintNewResults(Results r) {
 		if( first )
 			createBaseLayout();
 		
@@ -117,7 +112,7 @@ public class TableTabController extends _AbstractTableTab{
 	
 	private Node getDataTable(Results r, Pane pane) {
 		//The grid part contains the cluster's centoid data, as well as the "X" button
-		String[] subH = new String[  r.numberOfClusters() ];
+		String[] subH = new String[  r.getNumberOfClusters() ];
 		for(int i = 0; i < subH.length; i++)
 			subH[i] = "Cluster " + i;
 		
@@ -130,7 +125,7 @@ public class TableTabController extends _AbstractTableTab{
 		
 		//For each cluster, we create a list of Label - Data pairs, where the label denotes what feature we are looking at
 		//and the Data represents that clusters centoid for the current feature
-		for( int col = 0; col < r.numberOfClusters(); col++){
+		for( int col = 0; col < r.getNumberOfClusters(); col++){
 			ArrayList<Pair<String, String>> labelDataPairs = new ArrayList<Pair<String, String>>();		
 			double[] clusterCentoid = r.getCentoid(col);
 			
@@ -149,7 +144,7 @@ public class TableTabController extends _AbstractTableTab{
 	}
 	
 	private Node getReferenceTable(Results r) {
-		String[] subH = new String[  r.numberOfClusters() ];
+		String[] subH = new String[  r.getNumberOfClusters() ];
 		for(int i = 0; i < subH.length; i++)
 			subH[i] = "Cluster " + i;
 		
@@ -163,7 +158,7 @@ public class TableTabController extends _AbstractTableTab{
 		
 		//For each cluster, we add the reference data means as labels, and link that data to the corresponding label
 		double[][] refMeans = r.getReferenceDataMeans();
-		for( int col = 0; col < r.numberOfClusters(); col++){
+		for( int col = 0; col < r.getNumberOfClusters(); col++){
 			ArrayList<Pair<String, String>> pairs = new ArrayList< Pair<String, String>>();
 			double[] thisCol = refMeans[col];
 			for(int j = 0; j < refLabels.length; j++){

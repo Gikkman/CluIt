@@ -24,8 +24,12 @@ public class Results {
 		calculateSquaredErrorCache();
 	}
 
-	public int numberOfClusters() {
+	public int getNumberOfClusters() {
 		return mResultSpace.getNumberOfClusters();
+	}
+	
+	public int getNumberOfFeatures() {
+		return mResultSpace.getDimensions();
 	}
 
 	public String[] getLabels() {
@@ -67,7 +71,6 @@ public class Results {
 		}
 		return out;
 	}	
-	
 	
 	public boolean hasMiscData(){
 		return mMiscData.size() > 0;
@@ -119,6 +122,18 @@ public class Results {
 	public double[][] getReferenceData(){
 		return mInputData.getReferenceData();
 	}
+	
+	public double[][] getNormalizedClusterEntryValues(int cluster){
+		Entry[] entries  = getNormalizedEntries(cluster);
+		
+		double[][] out = new double[entries.length][mResultSpace.getDimensions()];
+		for( int i = 0; i < entries.length; i++){
+			out[i] = entries[i].getCoordinates();
+		}
+				
+		return out;
+		
+	}
 	//*******************************************************************************************************
 	//region								PRIVATE			
 	//*******************************************************************************************************
@@ -153,6 +168,17 @@ public class Results {
 		for(int j = 0; j < coords.length; j++){
 			coords[j] = mInputData.getEntryData( clusterIDs[j] );
 		}			
+		return MiscUtils.entriesFromFeatureMatrix(coords);
+	}
+	
+	private Entry[] getNormalizedEntries(int fromCluster){
+		int[] clusterIDs = getEntryIDsFromCluster(fromCluster);
+		
+		double[][] coords = new double[ clusterIDs.length ][ mResultSpace.getDimensions() ];
+		for( int j = 0; j < coords.length; j++ ){
+			coords[j] = mInputData.getNormalizedEntryData( clusterIDs[j] );
+		}
+		
 		return MiscUtils.entriesFromFeatureMatrix(coords);
 	}
 	
