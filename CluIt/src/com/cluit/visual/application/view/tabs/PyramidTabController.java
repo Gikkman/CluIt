@@ -7,6 +7,7 @@ import javafx.scene.Group;
 import javafx.scene.control.Button;
 import javafx.scene.control.ColorPicker;
 import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -22,6 +23,10 @@ import com.cluit.util.AoP.VariableSingleton;
 import com.cluit.util.dataTypes.Results;
 import com.cluit.util.methods.ClusteringUtils;
 import com.cluit.util.structures.TypedObservableObjectWrapper;
+import com.cluit.visual.utility.GroupHeightBinding_Local;
+import com.cluit.visual.utility.GroupWidthBinding_Local;
+import com.cluit.visual.utility.ScrollPaneViewPortHeightBinding;
+import com.cluit.visual.utility.ScrollPaneViewPortWidthBinding;
 import com.cluit.visual.widget.dataPyramid.ACTION_SortIndividualWeight;
 import com.cluit.visual.widget.dataPyramid.ACTION_SortInsertionOrder;
 import com.cluit.visual.widget.dataPyramid.ACTION_SortMeanWeight;
@@ -34,6 +39,8 @@ public class PyramidTabController extends _AbstractTableTab{
 	private static final int SPACE_BETWEEN_ROWS = 30, SPACE_BETWEEN_COLOR_PICKERS = 10, SPACE_BETWEEN_PYRAMIDS = 10,
 							 PYRAMID_MINIMUM_WIDTH = 250;
 	
+	@FXML ScrollPane scroll_pane;
+	@FXML AnchorPane anchor_pane;
 	@FXML Button button_clear;
 	@FXML Group  group_wrapper;
 	@FXML protected void clear_tab(ActionEvent ae){ clear(); }	
@@ -56,7 +63,6 @@ public class PyramidTabController extends _AbstractTableTab{
 	private void createBaseLayout() {
 		//Set up the main vertical layout
 		vertical_layout = new VBox(SPACE_BETWEEN_ROWS);
-		vertical_layout.setAlignment(Pos.CENTER_LEFT);
 		group_wrapper.getChildren().add(vertical_layout);
 		
 		//Create the color-pickers row at the top
@@ -72,6 +78,20 @@ public class PyramidTabController extends _AbstractTableTab{
 		//Creates the vbox into which the different pyramid rows'll go
 		pyramids_layout = new VBox( SPACE_BETWEEN_PYRAMIDS );
 		vertical_layout.getChildren().add(pyramids_layout);
+			
+		GroupHeightBinding_Local groupH = new GroupHeightBinding_Local(group_wrapper);
+		GroupWidthBinding_Local  groupW = new GroupWidthBinding_Local(group_wrapper);
+		ScrollPaneViewPortHeightBinding scrollH = new ScrollPaneViewPortHeightBinding(scroll_pane);
+		ScrollPaneViewPortWidthBinding  scrollW = new ScrollPaneViewPortWidthBinding(scroll_pane);
+		
+		button_clear.layoutYProperty().bind( scroll_pane.vvalueProperty()
+				.multiply( groupH
+						.subtract( scrollH))
+				.add( scrollH.subtract(30) ));
+		button_clear.layoutXProperty().bind( scroll_pane.hvalueProperty()
+				.multiply( groupW
+						.subtract( scrollW))
+				.add( 10 ));
 	}	
 	
 	private void clear(){

@@ -6,7 +6,9 @@ import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.scene.Group;
 import javafx.scene.Node;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Separator;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
@@ -20,10 +22,16 @@ import java.util.ResourceBundle;
 
 import com.cluit.util.dataTypes.Results;
 import com.cluit.util.structures.Pair;
+import com.cluit.visual.utility.GroupHeightBinding_Local;
+import com.cluit.visual.utility.GroupWidthBinding_Local;
+import com.cluit.visual.utility.ScrollPaneViewPortHeightBinding;
+import com.cluit.visual.utility.ScrollPaneViewPortWidthBinding;
 import com.cluit.visual.widget.DataTable;
 
 public class TableTabController extends _AbstractTableTab{	
+	@FXML ScrollPane scroll_pane;
 	@FXML Group group;
+	@FXML Button button_clear;
 	
 	HBox wrap_pane;
 	VBox label_box;
@@ -254,6 +262,20 @@ public class TableTabController extends _AbstractTableTab{
 		
 		wrap_pane.setMinWidth(1);
 		addVerticalSeparator();
+		
+		GroupHeightBinding_Local groupH = new GroupHeightBinding_Local(group);
+		GroupWidthBinding_Local  groupW = new GroupWidthBinding_Local(group);
+		ScrollPaneViewPortHeightBinding scrollH = new ScrollPaneViewPortHeightBinding(scroll_pane);
+		ScrollPaneViewPortWidthBinding  scrollW = new ScrollPaneViewPortWidthBinding(scroll_pane);
+		
+		button_clear.layoutYProperty().bind( scroll_pane.vvalueProperty()
+				.multiply( groupH
+						.subtract( scrollH))
+				.add( scrollH.subtract(30) ));
+		button_clear.layoutXProperty().bind( scroll_pane.hvalueProperty()
+				.multiply( groupW
+						.subtract( scrollW))
+				.add( 10 ));
 		
 		first = false;
 	}
