@@ -1,5 +1,6 @@
 package com.cluit.visual.widget.dataPyramid;
 
+import javafx.beans.binding.NumberExpression;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
@@ -57,6 +58,14 @@ public class PyramidRow extends HBox {
 		
 	}
 	
+	public void setBlockBindings( NumberExpression width, NumberExpression height ){
+		for( Pyramid p : pyramids ){
+			p.setBlockWidthBinding(width);
+			p.setBlockHeightBinding(height);
+		}
+			
+	}
+	
 	//endregion *********************************************************************************************
 	//		
 	//region							PRIVATE 		
@@ -76,7 +85,7 @@ public class PyramidRow extends HBox {
 		tempPane.getChildren().add(comboBox);
 		headerBox.add(tempPane, 0, 1);
 		
-		
+		//The "Delete row" button
 		Button button = new Button("Delete run");
 		button.setOnAction( (ev) -> ( (Pane) master.getParent() ).getChildren().remove(master) );
 		GridPane.setValignment(button, VPos.BOTTOM);

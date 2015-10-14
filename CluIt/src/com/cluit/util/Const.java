@@ -33,4 +33,7 @@ public final class Const {
 
 	public static final String METHOD_UNLOAD_EXCEL_SHEET = "method_unload_excel_file_to_release_lock";
 	
+	public static final int PYRAMID_SPACING = 5;
+	public static final double PYRAMID_PADDING = 10;
+	
 }

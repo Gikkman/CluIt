@@ -8,6 +8,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ColorPicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.control.Slider;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -22,6 +23,7 @@ import java.util.ResourceBundle;
 import com.cluit.util.AoP.VariableSingleton;
 import com.cluit.util.dataTypes.Results;
 import com.cluit.util.methods.ClusteringUtils;
+import com.cluit.util.methods.MiscUtils;
 import com.cluit.util.structures.TypedObservableObjectWrapper;
 import com.cluit.visual.utility.GroupHeightBinding_Local;
 import com.cluit.visual.utility.GroupWidthBinding_Local;
@@ -48,6 +50,7 @@ public class PyramidTabController extends _AbstractTableTab{
 	private VBox vertical_layout;
 	private VBox pyramids_layout;
 	private HBox color_picker_layout;
+	private Slider width, height;
 	
 	private Map< String, TypedObservableObjectWrapper<Color> > feature_to_color = new HashMap<>();
 	private ArrayList< TypedObservableObjectWrapper<int[]> > order_list = new ArrayList<>();
@@ -65,15 +68,30 @@ public class PyramidTabController extends _AbstractTableTab{
 		vertical_layout = new VBox(SPACE_BETWEEN_ROWS);
 		group_wrapper.getChildren().add(vertical_layout);
 		
+		//Create the width and height sliders
+		AnchorPane slidersAnchor = new AnchorPane();
+		slidersAnchor.setMinHeight(25);
+		HBox slidersLayout = new HBox( 10 );
+		slidersLayout.setAlignment(Pos.CENTER_LEFT);
+	
+		height = getSlider("H");
+		width = getSlider("W");
+		slidersLayout.getChildren().addAll( new Label("Max Width: "), width,  new Label("Height: "), height);
+		
+		AnchorPane.setTopAnchor(slidersLayout, 5.0);
+		AnchorPane.setLeftAnchor(slidersLayout, 5.0);
+		slidersAnchor.getChildren().add(slidersLayout);
+		vertical_layout.getChildren().add(slidersAnchor);
+		
 		//Create the color-pickers row at the top
-		AnchorPane ap = new AnchorPane();
-		ap.setMinHeight(25);
+		AnchorPane colorsAnchor = new AnchorPane();
+		colorsAnchor.setMinHeight(25);
 		color_picker_layout = new HBox(SPACE_BETWEEN_COLOR_PICKERS);
 		color_picker_layout.setAlignment(Pos.CENTER_LEFT);
 		AnchorPane.setTopAnchor(color_picker_layout, 5.0);
 		AnchorPane.setLeftAnchor(color_picker_layout, 5.0);
-		ap.getChildren().add(color_picker_layout);
-		vertical_layout.getChildren().add(ap);
+		colorsAnchor.getChildren().add(color_picker_layout);
+		vertical_layout.getChildren().add(colorsAnchor);
 		
 		//Creates the vbox into which the different pyramid rows'll go
 		pyramids_layout = new VBox( SPACE_BETWEEN_PYRAMIDS );
@@ -95,6 +113,8 @@ public class PyramidTabController extends _AbstractTableTab{
 	}	
 	
 	private void clear(){
+		feature_to_color.clear();
+		color_picker_layout.getChildren().clear();
 		order_list.clear();
 		pyramids_layout.getChildren().clear();
 	}
@@ -133,10 +153,11 @@ public class PyramidTabController extends _AbstractTableTab{
 				for( int j = 0; j < refLabels.length; j++)
 					pyramid.addMiscData( String.format( refLabels[j] + " : %.4f", refData[j]) );
 			}
-				
+			
 			row.addPyramid(pyramid);
 		}		
 		
+		row.setBlockBindings(width.valueProperty(), height.valueProperty());
 		//Add it to the view
 		pyramids_layout.getChildren().add(row);
 	}
@@ -155,6 +176,33 @@ public class PyramidTabController extends _AbstractTableTab{
 		return feature_to_color.get(feature);
 	}
 	
+	private Slider getSlider(String type) {
+		Slider slider = new Slider();
+		slider.setShowTickLabels(true);
+		slider.setShowTickMarks(true);
+		//There is a lot of hard coded values here. But that is to avoid cluttering down the CONST section
+		if( type == "W" ){
+			slider.setMin(0);
+			slider.setMax(500);
+			slider.setValue(100);
+			slider.setMajorTickUnit(100);
+			slider.setMinorTickCount(25);
+			slider.setBlockIncrement(10);
+		} 
+		else if ( type == "H" ){
+			slider.setMin(0);
+			slider.setMax(100);
+			slider.setValue(30);
+			slider.setMajorTickUnit(50);
+			slider.setMinorTickCount(5);
+			slider.setBlockIncrement(5);
+		} else {
+			System.err.println("Unknow slider type " + MiscUtils.getStackPos());
+		}
+		
+		return slider;		
+	}
+	
 	private void addNewColorPicker(String feature) {
 		TypedObservableObjectWrapper<Color> color = VariableSingleton.getInstance().getFeatureColor(feature);		
 		ColorPicker cp = new ColorPicker( color.getValue() );
@@ -171,7 +219,7 @@ public class PyramidTabController extends _AbstractTableTab{
 				
 		TypedObservableObjectWrapper<int[]> block_order = new TypedObservableObjectWrapper<int[]>( new int[] {0, 1, 2, 3} );
 		
-		HBox hbox = new HBox(SPACE_BETWEEN_PYRAMIDS); //Will contain the pyramids
+		PyramidRow row = new PyramidRow("Run"); //Will contain the pyramids
 		for( int nrPyr = 0; nrPyr < 3; nrPyr++){
 			Pyramid pyramid = new Pyramid( VariableSingleton.getInstance().getClusterName(i), block_order);
 			pyramid.setMinWidth(PYRAMID_MINIMUM_WIDTH);
@@ -180,10 +228,11 @@ public class PyramidTabController extends _AbstractTableTab{
 				pyramid.add(block);
 			}
 			
-			hbox.getChildren().add(pyramid);
+			row.addPyramid(pyramid);
 		}		
 		
+		row.setBlockBindings(width.valueProperty(), height.valueProperty());
 		//Add it to the view
-		pyramids_layout.getChildren().add(hbox);
+		pyramids_layout.getChildren().add(row);
 	}
 }

@@ -1,5 +1,6 @@
 package com.cluit.visual.widget.dataPyramid;
 
+import javafx.beans.binding.NumberExpression;
 import javafx.scene.control.Label;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
@@ -15,7 +16,7 @@ import com.cluit.util.structures.TypedObservableObjectWrapper;
  *
  */
 public class Block extends StackPane{	
-	private static final double MAX_WIDTH = 100, HEIGHT = 30, STROKE = 3;
+	private static final double DEFAULT_WIDTH = 100, DEFAULT_HEIGHT = 30, STROKE = 3;
 	
 	private final Rectangle rect;
 	private final TypedObservableObjectWrapper<Color> color;
@@ -31,7 +32,7 @@ public class Block extends StackPane{
 	 * @param weight Width of the block, in relation to the maximum width. 1.0 is the maximum weight, and 0.0 the minimum
 	 */
 	public Block( String name, TypedObservableObjectWrapper<Color> color, double weight){
-		this.rect = new Rectangle(weight*MAX_WIDTH, HEIGHT);
+		this.rect = new Rectangle(weight*DEFAULT_WIDTH, DEFAULT_HEIGHT);
 		this.name = new Label(name);
 		this.color = color;
 		this.weight = weight;
@@ -56,12 +57,21 @@ public class Block extends StackPane{
 		mean /= values.length;
 		
 		this.values = values;
-		this.rect = new Rectangle(mean*MAX_WIDTH, HEIGHT);
+		this.rect = new Rectangle(mean*DEFAULT_WIDTH, DEFAULT_HEIGHT);
 		this.name = new Label(name);
 		this.color = color;
 		this.weight = mean;
 		
 		init();
+	}
+	
+	
+	public void bindMaxWidht( NumberExpression binding){
+		rect.widthProperty().bind( binding.multiply( weight ) );
+	}
+	
+	public void bindMaxHeight( NumberExpression binding){
+		rect.heightProperty().bind( binding );
 	}
 		
 	public double getWeight(){

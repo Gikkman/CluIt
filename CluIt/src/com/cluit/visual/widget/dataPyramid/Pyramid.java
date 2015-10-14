@@ -1,5 +1,6 @@
 package com.cluit.visual.widget.dataPyramid;
 
+import javafx.beans.binding.NumberExpression;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
@@ -19,6 +20,7 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import com.cluit.util.Const;
 import com.cluit.util.structures.TypedObservableObjectWrapper;
 
 /**A pyramid is an abstraction of a cluster, where each block in the pyramid visualizes a certain feature. 
@@ -29,22 +31,21 @@ import com.cluit.util.structures.TypedObservableObjectWrapper;
 public class Pyramid extends VBox{
 	public static enum BlockOrdering {LINKED, UNLINKED};
 	private static final String UNIQUE_DRAG_KEY = "unique_pyramid_and_block_drag_key";
-	private static final int SPACING = 5;
 	
 	private final TypedObservableObjectWrapper<int[]> observableBlockOrder;
 	private final Map<Integer, Block> id_to_block = new LinkedHashMap<>();
 	private final Map<Block, Integer> block_to_id = new LinkedHashMap<>();
 	
 	private final Label heading;
-	private final VBox blockBox = new VBox(SPACING);
-	private final VBox miscBox  = new VBox(SPACING);
+	private final VBox blockBox = new VBox(Const.PYRAMID_SPACING);
+	private final VBox miscBox  = new VBox(Const.PYRAMID_SPACING);
 	
 	private boolean blockOrderIsLinked = true;
 	
 	public Pyramid( TypedObservableObjectWrapper<String> name, TypedObservableObjectWrapper<int[]> observableBlockOrder){
 		setAlignment(Pos.CENTER);
-		setSpacing(SPACING);
-		setPadding( new Insets(10) );
+		setSpacing(Const.PYRAMID_SPACING);
+		setPadding( new Insets(Const.PYRAMID_PADDING) );
 		setStyle("-fx-background-color: YELLOW;");
 		
 		blockBox.setAlignment(Pos.TOP_CENTER);
@@ -97,6 +98,16 @@ public class Pyramid extends VBox{
 	 */
 	public void addMiscData(String label){
 		miscBox.getChildren().add( new Label( label ) );
+	}
+	
+	void setBlockWidthBinding(NumberExpression binding){
+		for( Block b : block_to_id.keySet() )
+			b.bindMaxWidht(binding);
+	}
+	
+	void setBlockHeightBinding(NumberExpression binding){
+		for( Block b : block_to_id.keySet() )
+			b.bindMaxHeight(binding);
 	}
 	
 	/**Tells the pyramid if it should comfort to the observable block order or not.
