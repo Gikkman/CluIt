@@ -32,10 +32,10 @@ import com.cluit.visual.utility.ScrollPaneViewPortWidthBinding;
 import com.cluit.visual.widget.dataPyramid.ACTION_SortIndividualWeight;
 import com.cluit.visual.widget.dataPyramid.ACTION_SortInsertionOrder;
 import com.cluit.visual.widget.dataPyramid.ACTION_SortMeanWeight;
-import com.cluit.visual.widget.dataPyramid.Block;
 import com.cluit.visual.widget.dataPyramid.Pyramid;
-import com.cluit.visual.widget.dataPyramid.PyramidAction;
 import com.cluit.visual.widget.dataPyramid.PyramidRow;
+import com.cluit.visual.widget.dataPyramid.RowAction;
+import com.cluit.visual.widget.dataPyramid.Block.Block;
 
 public class PyramidTabController extends _AbstractTableTab{
 	private static final int SPACE_BETWEEN_ROWS = 30, SPACE_BETWEEN_COLOR_PICKERS = 10, SPACE_BETWEEN_PYRAMIDS = 10,
@@ -50,7 +50,7 @@ public class PyramidTabController extends _AbstractTableTab{
 	private VBox vertical_layout;
 	private VBox pyramids_layout;
 	private HBox color_picker_layout;
-	private Slider width, height;
+	private Slider min_width, max_width, height;
 	
 	private Map< String, TypedObservableObjectWrapper<Color> > feature_to_color = new HashMap<>();
 	private ArrayList< TypedObservableObjectWrapper<int[]> > order_list = new ArrayList<>();
@@ -75,8 +75,10 @@ public class PyramidTabController extends _AbstractTableTab{
 		slidersLayout.setAlignment(Pos.CENTER_LEFT);
 	
 		height = getSlider("H");
-		width = getSlider("W");
-		slidersLayout.getChildren().addAll( new Label("Max Width: "), width,  new Label("Height: "), height);
+		min_width = getSlider("MinW");
+		max_width = getSlider("MaxW");
+		max_width.minProperty().bind( min_width.valueProperty() );
+		slidersLayout.getChildren().addAll( new Label("Min Width: "), min_width, new Label("Max Width: "), max_width,  new Label("Height: "), height);
 		
 		AnchorPane.setTopAnchor(slidersLayout, 5.0);
 		AnchorPane.setLeftAnchor(slidersLayout, 5.0);
@@ -157,13 +159,13 @@ public class PyramidTabController extends _AbstractTableTab{
 			row.addPyramid(pyramid);
 		}		
 		
-		row.setBlockBindings(width.valueProperty(), height.valueProperty());
+		row.setBlockBindings(null, max_width.valueProperty(), height.valueProperty());
 		//Add it to the view
 		pyramids_layout.getChildren().add(row);
 	}
 
-	private PyramidAction[] getPyramidActions() {
-		PyramidAction[] actions = new PyramidAction[3];
+	private RowAction[] getPyramidActions() {
+		RowAction[] actions = new RowAction[3];
 		actions[0] = new ACTION_SortInsertionOrder();
 		actions[1] = new ACTION_SortMeanWeight();
 		actions[2] = new ACTION_SortIndividualWeight();
@@ -181,20 +183,28 @@ public class PyramidTabController extends _AbstractTableTab{
 		slider.setShowTickLabels(true);
 		slider.setShowTickMarks(true);
 		//There is a lot of hard coded values here. But that is to avoid cluttering down the CONST section
-		if( type == "W" ){
+		if( type.matches("MinW") ){
+			slider.setMin(0);
+			slider.setMax(100);
+			slider.setValue(0);
+			slider.setMajorTickUnit(50);
+			slider.setMinorTickCount(10);
+			slider.setBlockIncrement(5);
+		}
+		else if( type.matches("MaxW") ){
 			slider.setMin(0);
 			slider.setMax(500);
 			slider.setValue(100);
 			slider.setMajorTickUnit(100);
-			slider.setMinorTickCount(25);
+			slider.setMinorTickCount(50);
 			slider.setBlockIncrement(10);
 		} 
-		else if ( type == "H" ){
+		else if ( type.matches("H") ){
 			slider.setMin(0);
 			slider.setMax(100);
 			slider.setValue(30);
 			slider.setMajorTickUnit(50);
-			slider.setMinorTickCount(5);
+			slider.setMinorTickCount(10);
 			slider.setBlockIncrement(5);
 		} else {
 			System.err.println("Unknow slider type " + MiscUtils.getStackPos());
@@ -224,14 +234,15 @@ public class PyramidTabController extends _AbstractTableTab{
 			Pyramid pyramid = new Pyramid( VariableSingleton.getInstance().getClusterName(i), block_order);
 			pyramid.setMinWidth(PYRAMID_MINIMUM_WIDTH);
 			for( int nrBlock = 0; nrBlock < 4; nrBlock++){		
-				Block block = new Block( "Block " + nrBlock,  getColor( "Block " + nrBlock ), (1.0 - nrBlock/10 - 0.05) / (nrBlock+1) );
+				Block block = new Block( "Block " + nrBlock,  getColor( "Block " + nrBlock ), new double[] {(1.0 - nrBlock/10 - 0.05) / (nrBlock+1), 0.8, 0.6, 0.4} );
 				pyramid.add(block);
 			}
 			
 			row.addPyramid(pyramid);
 		}		
 		
-		row.setBlockBindings(width.valueProperty(), height.valueProperty());
+		row.setBlockBindings(null, max_width.valueProperty(), height.valueProperty());
+		row.addPyramidAction( getPyramidActions() );
 		//Add it to the view
 		pyramids_layout.getChildren().add(row);
 	}

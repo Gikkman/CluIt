@@ -1,11 +1,15 @@
-package com.cluit.visual.widget.dataPyramid;
+package com.cluit.visual.widget.dataPyramid.Block;
 
 import javafx.beans.binding.NumberExpression;
+import javafx.geometry.Pos;
 import javafx.scene.control.Label;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Rectangle;
 
+import java.util.HashMap;
+
+import com.cluit.util.Const;
 import com.cluit.util.methods.MiscUtils;
 import com.cluit.util.structures.TypedObservableObjectWrapper;
 
@@ -15,14 +19,14 @@ import com.cluit.util.structures.TypedObservableObjectWrapper;
  * @author Simon
  *
  */
-public class Block extends StackPane{	
-	private static final double DEFAULT_WIDTH = 100, DEFAULT_HEIGHT = 30, STROKE = 3;
+public class Block extends StackPane{
+	public enum BlockType {Mean, Range};
 	
-	private final Rectangle rect;
-	private final TypedObservableObjectWrapper<Color> color;
+	private final HBox rectBox = new HBox();
 	private final Label		name;
 	
-	private final double weight;
+	private final HashMap<BlockType, DataBlock> blockSet = new HashMap<>();
+	private final double mean, range;
 	private double[] values;
 	
 	/**Creates a block that is intended to be added to a pyramid.
@@ -32,10 +36,13 @@ public class Block extends StackPane{
 	 * @param weight Width of the block, in relation to the maximum width. 1.0 is the maximum weight, and 0.0 the minimum
 	 */
 	public Block( String name, TypedObservableObjectWrapper<Color> color, double weight){
-		this.rect = new Rectangle(weight*DEFAULT_WIDTH, DEFAULT_HEIGHT);
-		this.name = new Label(name);
-		this.color = color;
-		this.weight = weight;
+		this.name = new Label(" " + name + " ");
+		this.name.setStyle( "-fx-background-color: LIGHTGREY;");
+		
+		this.mean = weight;
+		this.range = -1;
+		
+		this.blockSet.put( BlockType.Mean, new MeanBlock(color, mean) );
 		
 		init();
 	}
@@ -51,56 +58,64 @@ public class Block extends StackPane{
 		if( values == null || values.length == 0 )
 			System.err.println("Error in Block : Constructor. Invalid 'values' parameter " + MiscUtils.getStackPos());
 		
-		double mean = 0;
-		for( double d : values )
-			mean += d;
+		double mean = 0, min = Double.POSITIVE_INFINITY, max = Double.NEGATIVE_INFINITY;
+		for( double value : values ){
+			mean += value;
+			min = min > value ? value : min;
+			max = max < value ? value : max;
+		}
 		mean /= values.length;
 		
 		this.values = values;
-		this.rect = new Rectangle(mean*DEFAULT_WIDTH, DEFAULT_HEIGHT);
 		this.name = new Label(name);
-		this.color = color;
-		this.weight = mean;
+		this.mean = mean;
+		this.range = max - min;
+		
+		this.blockSet.put( BlockType.Mean, new MeanBlock(color, mean) );
+		this.blockSet.put( BlockType.Range, new RangeBlock(color, mean, range) );
 		
 		init();
 	}
 	
-	
-	public void bindMaxWidht( NumberExpression binding){
-		rect.widthProperty().bind( binding.multiply( weight ) );
+	public void bindWidht( NumberExpression deadZone, NumberExpression maxWidth){
+		for( DataBlock b : blockSet.values() )
+			b.bindWidth(deadZone, maxWidth);
 	}
 	
-	public void bindMaxHeight( NumberExpression binding){
-		rect.heightProperty().bind( binding );
+	public void bindHeight( NumberExpression height){
+		for( DataBlock b : blockSet.values() )
+			b.bindHeight(height);
 	}
 		
 	public double getWeight(){
-		return weight;
+		return mean;
 	}
 	
-	public final double[] getValues(){
-		return values;
+	public void changeDisplayMode(BlockType displayMode){
+		if( blockSet.containsKey(displayMode) ){
+			rectBox.getChildren().clear();
+			rectBox.getChildren().add( blockSet.get(displayMode) );
+		} else {
+			System.out.println("No block with that type present " + MiscUtils.getStackPos() );
+		}
 	}
 
 	/**Sets up the name and colorisation of the block.
 	 */
 	private void init() {
-		rect.setStroke(Color.BLACK);
-		rect.setStrokeWidth(STROKE);
-		rect.setFill(color.getValue());
+		this.prefWidth(Const.BLOCK_DEFAULT_WIDTH);
 		
-		this.color.addPropertyChangeListener( (event) -> rect.setFill( color.getValue()));
-		visualizeValues();
-		
-		getChildren().addAll(rect, name);
-	}
-	
-	private void visualizeValues() {
-		// TODO Create a way to visualize the values
+		rectBox.setAlignment( Pos.TOP_CENTER );
+		rectBox.getChildren().add( blockSet.get( BlockType.Mean ) );		
+		getChildren().addAll(rectBox, name);
 	}
 	
 	@Override
 	public String toString(){
 		return name.getText();
+	}
+
+	public double getRange() {
+		return range;
 	}
 }

@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 import com.cluit.visual.widget.dataPyramid.Pyramid.BlockOrdering;
 
-public class ACTION_SortInsertionOrder extends PyramidAction{
+public class ACTION_SortInsertionOrder extends RowAction{
 
 	@Override
 		public void onSelect(ArrayList<Pyramid> pyramids) {

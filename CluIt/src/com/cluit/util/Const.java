@@ -35,5 +35,8 @@ public final class Const {
 	
 	public static final int PYRAMID_SPACING = 5;
 	public static final double PYRAMID_PADDING = 10;
+	public static final double BLOCK_STROKE_WIDTH = 3;
+	public static final double BLOCK_DEFAULT_HEIGHT = 50;
+	public static final double BLOCK_DEFAULT_WIDTH = 150;
 	
 }

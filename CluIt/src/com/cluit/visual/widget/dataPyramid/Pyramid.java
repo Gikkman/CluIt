@@ -22,6 +22,8 @@ import java.util.Map;
 
 import com.cluit.util.Const;
 import com.cluit.util.structures.TypedObservableObjectWrapper;
+import com.cluit.visual.widget.dataPyramid.Block.Block;
+import com.cluit.visual.widget.dataPyramid.Block.Block.BlockType;
 
 /**A pyramid is an abstraction of a cluster, where each block in the pyramid visualizes a certain feature. 
  * 
@@ -41,17 +43,21 @@ public class Pyramid extends VBox{
 	private final VBox miscBox  = new VBox(Const.PYRAMID_SPACING);
 	
 	private boolean blockOrderIsLinked = true;
+	private PyramidDropAction pyramidDropAction = (parent, source, target) -> changePyramidOrder(parent, source, target);
+	private BlockDropAction   blockDropAction   = (parent, source, target) -> changeBlockOrder(parent, source, target);
 	
+	//////////////////////////////////////////////////////////////////////////////////////////
+	//region 			CONSTRUCTORS		
 	public Pyramid( TypedObservableObjectWrapper<String> name, TypedObservableObjectWrapper<int[]> observableBlockOrder){
 		setAlignment(Pos.CENTER);
 		setSpacing(Const.PYRAMID_SPACING);
 		setPadding( new Insets(Const.PYRAMID_PADDING) );
 		setStyle("-fx-background-color: YELLOW;");
 		
-		blockBox.setAlignment(Pos.TOP_CENTER);
+		blockBox.setAlignment(Pos.CENTER);
 		blockBox.setStyle("-fx-background-color: CYAN;");
 
-		miscBox.setAlignment(Pos.TOP_CENTER);
+		miscBox.setAlignment(Pos.CENTER);
 
 		this.observableBlockOrder = observableBlockOrder;
 		this.observableBlockOrder.addPropertyChangeListener( (event) -> orderChangedEvent(event) );
@@ -67,6 +73,8 @@ public class Pyramid extends VBox{
 		
 		addDragDrop(this, UNIQUE_DRAG_KEY);
 	}
+	//endregion
+	//////////////////////////////////////////////////////////////////////////////////////////
 	
 	public int getNumberOfBlocks(){
 		return id_to_block.size();
@@ -100,14 +108,23 @@ public class Pyramid extends VBox{
 		miscBox.getChildren().add( new Label( label ) );
 	}
 	
-	void setBlockWidthBinding(NumberExpression binding){
-		for( Block b : block_to_id.keySet() )
-			b.bindMaxWidht(binding);
+	/**Binds the blocks' <b>maximum</b> width to an expression. Useful to controlling pyramids appearance from an external controller.
+	 * @param deadZone How "wide" is the zone representing ZERO
+	 * @param maxWidth
+	 */
+	void setBlockWidthBinding(NumberExpression deadZone, NumberExpression maxWidth){
+		for( Block b : block_to_id.keySet() ){
+			b.bindWidht(deadZone, maxWidth);
+		}
 	}
 	
+	/**Binds the blocks' height to an expression. Useful to controlling pyramids appearance from an external controller
+	 * 
+	 * @param binding
+	 */
 	void setBlockHeightBinding(NumberExpression binding){
 		for( Block b : block_to_id.keySet() )
-			b.bindMaxHeight(binding);
+			b.bindHeight(binding);
 	}
 	
 	/**Tells the pyramid if it should comfort to the observable block order or not.
@@ -150,6 +167,31 @@ public class Pyramid extends VBox{
 	public void setBlockOrder_WithForce(int[] blockOrder) {
 		observableBlockOrder.setValue(blockOrder);
 		setBlockOrderMode( BlockOrdering.LINKED );
+	}
+	
+	public PyramidDropAction getPyramidDropAction() {
+		return pyramidDropAction;
+	}
+
+	public void setPyramidDropAction(PyramidDropAction pyramidDropAction) {
+		this.pyramidDropAction = pyramidDropAction;
+	}
+
+	public BlockDropAction getBlockDropAction() {
+		return blockDropAction;
+	}
+
+	public void setBlockDropAction(BlockDropAction blockDropAction) {
+		this.blockDropAction = blockDropAction;
+	}
+	
+	public String getHeading(){
+		return heading.getText();
+	}
+	
+	public void setBlockDisplay(BlockType displayMode) {
+		for( Block b : block_to_id.keySet() )
+			b.changeDisplayMode(displayMode);
 	}
 	//////////////////////////////////////////////////////////////////////////////
 	//region 			PRIVATE METHODS		
@@ -204,17 +246,17 @@ public class Pyramid extends VBox{
                 
                 //We check what types the dragged and dropped objects are, to decide how to handle the drag-drop event
                 if( dragSource instanceof Pyramid && dragTarget instanceof Pyramid ){
-                	changePyramidOrder(parent, dragSource, dragTarget);
+                	pyramidDropAction.onDrop(parent, (Pyramid) dragSource, (Pyramid) dragTarget);
                 }
                 else if( dragSource instanceof Block && dragTarget instanceof Block ){
                 	Block sourceBlock = (Block) dragSource;
                 	Block targetBlock = (Block) dragTarget;
                 	if( sourceBlock.getParent() == targetBlock.getParent() )
                 		//If the two blocks have the same parent, the event occurred inside a pyramid. Swap the block's positions
-                		changeBlockOrder(parent, dragSource, dragTarget);
+                		blockDropAction.onDrop(parent, sourceBlock, targetBlock);
                 	else
                 		//If the two blocks have different parents, the event occurred between pyramids. Swap the pyramid's positions
-                		changePyramidOrder((Pane) getPyramid(sourceBlock).getParent(), getPyramid(sourceBlock), getPyramid(targetBlock));
+                		pyramidDropAction.onDrop(getParent(getPyramid(sourceBlock)), getPyramid(sourceBlock), getPyramid(targetBlock));
                 } 
                 else {
                 	//In this case, one of the objects involved is a block and the other is a pyramid
@@ -228,7 +270,7 @@ public class Pyramid extends VBox{
                 	}
                 	else {
                 		//Otherwise, the drag-drop was between pyramids. In that case, we swap the two pyramid's positions
-                		changePyramidOrder((Pane) pyramid.getParent(), getPyramid(block), pyramid);
+                		pyramidDropAction.onDrop( getParent(pyramid), getPyramid(block), pyramid);
                 	}
                 }
 
@@ -239,8 +281,22 @@ public class Pyramid extends VBox{
 		} );
 	}
 	
+	/**Fetches the pyramid containing a specific block
+	 * 
+	 * @param block The block for which we search the containing pyramid
+	 * @return The pyramid containing the parameter block
+	 */
 	private Pyramid getPyramid(Block block){
 		return (Pyramid) block.getParent().getParent();
+	}
+	
+	/**Fetches the pane containing a specific pyramid
+	 * 
+	 * @param pyramid The pyramid for which we search the containing pane
+	 * @return The pane containing the parameter pyramid
+	 */
+	private Pane getParent(Pyramid pyramid){
+		return (Pane) pyramid.getParent();
 	}
 	
 	private int[] getBlockOrder(){
@@ -252,8 +308,8 @@ public class Pyramid extends VBox{
 	
 	//endregion //////////////////////////////////////////////////////////////////
 	//
-	//region 			SWAPPING METHOD		
-	private void changePyramidOrder(Pane parent, Object source, Object target){
+	//region 			DROP ACTIONS		
+	private void changePyramidOrder(Pane parent, Pyramid source, Pyramid target){
 		int sourceIndex = parent.getChildren().indexOf(source);
        	int targetIndex = parent.getChildren().indexOf(target); 
        	
@@ -262,7 +318,7 @@ public class Pyramid extends VBox{
 		parent.getChildren().setAll(workingCollection);
 	}
 	
-	private void changeBlockOrder(Pane parent, Object source, Object target){
+	private void changeBlockOrder(Pane parent, Block source, Block target){
 		int sourceIndex = parent.getChildren().indexOf(source);
        	int targetIndex = parent.getChildren().indexOf(target);     
 		
@@ -280,6 +336,7 @@ public class Pyramid extends VBox{
 				applyNewBlockOrder(newOrder);
 		}
 	}
+
 	
 	//endregion
 	//////////////////////////////////////////////////////////////////////////////

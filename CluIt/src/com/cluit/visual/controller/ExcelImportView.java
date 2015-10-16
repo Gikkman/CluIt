@@ -101,7 +101,7 @@ public class ExcelImportView implements Initializable{
 				//anything in the variable singleton (to prevent the user from running a clustering algorithm with no valid data).
 				double[][] data = mReader.getDoubleValues();
 				String[] labels = mReader.getFilteredLabels();
-				Data importedData = new Data(labels, data);
+				Data importedData = new Data(labels, data); 
 				
 				int[] refVarIndices = getUnselectedIndices(mRefBoxes);
 				if( refVarIndices.length > 0 ){
@@ -230,6 +230,7 @@ public class ExcelImportView implements Initializable{
 		feature_grid.getColumnConstraints().clear();
 		feature_grid.getColumnConstraints().addAll( feature_grid_cols );
 		mSelectBoxes.clear();
+		mRefBoxes.clear();
 	}
 	
 	private void buildGrid(int sheet) {

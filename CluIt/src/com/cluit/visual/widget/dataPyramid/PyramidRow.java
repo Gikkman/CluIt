@@ -15,13 +15,18 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
+import javafx.scene.layout.VBox;
 
 import java.util.ArrayList;
 
-public class PyramidRow extends HBox {
+import com.cluit.visual.widget.dataPyramid.Block.Block;
+
+public class PyramidRow extends VBox {
 	private static final int SPACING = 5;
 	
-	private final ComboBox<PyramidAction> comboBox = new ComboBox<>();
+	private final HBox					  row = new HBox();
+	private final ComboBox<RowAction> comboBox = new ComboBox<>();
+	private final Button 				  reloadButton = new Button("R");
 	private final ArrayList<Pyramid> 	  pyramids = new ArrayList<>();
 	
 	//*******************************************************************************************************
@@ -30,14 +35,26 @@ public class PyramidRow extends HBox {
 
 	public PyramidRow(String rowName){
 		setAlignment(Pos.CENTER_LEFT);
+		row.setAlignment(Pos.CENTER_LEFT);
 		
 		insertRowHeader(rowName);	
 		insertVerticalSeparator();
 		
 		comboBox.setVisibleRowCount(5);
 		comboBox.valueProperty().addListener( (o, oldV, newV) -> { 
-			newV.onSelect(pyramids); 
+			if( oldV != null )
+				oldV.onDeselect(pyramids);
+			if( newV != null )
+				newV.onSelect(pyramids); 
 		} );
+		
+		reloadButton.setOnAction( (event) -> {
+			if( comboBox.getValue() != null )
+				comboBox.getValue().onSelect(pyramids);
+		} );	
+		
+		getChildren().add(row);
+		getChildren().add( new Separator() );
 	}
 	
 
@@ -46,11 +63,11 @@ public class PyramidRow extends HBox {
 			this.pyramids.add(p);
 		}
 		
-		getChildren().addAll(pyramids);
+		row.getChildren().addAll(pyramids);
 	}
 	
 	
-	public void addPyramidAction( PyramidAction ... actions ){
+	public void addPyramidAction( RowAction ... actions ){
 		if( actions.length > 0 ){
 			comboBox.getItems().addAll(actions);
 			comboBox.setValue( comboBox.getItems().get(0) );
@@ -58,19 +75,26 @@ public class PyramidRow extends HBox {
 		
 	}
 	
-	public void setBlockBindings( NumberExpression width, NumberExpression height ){
+	public void setBlockBindings( NumberExpression deadZone, NumberExpression maxWidth, NumberExpression height ){
 		for( Pyramid p : pyramids ){
-			p.setBlockWidthBinding(width);
+			p.setBlockWidthBinding(deadZone, maxWidth);
 			p.setBlockHeightBinding(height);
 		}
 			
 	}
 	
+	public void setBlockDisplay( Block.BlockType displayMode ){
+		for( Pyramid p : pyramids ){
+			p.setBlockDisplay( displayMode );
+		}
+	}
+	
+	
 	//endregion *********************************************************************************************
 	//		
 	//region							PRIVATE 		
 	private void insertRowHeader(String rowName) {
-		HBox master = this;
+		Pane master = this;
 		GridPane headerBox = new GridPane();
 		headerBox.setVgap(SPACING);
 		
@@ -85,6 +109,8 @@ public class PyramidRow extends HBox {
 		tempPane.getChildren().add(comboBox);
 		headerBox.add(tempPane, 0, 1);
 		
+		headerBox.add(reloadButton, 1, 1);
+		
 		//The "Delete row" button
 		Button button = new Button("Delete run");
 		button.setOnAction( (ev) -> ( (Pane) master.getParent() ).getChildren().remove(master) );
@@ -93,13 +119,13 @@ public class PyramidRow extends HBox {
 		GridPane.setVgrow(button, Priority.ALWAYS);
 		headerBox.add(button, 0, 2);
 		
-		getChildren().add(headerBox);		
+		row.getChildren().add(headerBox);		
 	}
 	
 	private void insertVerticalSeparator() {
 		Separator s = new Separator(Orientation.VERTICAL);
 		s.setPadding( new Insets(SPACING) );
-		getChildren().add( s ); 
+		row.getChildren().add( s ); 
 	}
 	//*******************************************************************************************************	
 	//endregion *********************************************************************************************
