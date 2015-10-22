@@ -29,13 +29,13 @@ import com.cluit.visual.utility.GroupHeightBinding_Local;
 import com.cluit.visual.utility.GroupWidthBinding_Local;
 import com.cluit.visual.utility.ScrollPaneViewPortHeightBinding;
 import com.cluit.visual.utility.ScrollPaneViewPortWidthBinding;
-import com.cluit.visual.widget.dataPyramid.ACTION_SortIndividualWeight;
-import com.cluit.visual.widget.dataPyramid.ACTION_SortInsertionOrder;
-import com.cluit.visual.widget.dataPyramid.ACTION_SortMeanWeight;
 import com.cluit.visual.widget.dataPyramid.Pyramid;
 import com.cluit.visual.widget.dataPyramid.PyramidRow;
 import com.cluit.visual.widget.dataPyramid.RowAction;
 import com.cluit.visual.widget.dataPyramid.Block.Block;
+import com.cluit.visual.widget.dataPyramid.actions.ACTION_SortIndividualWeight;
+import com.cluit.visual.widget.dataPyramid.actions.ACTION_SortInsertionOrder;
+import com.cluit.visual.widget.dataPyramid.actions.ACTION_SortMeanWeight;
 
 public class PyramidTabController extends _AbstractTableTab{
 	private static final int SPACE_BETWEEN_ROWS = 30, SPACE_BETWEEN_COLOR_PICKERS = 10, SPACE_BETWEEN_PYRAMIDS = 10,

@@ -1,8 +1,10 @@
-package com.cluit.visual.widget.dataPyramid;
+package com.cluit.visual.widget.dataPyramid.actions;
 
 import java.util.ArrayList;
 
 import com.cluit.util.structures.KeyPriorityQueue_Min;
+import com.cluit.visual.widget.dataPyramid.Pyramid;
+import com.cluit.visual.widget.dataPyramid.RowAction;
 import com.cluit.visual.widget.dataPyramid.Block.Block;
 
 public class ACTION_SortIndividualWeight extends RowAction{

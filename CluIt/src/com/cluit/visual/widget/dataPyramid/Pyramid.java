@@ -23,6 +23,7 @@ import java.util.Map;
 import com.cluit.util.Const;
 import com.cluit.util.structures.TypedObservableObjectWrapper;
 import com.cluit.visual.widget.dataPyramid.Block.Block;
+import com.cluit.visual.widget.dataPyramid.Block.BlockDropAction;
 import com.cluit.visual.widget.dataPyramid.Block.Block.BlockType;
 
 /**A pyramid is an abstraction of a cluster, where each block in the pyramid visualizes a certain feature. 
@@ -134,7 +135,7 @@ public class Pyramid extends VBox{
 	 * 
 	 * @param mode: LINKED or UNLINKED
 	 */
-	void setBlockOrderMode( BlockOrdering mode ){
+	public void setBlockOrderMode( BlockOrdering mode ){
 		if( mode == BlockOrdering.LINKED ){
 			blockOrderIsLinked = true;
 			applyNewBlockOrder( observableBlockOrder.getValue() );
@@ -151,7 +152,7 @@ public class Pyramid extends VBox{
 	 * <br>
 	 * @param blockOrder
 	 */
-	void setBlockOrder(int[] blockOrder){
+	public void setBlockOrder(int[] blockOrder){
 		setBlockOrderMode( BlockOrdering.UNLINKED );
 		applyNewBlockOrder(blockOrder);	
 	}

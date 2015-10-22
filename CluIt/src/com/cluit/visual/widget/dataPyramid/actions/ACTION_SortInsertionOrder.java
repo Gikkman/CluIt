@@ -1,7 +1,9 @@
-package com.cluit.visual.widget.dataPyramid;
+package com.cluit.visual.widget.dataPyramid.actions;
 
 import java.util.ArrayList;
 
+import com.cluit.visual.widget.dataPyramid.Pyramid;
+import com.cluit.visual.widget.dataPyramid.RowAction;
 import com.cluit.visual.widget.dataPyramid.Pyramid.BlockOrdering;
 
 public class ACTION_SortInsertionOrder extends RowAction{

@@ -1,9 +1,13 @@
-package com.cluit.visual.widget.dataPyramid;
+package com.cluit.visual.widget.dataPyramid.actions;
 
 import javafx.scene.layout.Pane;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+
+import com.cluit.visual.widget.dataPyramid.Pyramid;
+import com.cluit.visual.widget.dataPyramid.PyramidDropAction;
+import com.cluit.visual.widget.dataPyramid.RowAction;
 
 public class ACTION_DragDropOverride extends RowAction {
 
