@@ -24,12 +24,16 @@ class MeanBlock extends DataBlock {
 
 	@Override
 	public void bindWidth(NumberExpression deadZone, NumberExpression maxWidth) {
+		super.bindWidth(deadZone, maxWidth);
+		
 		rect.widthProperty().bind( deadZone.add( maxWidth.multiply(mean)));	
 		minWidthProperty().bind( maxWidth.add(deadZone) );
 	}
 	
 	@Override
 	void bindHeight(NumberExpression height) {
+		super.bindHeight(height);
+		
 		rect.heightProperty().bind(height);		
 	}
 }

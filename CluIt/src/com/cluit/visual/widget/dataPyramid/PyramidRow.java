@@ -1,6 +1,8 @@
 package com.cluit.visual.widget.dataPyramid;
 
 import javafx.beans.binding.NumberExpression;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
@@ -20,6 +22,7 @@ import javafx.scene.layout.VBox;
 import java.util.ArrayList;
 
 import com.cluit.visual.widget.dataPyramid.Block.Block;
+import com.cluit.visual.widget.dataPyramid.Block.Block.BlockType;
 
 public class PyramidRow extends VBox {
 	private static final int SPACING = 5;
@@ -111,13 +114,37 @@ public class PyramidRow extends VBox {
 		
 		headerBox.add(reloadButton, 1, 1);
 		
+		//The "switch block mode" button
+		Button mode = new Button("Pos Only");
+		mode.setPrefWidth(80);
+		mode.setOnAction( new EventHandler<ActionEvent>() {
+			boolean posOnly = true;
+			@Override
+			public void handle(ActionEvent event) {
+				if( posOnly ){
+					for( Pyramid p : pyramids )
+						p.setBlockDisplay( BlockType.Range );
+					mode.textProperty().set( "Pos | Range");
+					posOnly = false;
+				}
+				else if( !posOnly ){
+					for( Pyramid p : pyramids )
+						p.setBlockDisplay( BlockType.Mean );
+					mode.textProperty().set( "Pos Only");
+					posOnly = true;
+				}
+			}
+		});
+		GridPane.setHalignment(mode, HPos.CENTER);
+		headerBox.add(mode, 0, 2);
+		
 		//The "Delete row" button
 		Button button = new Button("Delete run");
 		button.setOnAction( (ev) -> ( (Pane) master.getParent() ).getChildren().remove(master) );
 		GridPane.setValignment(button, VPos.BOTTOM);
 		GridPane.setHalignment(button, HPos.LEFT);
 		GridPane.setVgrow(button, Priority.ALWAYS);
-		headerBox.add(button, 0, 2);
+		headerBox.add(button, 0, 3);
 		
 		row.getChildren().add(headerBox);		
 	}

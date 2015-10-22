@@ -35,6 +35,8 @@ class RangeBlock extends DataBlock {
 
 	@Override
 	void bindWidth(NumberExpression deadZone, NumberExpression maxWidth) {
+		super.bindWidth(deadZone, maxWidth);
+		
 		meanRect.widthProperty().bind( maxWidth.multiply( 0.5 ).multiply(mean).subtract(Const.BLOCK_STROKE_WIDTH/2) );
 		rangeRect.widthProperty().bind( maxWidth.multiply( 0.5 ).multiply( range ).subtract(Const.BLOCK_STROKE_WIDTH/2) );
 		deadRect.widthProperty().bind(deadZone);
@@ -57,6 +59,8 @@ class RangeBlock extends DataBlock {
 
 	@Override
 	void bindHeight(NumberExpression height) {
+		super.bindHeight(height);
+		
 		meanRect.heightProperty().bind(height);
 		deadRect.heightProperty().bind(height);
 		rangeRect.heightProperty().bind(height);

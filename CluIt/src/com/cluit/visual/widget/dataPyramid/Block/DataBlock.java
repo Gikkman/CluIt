@@ -13,14 +13,21 @@ abstract class DataBlock extends GridPane{
 
 	private final TypedObservableObjectWrapper<Color> color;
 	
+	NumberExpression deadZone, maxWidth, height;
+	
 	DataBlock(TypedObservableObjectWrapper<Color> color){
 		this.color = color;
 		this.setAlignment( Pos.CENTER );
 		this.setStyle( "-fx-background-color: WHITE;");
 	}
 	
-	abstract void bindWidth( NumberExpression deadZone, NumberExpression maxWidth);
-	abstract void bindHeight(NumberExpression height);
+	void bindWidth( NumberExpression deadZone, NumberExpression maxWidth){
+		this.deadZone = deadZone;
+		this.maxWidth = maxWidth;
+	}
+	void bindHeight(NumberExpression height){
+		this.height = height;
+	}
 	
 	
 	protected void initColors(Rectangle ... rects){
@@ -31,5 +38,21 @@ abstract class DataBlock extends GridPane{
 			
 			this.color.addPropertyChangeListener( (event) -> rect.setFill( color.getValue()));
 		}
+	}
+
+	public TypedObservableObjectWrapper<Color> getColor() {
+		return color;
+	}
+
+	NumberExpression getDeadZoneExpression() { 
+		return deadZone;
+	}
+
+	public NumberExpression getMaxWidthExpression() {
+		return maxWidth;
+	}
+
+	public NumberExpression getHeightExpression() {
+		return height;
 	}
 }

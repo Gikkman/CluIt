@@ -1,4 +1,4 @@
-package com.cluit.visual.widget.dataPyramid.actions;
+package com.cluit.visual.widget.dataPyramid.Actions;
 
 import java.util.ArrayList;
 
@@ -16,7 +16,7 @@ public class ACTION_SortIndividualWeight extends RowAction{
 			
 			KeyPriorityQueue_Min<Integer> weightQueue = new KeyPriorityQueue_Min<>();
 			for( int i = 0; i < blocks.length; i++)
-				weightQueue.add( blocks[i].getWeight(), i);
+				weightQueue.add( blocks[i].getPosition(), i);
 			
 			int[] newOrder = new int[ blocks.length ];
 			for( int i = 0; i < blocks.length; i++)

@@ -1,4 +1,4 @@
-package com.cluit.visual.widget.dataPyramid.actions;
+package com.cluit.visual.widget.dataPyramid.Actions;
 
 import java.util.ArrayList;
 
@@ -18,7 +18,7 @@ public class ACTION_SortMeanWeight extends RowAction{
 		for( Pyramid p : pyramids ){
 			Block[] blocks = p.getBlocks();
 			for( int i = 0; i < p.getNumberOfBlocks(); i++){
-				totalWeights[i] += blocks[i].getWeight();
+				totalWeights[i] += blocks[i].getPosition();
 			}
 		}
 		//Sort the Weight-Index pairs in ascending order, with respect to the weights

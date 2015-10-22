@@ -22,27 +22,26 @@ import com.cluit.util.structures.TypedObservableObjectWrapper;
 public class Block extends StackPane{
 	public enum BlockType {Mean, Range};
 	
-	private final HBox rectBox = new HBox();
-	private final Label		name;
+	private final HBox  rectBox = new HBox();
+	private final Label	name;
 	
 	private final HashMap<BlockType, DataBlock> blockSet = new HashMap<>();
-	private final double mean, range;
+	private final double position, range;
 	private double[] values;
 	
 	/**Creates a block that is intended to be added to a pyramid.
 	 * 
 	 * @param name Name of this block
 	 * @param color If the observable value is updated, the block will change color accordingly
-	 * @param weight Width of the block, in relation to the maximum width. 1.0 is the maximum weight, and 0.0 the minimum
+	 * @param position Width of the block, in relation to the maximum width. 1.0 is the maximum weight, and 0.0 the minimum
 	 */
-	public Block( String name, TypedObservableObjectWrapper<Color> color, double weight){
+	public Block( String name, TypedObservableObjectWrapper<Color> color, double position){
 		this.name = new Label(" " + name + " ");
-		this.name.setStyle( "-fx-background-color: LIGHTGREY;");
 		
-		this.mean = weight;
+		this.position = position;
 		this.range = -1;
 		
-		this.blockSet.put( BlockType.Mean, new MeanBlock(color, mean) );
+		this.blockSet.put( BlockType.Mean, new MeanBlock(color, this.position) );
 		
 		init();
 	}
@@ -58,25 +57,42 @@ public class Block extends StackPane{
 		if( values == null || values.length == 0 )
 			System.err.println("Error in Block : Constructor. Invalid 'values' parameter " + MiscUtils.getStackPos());
 		
-		double mean = 0, min = Double.POSITIVE_INFINITY, max = Double.NEGATIVE_INFINITY;
+		//Calculate position and range!
+		double pos = 0, min = Double.POSITIVE_INFINITY, max = Double.NEGATIVE_INFINITY;
 		for( double value : values ){
-			mean += value;
+			pos += value;
 			min = min > value ? value : min;
 			max = max < value ? value : max;
 		}
-		mean /= values.length;
+		pos /= values.length;
 		
 		this.values = values;
-		this.name = new Label(name);
-		this.mean = mean;
+		this.name = new Label(" " + name + " ");
+		this.position = pos;
 		this.range = max - min;
 		
-		this.blockSet.put( BlockType.Mean, new MeanBlock(color, mean) );
-		this.blockSet.put( BlockType.Range, new RangeBlock(color, mean, range) );
+		this.blockSet.put( BlockType.Mean, new MeanBlock(color, position) );
+		this.blockSet.put( BlockType.Range, new RangeBlock(color, position, range) );
 		
 		init();
 	}
 	
+	public Block(String name, DataBlock dataBlock) {
+		this.name = new Label(" " + name +" ");
+		
+		position = -1; 
+		range = -1;
+		values = null;
+		
+		this.prefWidth(Const.BLOCK_DEFAULT_WIDTH);
+		this.name.setStyle( "-fx-background-color: LIGHTGREY;");
+		
+		rectBox.setAlignment( Pos.TOP_CENTER );
+		rectBox.getChildren().add( dataBlock );
+		
+		this.getChildren().addAll(rectBox, this.name);
+	}
+
 	public void bindWidht( NumberExpression deadZone, NumberExpression maxWidth){
 		for( DataBlock b : blockSet.values() )
 			b.bindWidth(deadZone, maxWidth);
@@ -85,10 +101,6 @@ public class Block extends StackPane{
 	public void bindHeight( NumberExpression height){
 		for( DataBlock b : blockSet.values() )
 			b.bindHeight(height);
-	}
-		
-	public double getWeight(){
-		return mean;
 	}
 	
 	public void changeDisplayMode(BlockType displayMode){
@@ -100,10 +112,39 @@ public class Block extends StackPane{
 		}
 	}
 
+	public TypedObservableObjectWrapper<Color> getColor(){
+		return blockSet.values().iterator().next().getColor();
+	}
+	
+	public NumberExpression getDeadZoneExpression(){
+		return blockSet.values().iterator().next().getDeadZoneExpression();
+	}
+	
+	public NumberExpression getMaxWidthExpression(){
+		return blockSet.values().iterator().next().getMaxWidthExpression();
+	}
+	
+	public NumberExpression getHeightExpression(){
+		return blockSet.values().iterator().next().getHeightExpression();
+	}
+	
+	public double getPosition(){
+		return position;
+	}
+	
+	public double getRange() {
+		return range;
+	}
+	
+	public String getName(){
+		return name.getText();
+	}
+	
 	/**Sets up the name and colorisation of the block.
 	 */
 	private void init() {
 		this.prefWidth(Const.BLOCK_DEFAULT_WIDTH);
+		this.name.setStyle( "-fx-background-color: LIGHTGREY;");
 		
 		rectBox.setAlignment( Pos.TOP_CENTER );
 		rectBox.getChildren().add( blockSet.get( BlockType.Mean ) );		
@@ -115,7 +156,4 @@ public class Block extends StackPane{
 		return name.getText();
 	}
 
-	public double getRange() {
-		return range;
-	}
 }

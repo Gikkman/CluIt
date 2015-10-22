@@ -1,4 +1,4 @@
-package com.cluit.visual.widget.dataPyramid.actions;
+package com.cluit.visual.widget.dataPyramid.Actions;
 
 import java.util.ArrayList;
 

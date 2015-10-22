@@ -38,5 +38,6 @@ public final class Const {
 	public static final double BLOCK_STROKE_WIDTH = 3;
 	public static final double BLOCK_DEFAULT_HEIGHT = 50;
 	public static final double BLOCK_DEFAULT_WIDTH = 150;
+	public static final double COMPARISON_BLOCK_STROKE_WIDTH = 1;
 	
 }

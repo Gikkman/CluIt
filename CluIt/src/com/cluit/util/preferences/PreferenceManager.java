@@ -26,13 +26,25 @@ public class PreferenceManager {
 	}
 	
 	public static Color getFeatureColor(String feature){
-		String colorAsString = INSTANCE.prefs.get(COLOR_KEY+feature, "1:1:1:1");		
+		return getFeatureColor(feature, Color.WHITE);
+	}
+	
+	public static Color getFeatureColor(String feature, Color defaultColor){
+		String colorAsString = INSTANCE.prefs.get(COLOR_KEY+feature, parseColor(defaultColor));		
 		return parseColor(colorAsString);
 	}
 	
 	public static void setFeatureColor(String feature, Color color){
 		String colorAsString = parseColor(color);
 		INSTANCE.prefs.put(COLOR_KEY+feature, colorAsString);
+	}
+	
+	public static int getInteger(String identifyer, int defaultValue) {
+		return INSTANCE.prefs.getInt(identifyer, defaultValue);
+	}
+	
+	public static void storeInteger(String identifyer, int value) {
+		INSTANCE.prefs.putInt(identifyer, value);
 	}
 	//endregion *********************************************************************************************
 	//		

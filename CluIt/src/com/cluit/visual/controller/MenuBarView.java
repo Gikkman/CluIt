@@ -19,7 +19,6 @@ public class MenuBarView {
 		//TODO: Make window unique (i.e. disallow multiples)
 		try{    
             Stage stage = new Stage();
-            System.out.println( Main.class );
             
             URL url = Main.class.getResource("view/ExcelImporter.fxml");            
             Parent root = FXMLLoader.load( url );    

@@ -12,6 +12,7 @@ import javafx.scene.input.Dragboard;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
+import javafx.scene.text.TextAlignment;
 
 import java.beans.PropertyChangeEvent;
 import java.util.Arrays;
@@ -23,8 +24,8 @@ import java.util.Map;
 import com.cluit.util.Const;
 import com.cluit.util.structures.TypedObservableObjectWrapper;
 import com.cluit.visual.widget.dataPyramid.Block.Block;
-import com.cluit.visual.widget.dataPyramid.Block.BlockDropAction;
 import com.cluit.visual.widget.dataPyramid.Block.Block.BlockType;
+import com.cluit.visual.widget.dataPyramid.Block.BlockDropAction;
 
 /**A pyramid is an abstraction of a cluster, where each block in the pyramid visualizes a certain feature. 
  * 
@@ -66,7 +67,9 @@ public class Pyramid extends VBox{
 		//Creates the label which specifies the name of the cluster.
 		heading = new Label( name.getValue() );
 		heading.setStyle("-fx-font-size: 18; -fx-font-weight: bold;");
+		heading.textAlignmentProperty().set( TextAlignment.CENTER );
 		name.addPropertyChangeListener( (ev) -> heading.textProperty().set( (String) ev.getNewValue() ));
+		
 		
 		getChildren().add( heading );
 		getChildren().add( blockBox );
@@ -193,6 +196,16 @@ public class Pyramid extends VBox{
 	public void setBlockDisplay(BlockType displayMode) {
 		for( Block b : block_to_id.keySet() )
 			b.changeDisplayMode(displayMode);
+	}
+	
+	public int[] getCurrentBlockOrder() {
+		int[] order = new int[ getNumberOfBlocks() ];
+		
+		for( int i = 0; i < order.length; i++ ){
+			order[i] = block_to_id.get( blockBox.getChildren().get(i) );
+		}
+		
+		return order;
 	}
 	//////////////////////////////////////////////////////////////////////////////
 	//region 			PRIVATE METHODS		
