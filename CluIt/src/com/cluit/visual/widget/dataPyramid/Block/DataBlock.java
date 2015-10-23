@@ -19,11 +19,15 @@ abstract class DataBlock extends GridPane{
 		this.color = color;
 		this.setAlignment( Pos.CENTER );
 		this.setStyle( "-fx-background-color: WHITE;");
+		
+		this.setGridLinesVisible(true);
 	}
 	
 	void bindWidth( NumberExpression deadZone, NumberExpression maxWidth){
 		this.deadZone = deadZone;
 		this.maxWidth = maxWidth;
+		
+		minWidthProperty().bind( maxWidth.add(deadZone) );
 	}
 	void bindHeight(NumberExpression height){
 		this.height = height;

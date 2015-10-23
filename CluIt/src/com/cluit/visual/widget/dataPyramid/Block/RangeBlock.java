@@ -54,7 +54,7 @@ class RangeBlock extends DataBlock {
 		rangeCol.minWidthProperty().bind(maxWidth.multiply(0.5));  
 		
 		getColumnConstraints().addAll(meanCol, deadCol, rangeCol);
-		minWidthProperty().bind( maxWidth.add(deadZone) );
+		
 	}
 
 	@Override

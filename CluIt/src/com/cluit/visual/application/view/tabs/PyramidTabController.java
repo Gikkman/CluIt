@@ -42,8 +42,7 @@ import com.cluit.visual.widget.dataPyramid.Actions.ACTION_SortMeanWeight;
 import com.cluit.visual.widget.dataPyramid.Block.Block;
 
 public class PyramidTabController extends _AbstractTableTab{
-	private static final int SPACE_BETWEEN_ROWS = 30, SPACE_BETWEEN_COLOR_PICKERS = 10, SPACE_BETWEEN_PYRAMIDS = 10,
-							 PYRAMID_MINIMUM_WIDTH = 250;
+	private static final int SPACE_BETWEEN_ROWS = 30, SPACE_BETWEEN_COLOR_PICKERS = 10, SPACE_BETWEEN_PYRAMIDS = 10;
 	
 	@FXML ScrollPane scroll_pane;
 	@FXML AnchorPane anchor_pane;
@@ -131,12 +130,11 @@ public class PyramidTabController extends _AbstractTableTab{
 		
 		//Creates the pyramids
 		PyramidRow row = new PyramidRow("Run " + run++); //Will contain the pyramids
-		row.addPyramidAction( getPyramidActions() );
 		for( int i = 0; i < numberClusters; i++){	//Each cluster is represented by one pyramid
 			Pyramid pyramid = new Pyramid( VariableSingleton.getInstance().getClusterName(i) , blockOrder);
-			pyramid.setMinWidth(PYRAMID_MINIMUM_WIDTH);
-			double[][] blockValues = ClusteringUtils.transposeMatrix( results.getNormalizedClusterEntryValues(i) );
+			pyramid.setAlignment(Pos.CENTER);
 			
+			double[][] blockValues = ClusteringUtils.transposeMatrix( results.getNormalizedClusterEntryValues(i) );
 			for( int j = 0; j < numberFeatures; j++){		
 				String feature = results.getLabels()[j];
 				Block block = new Block( feature,  getColor( feature ), blockValues[j] );
@@ -151,10 +149,10 @@ public class PyramidTabController extends _AbstractTableTab{
 				for( int j = 0; j < refLabels.length; j++)
 					pyramid.addMiscData( String.format( refLabels[j] + " : %.4f", refData[j]) );
 			}
-			
 			row.addPyramid(pyramid);
 		}		
 		
+		row.addPyramidAction( getPyramidActions() );
 		row.setBlockBindings(dead_zone.valueProperty(), max_width.valueProperty(), height.valueProperty());
 		//Add it to the view
 		pyramids_layout.getChildren().add(row);
@@ -195,7 +193,7 @@ public class PyramidTabController extends _AbstractTableTab{
 			if( type.matches("MinW") ){
 				slider.setMin(0);
 				slider.setMax(100);
-				slider.setValue(0);
+				slider.setValue(20);
 				slider.setMajorTickUnit(50);
 				slider.setMinorTickCount(10);
 				slider.setBlockIncrement(5);
@@ -219,6 +217,8 @@ public class PyramidTabController extends _AbstractTableTab{
 				System.err.println("Unknow slider type " + MiscUtils.getStackPos());
 			}
 			
+			slider.valueProperty().addListener( (o, oldV, newV) ->  { slider.valueProperty().set( (newV.intValue() / 2)*2 ); System.out.println(slider.getValue());} );
+			
 			return slider;	
 		}
 	
@@ -241,12 +241,18 @@ public class PyramidTabController extends _AbstractTableTab{
 		PyramidRow row = new PyramidRow("Run"); //Will contain the pyramids
 		for( int nrPyr = 0; nrPyr < 3; nrPyr++){
 			Pyramid pyramid = new Pyramid( VariableSingleton.getInstance().getClusterName(i), block_order);
-			pyramid.setMinWidth(PYRAMID_MINIMUM_WIDTH);
-			for( int nrBlock = 0; nrBlock < 4; nrBlock++){		
-				Block block = new Block( "Block " + nrBlock,  getColor( "Block " + nrBlock ), new double[] {(1.0 - nrBlock/10 - 0.05) / (nrBlock+1), 0.8, 0.6, 0.4} );
+			for( int nrBlock = 0; nrBlock < 4; nrBlock++){	
+				Block block;
+				if( nrPyr == 1 && nrBlock == 1)
+					block = new Block( "Block " + nrBlock,  getColor( "Block " + nrBlock ), new double[] {1.0} );
+				else if (nrPyr == 1 && nrBlock == 2)
+					block = new Block( "Block " + nrBlock,  getColor( "Block " + nrBlock ), new double[] {1.0, 0.0} );
+				else
+					block = new Block( "Block " + nrBlock,  getColor( "Block " + nrBlock ), new double[] {(1.0 - nrBlock/10 - 0.05) / (nrBlock+1), 0.8, 0.6, 0.4} );
 				pyramid.add(block);
 			}
 			
+			pyramid.addMiscData( "Hej: Där");
 			row.addPyramid(pyramid);
 		}		
 		

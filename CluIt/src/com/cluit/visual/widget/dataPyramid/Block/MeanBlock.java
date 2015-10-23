@@ -1,6 +1,9 @@
 package com.cluit.visual.widget.dataPyramid.Block;
 
 import javafx.beans.binding.NumberExpression;
+import javafx.geometry.HPos;
+import javafx.scene.layout.ColumnConstraints;
+import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 
@@ -18,7 +21,8 @@ class MeanBlock extends DataBlock {
 		this.mean = mean;
 		this.rect = new Rectangle(Const.BLOCK_DEFAULT_WIDTH*mean, Const.BLOCK_DEFAULT_HEIGHT);
 		initColors(rect);
-					
+		
+		GridPane.setHalignment(rect, HPos.CENTER);
 		add(rect, 0, 0);
 	}
 
@@ -27,7 +31,10 @@ class MeanBlock extends DataBlock {
 		super.bindWidth(deadZone, maxWidth);
 		
 		rect.widthProperty().bind( deadZone.add( maxWidth.multiply(mean)));	
-		minWidthProperty().bind( maxWidth.add(deadZone) );
+		
+		ColumnConstraints c = new ColumnConstraints();
+		c.minWidthProperty().bind( maxWidth.add(deadZone));
+		getColumnConstraints().add(c);
 	}
 	
 	@Override

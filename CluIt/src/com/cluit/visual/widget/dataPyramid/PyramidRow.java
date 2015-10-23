@@ -17,7 +17,6 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
-import javafx.scene.layout.TilePane;
 import javafx.scene.layout.VBox;
 
 import java.util.ArrayList;
@@ -59,7 +58,7 @@ public class PyramidRow extends VBox {
 		} );	
 		
 		//The pyramids container
-		TilePane pane = new TilePane();
+		HBox pane = new HBox();
 		pyramidBox = pane;
 		
 		row.getChildren().add(pyramidBox);

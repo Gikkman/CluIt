@@ -3,15 +3,21 @@ package com.cluit.visual.widget.dataPyramid;
 import javafx.beans.binding.NumberExpression;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.geometry.VPos;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.TransferMode;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
 import javafx.scene.text.TextAlignment;
 
 import java.beans.PropertyChangeEvent;
@@ -43,6 +49,7 @@ public class Pyramid extends VBox{
 	private final Label heading;
 	private final VBox blockBox = new VBox(Const.PYRAMID_SPACING);
 	private final VBox miscBox  = new VBox(Const.PYRAMID_SPACING);
+	private Rectangle leftRange, deadCenter, rightRange;
 	
 	private boolean blockOrderIsLinked = true;
 	private PyramidDropAction pyramidDropAction = (parent, source, target) -> changePyramidOrder(parent, source, target);
@@ -70,9 +77,14 @@ public class Pyramid extends VBox{
 		heading.textAlignmentProperty().set( TextAlignment.CENTER );
 		name.addPropertyChangeListener( (ev) -> heading.textProperty().set( (String) ev.getNewValue() ));
 		
+		//Creates the range-indicator bellow the blocks
+		GridPane rangeIndicatorGrid = createRangeIndicatorGrid();
+		Label sep = new Label("");
 		
 		getChildren().add( heading );
 		getChildren().add( blockBox );
+		getChildren().add( rangeIndicatorGrid );
+		getChildren().add( sep );
 		getChildren().add( miscBox );
 		
 		addDragDrop(this, UNIQUE_DRAG_KEY);
@@ -116,10 +128,15 @@ public class Pyramid extends VBox{
 	 * @param deadZone How "wide" is the zone representing ZERO
 	 * @param maxWidth
 	 */
-	void setBlockWidthBinding(NumberExpression deadZone, NumberExpression maxWidth){
+	public void setBlockWidthBinding(NumberExpression deadZone, NumberExpression maxWidth){
 		for( Block b : block_to_id.keySet() ){
 			b.bindWidht(deadZone, maxWidth);
 		}
+		
+		rightRange.widthProperty().bind(maxWidth.divide(2));
+		leftRange.widthProperty().bind(maxWidth.divide(2));
+		deadCenter.widthProperty().bind(deadZone);
+		
 	}
 	
 	/**Binds the blocks' height to an expression. Useful to controlling pyramids appearance from an external controller
@@ -320,6 +337,23 @@ public class Pyramid extends VBox{
 		return order;
 	}
 	
+	private GridPane createRangeIndicatorGrid() {
+		GridPane grid = new GridPane();
+		grid.setAlignment(Pos.TOP_CENTER);
+		
+		leftRange = new Rectangle(2, 5); deadCenter = new Rectangle(2, 5); rightRange = new Rectangle(2, 5);
+		leftRange.setFill( Color.BLACK ); deadCenter.setFill( Color.TRANSPARENT ); rightRange.setFill( Color.BLACK );
+		GridPane.setConstraints(leftRange, 0, 0, 2, 1, HPos.RIGHT, VPos.TOP, Priority.NEVER, Priority.NEVER);
+		GridPane.setConstraints(rightRange, 3, 0, 2, 1, HPos.CENTER, VPos.TOP, Priority.NEVER, Priority.NEVER);
+		GridPane.setConstraints(deadCenter, 2, 0, 1, 1, HPos.LEFT, VPos.TOP, Priority.NEVER, Priority.NEVER);
+		grid.getChildren().addAll(leftRange, deadCenter, rightRange);
+		
+		Label right1 = new Label("1"), right0 = new Label("0"), left1 = new Label("1"), left0 = new Label("0");
+		grid.add(left1, 0, 1); 		grid.add(left0, 1, 1); 		grid.add(right0, 3, 1); 	grid.add(right1, 4, 1);
+		GridPane.setHalignment(left0, HPos.RIGHT); GridPane.setHalignment(right1, HPos.RIGHT);
+		
+		return grid;
+	}
 	//endregion //////////////////////////////////////////////////////////////////
 	//
 	//region 			DROP ACTIONS		

@@ -7,6 +7,8 @@ import javafx.geometry.VPos;
 import javafx.scene.Scene;
 import javafx.scene.control.ColorPicker;
 import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.control.ScrollPane.ScrollBarPolicy;
 import javafx.scene.control.Slider;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
@@ -97,9 +99,16 @@ public class ACTION_DragDropOverride extends RowAction {
 		//The actual comparison pyramid
 		Pyramid pyramid = new Pyramid(heading, blockOrder);
 		pyramid.setPadding( new Insets(25) );
-		pyramid.add( createBlocks(source, target) );		
-		GridPane.setConstraints(pyramid, 0, 2, 1, 1, HPos.CENTER, VPos.BOTTOM, Priority.ALWAYS, Priority.ALWAYS);
-		box.add( pyramid, 0, 2 );
+		pyramid.add( createBlocks(source, target) );
+		pyramid.setBlockWidthBinding(dead_zone.valueProperty(), max_width.valueProperty());
+		//The pane containing the pyramid
+		ScrollPane scrollP = new ScrollPane(pyramid);
+		scrollP.setHbarPolicy( ScrollBarPolicy.NEVER);
+		
+		pyramid.translateXProperty().bind( scrollP.widthProperty().subtract( pyramid.widthProperty() ).divide(2) );
+		
+		GridPane.setConstraints(scrollP, 0, 2, 1, 1, HPos.CENTER, VPos.CENTER, Priority.ALWAYS, Priority.ALWAYS);
+		box.add( scrollP, 0, 2 );
 		
 		//Display the pyramid
 		Stage stage = new Stage();

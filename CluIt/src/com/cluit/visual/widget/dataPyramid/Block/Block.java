@@ -9,7 +9,6 @@ import javafx.scene.paint.Color;
 
 import java.util.HashMap;
 
-import com.cluit.util.Const;
 import com.cluit.util.methods.MiscUtils;
 import com.cluit.util.structures.TypedObservableObjectWrapper;
 
@@ -84,7 +83,6 @@ public class Block extends StackPane{
 		range = -1;
 		values = null;
 		
-		this.prefWidth(Const.BLOCK_DEFAULT_WIDTH);
 		this.name.setStyle( "-fx-background-color: LIGHTGREY;");
 		
 		rectBox.setAlignment( Pos.TOP_CENTER );
@@ -143,7 +141,6 @@ public class Block extends StackPane{
 	/**Sets up the name and colorisation of the block.
 	 */
 	private void init() {
-		this.prefWidth(Const.BLOCK_DEFAULT_WIDTH);
 		this.name.setStyle( "-fx-background-color: LIGHTGREY;");
 		
 		rectBox.setAlignment( Pos.TOP_CENTER );
