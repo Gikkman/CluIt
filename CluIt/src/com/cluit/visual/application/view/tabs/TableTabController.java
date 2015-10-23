@@ -83,6 +83,20 @@ public class TableTabController extends _AbstractTableTab{
 		super.initialize(location, resources);
 		wrap_pane = new HBox();
 		group.getChildren().add(wrap_pane);
+		
+		GroupHeightBinding_Local groupH = new GroupHeightBinding_Local(group);
+		GroupWidthBinding_Local  groupW = new GroupWidthBinding_Local(group);
+		ScrollPaneViewPortHeightBinding scrollH = new ScrollPaneViewPortHeightBinding(scroll_pane);
+		ScrollPaneViewPortWidthBinding  scrollW = new ScrollPaneViewPortWidthBinding(scroll_pane);
+		
+		button_clear.layoutYProperty().bind( scroll_pane.vvalueProperty()
+				.multiply( groupH
+						.subtract( scrollH))
+				.add( scrollH.subtract(30) ));
+		button_clear.layoutXProperty().bind( scroll_pane.hvalueProperty()
+				.multiply( groupW
+						.subtract( scrollW))
+				.add( 10 ));
 	}
 	
 	@Override
@@ -263,19 +277,7 @@ public class TableTabController extends _AbstractTableTab{
 		wrap_pane.setMinWidth(1);
 		addVerticalSeparator();
 		
-		GroupHeightBinding_Local groupH = new GroupHeightBinding_Local(group);
-		GroupWidthBinding_Local  groupW = new GroupWidthBinding_Local(group);
-		ScrollPaneViewPortHeightBinding scrollH = new ScrollPaneViewPortHeightBinding(scroll_pane);
-		ScrollPaneViewPortWidthBinding  scrollW = new ScrollPaneViewPortWidthBinding(scroll_pane);
 		
-		button_clear.layoutYProperty().bind( scroll_pane.vvalueProperty()
-				.multiply( groupH
-						.subtract( scrollH))
-				.add( scrollH.subtract(30) ));
-		button_clear.layoutXProperty().bind( scroll_pane.hvalueProperty()
-				.multiply( groupW
-						.subtract( scrollW))
-				.add( 10 ));
 		
 		first = false;
 	}

@@ -17,6 +17,7 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
+import javafx.scene.layout.TilePane;
 import javafx.scene.layout.VBox;
 
 import java.util.ArrayList;
@@ -27,10 +28,11 @@ import com.cluit.visual.widget.dataPyramid.Block.Block.BlockType;
 public class PyramidRow extends VBox {
 	private static final int SPACING = 5;
 	
-	private final HBox					  row = new HBox();
+	private final HBox				  row = new HBox();
+	private final Pane				  pyramidBox;
 	private final ComboBox<RowAction> comboBox = new ComboBox<>();
-	private final Button 				  reloadButton = new Button("R");
-	private final ArrayList<Pyramid> 	  pyramids = new ArrayList<>();
+	private final Button 			  reloadButton = new Button("R");
+	private final ArrayList<Pyramid>  pyramids = new ArrayList<>();
 	
 	//*******************************************************************************************************
 	//region							PUBLIC 			
@@ -56,6 +58,11 @@ public class PyramidRow extends VBox {
 				comboBox.getValue().onSelect(pyramids);
 		} );	
 		
+		//The pyramids container
+		TilePane pane = new TilePane();
+		pyramidBox = pane;
+		
+		row.getChildren().add(pyramidBox);
 		getChildren().add(row);
 		getChildren().add( new Separator() );
 	}
@@ -64,9 +71,8 @@ public class PyramidRow extends VBox {
 	public void addPyramid( Pyramid ... pyramids){
 		for( Pyramid p : pyramids ){
 			this.pyramids.add(p);
-		}
-		
-		row.getChildren().addAll(pyramids);
+			pyramidBox.getChildren().add(p);
+		}		
 	}
 	
 	

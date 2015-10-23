@@ -11,6 +11,11 @@ import javafx.scene.shape.Rectangle;
 import com.cluit.util.Const;
 import com.cluit.util.structures.TypedObservableObjectWrapper;
 
+/**This class represents a certain type of DataBlock that visualizes differences between two different blocks
+ * 
+ * @author Simon
+ *
+ */
 public class ComparisonBlock extends DataBlock {
 	
 	private final Rectangle positionLargerRect, positionOverlapRect, deadRect, rangeOverlapRect, rangeLargerRect;

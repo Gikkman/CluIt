@@ -12,6 +12,7 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
+import javafx.scene.layout.RowConstraints;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
@@ -72,27 +73,32 @@ public class ACTION_DragDropOverride extends RowAction {
 		return "Drop action override";
 	}
 	
+	//TODO: Bug with pyramids with different block order
+	
 	private void thisAction(Pane parent, Pyramid source, Pyramid target){		
-		//Create an ordered array, with index i = i. 
-		int[] order = new int[ source.getNumberOfBlocks() ];
-		for( int i = 0; i < order.length; i++ )
-			order[i] = i;
-		TypedObservableObjectWrapper<int[]>  blockOrder = new TypedObservableObjectWrapper<int[]>(order);
-		TypedObservableObjectWrapper<String> heading    = new TypedObservableObjectWrapper<String>("Comparison pyramid\n" + "Drag source: " + source.getHeading() + "\t\tDrop target: " + target.getHeading());
 		
 		//The containing pane
 		GridPane box = new GridPane();	
 		box.setAlignment(Pos.CENTER);
 		box.setVgap(10);
+		box.setPadding( new Insets(5) );
 		box.add( createColorBox(),  0, 0);
 		box.add( createSliderBox(), 0, 1);
+		RowConstraints r1 = new RowConstraints(25), r2 = new RowConstraints(25);
+		box.getRowConstraints().addAll(r1, r2);
 		
+		//Create an ordered array, with index i = i. 
+		int[] order = new int[ source.getNumberOfBlocks() ];
+		for( int i = 0; i < order.length; i++ )
+			order[i] = i;
+		//Pyramids needs certain parameters encased in TypedObservableObjectWrappers
+		TypedObservableObjectWrapper<int[]>  blockOrder = new TypedObservableObjectWrapper<int[]>(order);
+		TypedObservableObjectWrapper<String> heading    = new TypedObservableObjectWrapper<String>("Comparison pyramid\n" + "Drag source: " + source.getHeading() + "\t\tDrop target: " + target.getHeading());	
 		//The actual comparison pyramid
 		Pyramid pyramid = new Pyramid(heading, blockOrder);
 		pyramid.setPadding( new Insets(25) );
-		pyramid.add( createBlocks(source, target) );
-		
-		GridPane.setConstraints(pyramid, 0, 2, 1, 1, HPos.CENTER, VPos.CENTER, Priority.ALWAYS, Priority.ALWAYS);
+		pyramid.add( createBlocks(source, target) );		
+		GridPane.setConstraints(pyramid, 0, 2, 1, 1, HPos.CENTER, VPos.BOTTOM, Priority.ALWAYS, Priority.ALWAYS);
 		box.add( pyramid, 0, 2 );
 		
 		//Display the pyramid
@@ -113,35 +119,42 @@ public class ACTION_DragDropOverride extends RowAction {
 		PreferenceManager.storeInteger(HEIGHT_ID,     (int) height.getValue() );
 	}
 
+	//Creates the blocks that makes up the pyramid.
 	private Block[] createBlocks(Pyramid source, Pyramid target) {
 		Block[] blocks = new Block[ source.getNumberOfBlocks() ];
 		
+		//Since we don't know the order of the blocks currently in any of the two pyramids, we first fetch the order in the target pyramid.
+		//We then fetch the blocks from the two pyramids, so we can perform the comparisons.
 		int[] targetsOrder 	  = target.getCurrentBlockOrder();
 		Block[] targetsBlocks = target.getBlocks();
-		
-		int[] sourcesOrder 	  = source.getCurrentBlockOrder();
 		Block[] sourcesBlocks = source.getBlocks();
 		
 		for( int i = 0; i < blocks.length; i++){
+			//We make sure to fetch blocks representing the same feature, from both the pyramid's block-collections
 			Block targetsCurrentBlock = targetsBlocks[ targetsOrder[i] ];
-			Block sorucesCurrentBlock = sourcesBlocks[ sourcesOrder[i] ];
+			Block sorucesCurrentBlock = sourcesBlocks[ targetsOrder[i] ];
 			
-			String featureName					 	  = targetsCurrentBlock.getName();
+			String featureName  = targetsCurrentBlock.getName();
 			
 			double targetsPos 	= targetsCurrentBlock.getPosition();
 			double targetsRange = targetsCurrentBlock.getRange();
 			double sourcesPos 	= sorucesCurrentBlock.getPosition();
 			double sourcesRange = sorucesCurrentBlock.getRange();
 			
+			//A ComparisonBlock is a block that colors different visuals. The area both pyramid's overlap, given a certain feature,
+			//and the segments where one pyramid is larger than the other, are all colored differently.
 			ComparisonBlock comparisonBlock = new ComparisonBlock(overlapColor, targetLargerColor, soruceLargerColor, targetsPos, targetsRange, sourcesPos, sourcesRange);
+			//Bind the different size-sliders' values to the blocks sizes
 			comparisonBlock.bindHeight( height.valueProperty() );
 			comparisonBlock.bindWidth(  dead_zone.valueProperty(), max_width.valueProperty() );
+			
 			blocks[i] = new Block(featureName, comparisonBlock);
 		}
 		
 		return blocks;
 	}		
 	
+	//Creates the three color-pickers, for controlling the colors of the different visuals
 	private Pane createColorBox() {
 		HBox box = new HBox(10);
 		box.setAlignment(Pos.CENTER);
@@ -158,6 +171,7 @@ public class ACTION_DragDropOverride extends RowAction {
 		return box;
 	}
 	
+	//Creates the three size-sliders, for controlling the dead zone, height and max width
 	private Pane createSliderBox() {
     	HBox sliderLayout = new HBox( 10 );
     	sliderLayout.setAlignment( Pos.CENTER );
@@ -172,7 +186,7 @@ public class ACTION_DragDropOverride extends RowAction {
 		Slider slider = new Slider();
 		slider.setShowTickLabels(true);
 		slider.setShowTickMarks(true);
-		//There is a lot of hard coded values here. But that is to avoid cluttering down the CONST section
+		//There is a lot of hard coded values here. But that is to avoid cluttering down the CONST section.
 		if( type.matches("DeadZ") ){
 			slider.setMin(0);
 			slider.setMax(200);
