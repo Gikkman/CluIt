@@ -74,9 +74,7 @@ public class ACTION_DragDropOverride extends RowAction {
 	public String toString() {
 		return "Drop action override";
 	}
-	
-	//TODO: Bug with pyramids with different block order
-	
+		
 	private void thisAction(Pane parent, Pyramid source, Pyramid target){		
 		
 		//The containing pane

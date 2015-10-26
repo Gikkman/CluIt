@@ -18,9 +18,6 @@ abstract class DataBlock extends GridPane{
 	DataBlock(TypedObservableObjectWrapper<Color> color){
 		this.color = color;
 		this.setAlignment( Pos.CENTER );
-		this.setStyle( "-fx-background-color: WHITE;");
-		
-		this.setGridLinesVisible(true);
 	}
 	
 	void bindWidth( NumberExpression deadZone, NumberExpression maxWidth){

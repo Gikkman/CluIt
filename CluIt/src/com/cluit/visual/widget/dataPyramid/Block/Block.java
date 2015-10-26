@@ -83,8 +83,6 @@ public class Block extends StackPane{
 		range = -1;
 		values = null;
 		
-		this.name.setStyle( "-fx-background-color: LIGHTGREY;");
-		
 		rectBox.setAlignment( Pos.TOP_CENTER );
 		rectBox.getChildren().add( dataBlock );
 		

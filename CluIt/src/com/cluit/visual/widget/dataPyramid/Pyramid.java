@@ -61,11 +61,8 @@ public class Pyramid extends VBox{
 		setAlignment(Pos.CENTER);
 		setSpacing(Const.PYRAMID_SPACING);
 		setPadding( new Insets(Const.PYRAMID_PADDING) );
-		setStyle("-fx-background-color: YELLOW;");
 		
 		blockBox.setAlignment(Pos.CENTER);
-		blockBox.setStyle("-fx-background-color: CYAN;");
-
 		miscBox.setAlignment(Pos.CENTER);
 
 		this.observableBlockOrder = observableBlockOrder;
