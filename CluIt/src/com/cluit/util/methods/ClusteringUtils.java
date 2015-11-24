@@ -163,6 +163,8 @@ public class ClusteringUtils {
 	}
 
 	/**Complexity: O( 2 * N )
+	 * 
+	 * Should in contain only one unique number, this method return an array of 0's
 	 */
 	public static double[] normalize(double[] in){	
 		double min = Double.POSITIVE_INFINITY, max = Double.NEGATIVE_INFINITY;
@@ -174,13 +176,15 @@ public class ClusteringUtils {
 			if( val < min )
 				min = val;
 		}
-		
 		return normalize(in, min, max);	
 	}
 	
 	/**Complexity: O( N )
+	 *
+	 * Should min == max, this method return an array of 0's
 	 */
 	public static double[] normalize(double[] in, double min, double max){
+		
 		//Create normalized data
 		double[] out = new double[ in.length ];	
 		for( int i = 0; i < out.length; i++){
@@ -193,7 +197,7 @@ public class ClusteringUtils {
 	/**Complexity: O( 1 )
 	 */
 	public static double normalize(double in, double min, double max){
-		return (in - min) / (max - min);
+		return min == max ? 0 :(in - min) / (max - min);
 	}
 
 	/**Transposes a matrix, making each column a row and each row a columns.

@@ -13,6 +13,7 @@ import testing.io.Test_ExcelReader;
 import testing.io.Test_Image;
 import testing.utils.Test_MethodMapper;
 import testing.utils.Test_MultiMethodMapper;
+import testing.utils.Test_Normalization;
 import testing.utils.Test_PriorityQueues;
 import testing.utils.Test_ReferencePasser;
 
@@ -37,7 +38,7 @@ public class TestSuit {
 		Test_MultiMethodMapper.run();
 		Test_ReferencePasser.run();
 		Test_ExcelReader.run();
-							
+		Test_Normalization.run();					
 	}
 
 	private static class Ex implements Invocation{
