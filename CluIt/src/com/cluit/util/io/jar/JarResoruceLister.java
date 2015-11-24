@@ -11,6 +11,11 @@ import java.util.Set;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
+/**Static class which only contains a single method. Used for listing files inside a .jar file
+ * 
+ * @author Simon
+ *
+ */
 public class JarResoruceLister {
 
 	  /**Thanks to Greg Briggs for the following code. Gikkman made some slight modifications
@@ -20,8 +25,9 @@ public class JarResoruceLister {
 	   * Works for regular files and also JARs.
 	   * 
 	   * @author Greg Briggs
-	   * @param clazz Any java class that lives in the same place as the resources you want.
-	   * @param path Should end with "/", but not start with one.
+	   *
+	   * @param clazz Any java class within the jar.
+	   * @param path Path to the directory you want to list items in. The path should be relative to clazz. Should end with "/", but not start with one.
 	   * @return Just the name of each member item, not the full paths.
 	   * @throws URISyntaxException 
 	   * @throws IOException 

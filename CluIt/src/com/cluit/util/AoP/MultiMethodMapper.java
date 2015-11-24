@@ -3,6 +3,13 @@ package com.cluit.util.AoP;
 import java.util.HashMap;
 import java.util.Map;
 
+/**<b>This class is currently not used.</b> <br><br>
+ * 
+ * Allowed a user to register several methods to the same key, as per the MethodMapper, and later on invoke all methods registered to a given key. 
+ * @author Simon
+ *
+ */
+@Deprecated
 public class MultiMethodMapper {
 	private static Map<String, Map<String, Invocation>> map = new HashMap<>();	
 	private MultiMethodMapper() {}

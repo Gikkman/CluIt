@@ -3,6 +3,14 @@ package com.cluit.util.dataTypes;
 import java.io.File;
 import java.util.Map;
 
+/**Contains a collection of data related to a certain experiment. 
+ * 
+ * The contained data consist of JS-File location, imported data, the space object, should-data-be-normalized-bool, the number of clusters and
+ * the data from the JS-defined data fields
+ *  
+ * @author Simon
+ *
+ */
 public class ExperimentBundle {
 
 	//*******************************************************************************************************
@@ -70,12 +78,10 @@ public class ExperimentBundle {
 	public int 		getNumberOfClusters() {
 		return mNumberOfClusters;
 	}
+	
 	public Map<String, Object> getUserDefinedData() {
 		return mUserDefined;
 	}
-	//endregion *********************************************************************************************
-	//region								PRIVATE 		
-	//*******************************************************************************************************
 
 	//endregion *********************************************************************************************
 	//*******************************************************************************************************

@@ -12,14 +12,26 @@ import net.sf.image4j.codec.bmp.BMPDecoder;
 import net.sf.image4j.codec.bmp.BMPEncoder;
 
 public class BMP_Image {
+	//*******************************************************************************************************
+	//region								VARIABLES 		
+	//*******************************************************************************************************
+
 	private BufferedImage img;
 	private File file;
 	private RGB_Pixel[][] pixels;
 	
+	//endregion *********************************************************************************************
+	//region								CONSTRUCTORS 	
+	//*******************************************************************************************************
+
 	private BMP_Image(String filepath){
 		file = new File(filepath);
 	}
 	
+	//endregion *********************************************************************************************
+	//region								STATIC			
+	//*******************************************************************************************************
+
 	/**Reads an existing BMP-file from the file system.
 	 * 
 	 * @param filepath Path to the file that'll be loaded
@@ -56,6 +68,10 @@ public class BMP_Image {
 		i.createBlankImage(width, height);		
 		return i;
 	}
+	
+	//endregion *********************************************************************************************
+	//region								PUBLIC 			
+	//*******************************************************************************************************
 	
 	/**Retrieves the RGB_Pixel element at coordinate [x,y] counting from the top left corner
 	 * 
@@ -133,8 +149,10 @@ public class BMP_Image {
 		}		
 	}
 
-	/***********************************************************************************/
-	
+	//endregion *********************************************************************************************
+	//region								PRIVATE 		
+	//*******************************************************************************************************
+
 	private void readImage() throws IOException{
 			img = BMPDecoder.read(file);
 			pixels = readPixels();
@@ -171,4 +189,7 @@ public class BMP_Image {
          }
 		return result;
 	}
+	
+	//endregion *********************************************************************************************
+	//*******************************************************************************************************
 }

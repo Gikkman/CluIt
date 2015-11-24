@@ -21,7 +21,18 @@ import com.cluit.util.dataTypes.Results;
 import com.cluit.util.dataTypes.Space;
 import com.cluit.util.methods.MiscUtils;
 
+/**The ClusterEngine class runs on a separate thread and handles all the JS-engine calls. <br> <br>
+ * 
+ * Instructions can be queued and the engine will then handle them in FIFO order. 
+ * 
+ * @author Simon
+ *
+ */
 public class ClusteringEngine extends Thread {
+	//*******************************************************************************************************
+	//region								VARIABLES 		
+	//*******************************************************************************************************
+
 	public static enum Message {INIT_MESSAGE, RUNQUEUE_MESSAGE, ENQUEUE_MESSAGE, CLUSTER_MESSAGE, TERMINATE_MESSAGE };
 	
 	private final BlockingQueue<Message> mQueue = new LinkedBlockingQueue<>();
@@ -33,9 +44,20 @@ public class ClusteringEngine extends Thread {
 	
 	private Data mDataCache;
 	
+	//endregion *********************************************************************************************
+	//region								CONSTRUCTORS 	
+	//*******************************************************************************************************
+
+	/**
+	 * Make it Daemon so it dies when the last JFX window is closed
+	 */
 	public ClusteringEngine() {
 		this.setDaemon(true);
 	}
+	
+	//endregion *********************************************************************************************
+	//region								PUBLIC 			
+	//*******************************************************************************************************
 	
 	@Override
 	public void run() {
@@ -50,6 +72,15 @@ public class ClusteringEngine extends Thread {
 		}
 	}
 	
+	/**There are 5 different messages:<br>
+	 * <b>Init</b> - Loads the currently listed JS file and runs the .fields() method from it (creates the custom data fields). <br>
+	 * <b>Cluster</b> - Runs the currently loaded JS file<br>
+	 * <b>Enqueue</b> - Fetches the current settings (JS file, nrClusters and so on) and stores them as an experiment bundle in the experiment queue.<br>
+	 * <b>RunQueue</b> - Runs all enqueued experiments in succession <br>
+	 * <b>Terminuate</b> - Causes this thread to terminate safely.
+	 * 
+	 * @param m The message to the engine
+	 */
 	public void queueMessage(Message m){
 		try {
 			mQueue.put(m);
@@ -58,6 +89,10 @@ public class ClusteringEngine extends Thread {
 		}
 	}
 	
+	//endregion *********************************************************************************************
+	//region								PRIVATE 		
+	//*******************************************************************************************************
+
 	private void handleMessage(Message message) {
 		switch (message) {
 		case INIT_MESSAGE:
@@ -124,7 +159,7 @@ public class ClusteringEngine extends Thread {
 
 	/**This method is intended to be called when the clustering algorithm is finished.
 	 * 
-	 * @param args The Space, after all clustering is done
+	 * The method is enlisted in the MethodMapper, and can thus be called without knowledge of the class
 	 */
 	@SuppressWarnings("unchecked")
 	private void clusteringFinished(Object ... args) {
@@ -138,21 +173,11 @@ public class ClusteringEngine extends Thread {
 		Results results = new Results(mDataCache, space, map);
 		VariableSingleton.getInstance().setResults(results);
 		
-		MethodMapper.removeMethod(Const.METHOD_JS_SCRIPT_STEP);
 		MethodMapper.removeMethod(Const.METHOD_JS_SCRIPT_FINISH);
 	}
 	
-	private void clusteringStep(Object ... args) {
-		Entry[]  entries = (Entry[]) args[0];
-		int[] membership = (int[])   args[1];
-		if( membership == null || entries == null )
-			return;
-		
-		paint(entries, membership);
-	}
-	
-	////////////////////////////////////////////////////////////////////////////////////
-	//								COLLECT EXPERIMENT BUNDLE	
+	//endregion ////////////////////////////////////////////////////////////////////////
+	//region					COLLECT EXPERIMENT BUNDLE	
 	////////////////////////////////////////////////////////////////////////////////////
 	private ExperimentBundle getExperimentBundle(){
 		//Error handling, make sure that the JS file is intact
@@ -196,8 +221,7 @@ public class ClusteringEngine extends Thread {
 
 	private void performClustering(ExperimentBundle bundle) {
 		mDataCache = bundle.getData();
-		//Create methods that'll be called upon algorithm step and finish
-		MethodMapper.addMethod(Const.METHOD_JS_SCRIPT_STEP,   (args) -> clusteringStep(args) );
+		//Create methods that'll be called upon algorithm finish
 		MethodMapper.addMethod(Const.METHOD_JS_SCRIPT_FINISH,(args) -> clusteringFinished(args) );
 		
 		//Add the experiment bundle to the FRONT of the experiment queue (So it'll be the first one to be performed)
@@ -206,8 +230,8 @@ public class ClusteringEngine extends Thread {
 		mJavascriptEngine.performClustering();
 	}
 		
-	////////////////////////////////////////////////////////////////////////////////////
-	//region								PAINTING	
+	//endregion ///////////////////////////////////////////////////////////////////////////
+	//region								PAINTING		
 	////////////////////////////////////////////////////////////////////////////////////
 	private void paintBmp(Space space) {
 		Entry[] entries = space.getAllEntries();

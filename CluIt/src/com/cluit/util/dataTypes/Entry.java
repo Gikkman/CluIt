@@ -8,10 +8,16 @@ import java.util.Arrays;
  *
  */
 public class Entry {
-	
+	//*******************************************************************************************************
+	//region								VARIABLES 		
+	//*******************************************************************************************************
+
 	private final double[] coords;
 	private final int ID;
 	
+	//endregion *********************************************************************************************
+	//region								CONSTRUCTORS 	
+	//*******************************************************************************************************
 
 	/**Constructor for creating entries which don't represent elements in the object space. Primarily for representing cluster centoids.
 	 * 
@@ -41,7 +47,10 @@ public class Entry {
 		this.ID = e.getID();
 		this.coords = Arrays.copyOf(e.getCoordinates(), e.getDimensions());
 	}
-
+	
+	//endregion *********************************************************************************************
+	//region								STATIC			
+	//*******************************************************************************************************
 
 	/**Fetches the data at a given coordinate
 	 * 
@@ -72,4 +81,7 @@ public class Entry {
 		out = out.length() > 3 ? out.substring(0, out.length()-3 ) : "( ";
 		return out + ")";
 	}
+	
+	//endregion *********************************************************************************************
+	//*******************************************************************************************************
 }

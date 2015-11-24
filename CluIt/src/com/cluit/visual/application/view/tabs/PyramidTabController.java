@@ -217,7 +217,7 @@ public class PyramidTabController extends _AbstractTableTab{
 				System.err.println("Unknow slider type " + MiscUtils.getStackPos());
 			}
 			
-			slider.valueProperty().addListener( (o, oldV, newV) ->  { slider.valueProperty().set( (newV.intValue() / 2)*2 ); System.out.println(slider.getValue());} );
+			slider.valueProperty().addListener( (o, oldV, newV) ->  { slider.valueProperty().set( (newV.intValue() / 2)*2 ); } );
 			
 			return slider;	
 		}

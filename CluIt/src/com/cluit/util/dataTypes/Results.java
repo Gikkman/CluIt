@@ -6,7 +6,16 @@ import java.util.HashMap;
 import com.cluit.util.methods.MiscUtils;
 import com.cluit.util.structures.Pair;
 
+/**This class holds the results from a clustering experiments, as well as performs several calculations on said result
+ * 
+ * @author Simon
+ *
+ */
 public class Results {
+	//*******************************************************************************************************
+	//region								VARIABLES 		
+	//*******************************************************************************************************
+
 	private Space mResultSpace;
 	private Data  mInputData;
 	private HashMap<String, Double> mMiscData;
@@ -14,6 +23,10 @@ public class Results {
 	private Entry[]  centoidCache = null;
 	private double[] squaredErrorCache = null;
 	
+	//endregion *********************************************************************************************
+	//region								CONSTRUCTORS 	
+	//*******************************************************************************************************
+
 	public Results(Data inputData, Space resultSpace, HashMap<String, Double> misc){
 		mResultSpace =  resultSpace;
 		mInputData = inputData;
@@ -23,6 +36,10 @@ public class Results {
 		calculateCentoidCache();
 		calculateSquaredErrorCache();
 	}
+	
+	//endregion *********************************************************************************************
+	//region								PUBLIC 			
+	//*******************************************************************************************************
 
 	public int getNumberOfClusters() {
 		return mResultSpace.getNumberOfClusters();
@@ -89,10 +106,10 @@ public class Results {
 		return out;
 	}
 	
-	/**Fetches the centoid for a given cluster
+	/**Fetches the coordinates for a centoid for a given cluster
 	 * 
 	 * @param cluster
-	 * @return
+	 * @return Coordinates for the clusters centoid
 	 */
 	public double[] getCentoid(int cluster){
 		return centoidCache[cluster].getCoordinates();
@@ -134,8 +151,9 @@ public class Results {
 		return out;
 		
 	}
-	//*******************************************************************************************************
-	//region								PRIVATE			
+	
+	//endregion *********************************************************************************************
+	//region								PRIVATE 		
 	//*******************************************************************************************************
 
 	/* Since there is a chance that the result space is normalized, we have to "denormalize" all the data from the result space.
@@ -145,6 +163,7 @@ public class Results {
 	 * 
 	 * Several of the calculated values are cached, since they might be used several times (and they are relatively small) 
 	 */	
+	
 	private void calculateCentoidCache() {
 		centoidCache = new Entry[ mResultSpace.getNumberOfClusters() ];
 		for( int i = 0; i < mResultSpace.getNumberOfClusters(); i++){	

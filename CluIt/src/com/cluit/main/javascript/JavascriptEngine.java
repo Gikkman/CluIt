@@ -14,11 +14,18 @@ import com.cluit.util.AoP.MethodMapper;
 import jdk.nashorn.api.scripting.NashornScriptEngineFactory;
 
 public class JavascriptEngine {
-		
+	//*******************************************************************************************************
+	//region								VARIABLES 		
+	//*******************************************************************************************************
+	
 	private final ScriptEngine mScriptEngine;
 	private final String	   mFieldsFunctionName;
 	private final String 	   mEntryFunctionName;
 	
+	//endregion *********************************************************************************************
+	//region								CONSTRUCTORS 	
+	//*******************************************************************************************************
+
 	/**Sets up a Javascript engine, bound to the file specified by <b>jsFilePath</b>.
 	 * 
 	 * @param jsFilePath
@@ -56,11 +63,18 @@ public class JavascriptEngine {
 		}
 	}
 	
+	//endregion *********************************************************************************************
+	//region								PUBLIC 			
+	//*******************************************************************************************************
+
+	
 	public void performClustering() {	
 		
 		Invocable invocable = (Invocable) mScriptEngine;
 		try {
+			//This EVAL statement creates the API object within the script engine, so that JS can call methods from the API class
 			mScriptEngine.eval("var API = Java.type(\"com.cluit.api.API\").create_this_API();");		
+			//Then, run the .calculate() method defined in JS
 			invocable.invokeFunction( mEntryFunctionName );
 		} catch (NoSuchMethodException e) {		
 			MethodMapper.invoke(Const.METHOD_EXCEPTION_JS, "Javascript Exception occured! No such method: " + e.getMessage(), e);
@@ -74,7 +88,10 @@ public class JavascriptEngine {
 	public void addCustomFields() {
 		Invocable invocable = (Invocable) mScriptEngine;		
 		try{
-			mScriptEngine.eval("var JFX_API = Java.type(\"com.cluit.api.JFX_API\").create_this_API();");		
+			//This EVAL statement creates the JFX_API object within the script engine, so that JS can call methods which adds fields to our
+			//controll window
+			mScriptEngine.eval("var JFX_API = Java.type(\"com.cluit.api.JFX_API\").create_this_API();");	
+			//Run the .fields() method in JS
 			invocable.invokeFunction("fields");
 		} catch (NoSuchMethodException e) {		
 			MethodMapper.invoke(Const.METHOD_EXCEPTION_JS, "Javascript Exception occured! No such method: " + e.getMessage(), e);
@@ -84,4 +101,7 @@ public class JavascriptEngine {
 			MethodMapper.invoke(Const.METHOD_EXCEPTION_JS, "Javascript Exception occured! Unknown exception: " + e.getMessage(), e);
 		}
 	}
+	
+	//endregion *********************************************************************************************
+	//*******************************************************************************************************
 }

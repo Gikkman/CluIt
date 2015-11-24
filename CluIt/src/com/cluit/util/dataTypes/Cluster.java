@@ -10,6 +10,14 @@ import com.cluit.util.methods.ClusteringUtils;
 import com.cluit.util.structures.KeyPriorityQueue_Max;
 import com.cluit.util.structures.Pair;
 
+/**A cluster is a collection of entries.
+ * 
+ * The class has a lot of utility functions related to clusters such as calculating centoid, finding the entry furthest 
+ * from the centoid and so on.
+ * 
+ * @author Simon
+ *
+ */
 public class Cluster {	
 	//*******************************************************************************************************
 	//region								VARIABLES		
@@ -125,7 +133,7 @@ public class Cluster {
 		updateMemberDistances();
 	}
 	
-	/**Fetches a copy of the centoid of the cluster
+	/**Fetches a <b>copy</b> of the centoid of the cluster
 	 * 
 	 * @return A new Entry, which is a copy of the cluster's centoid
 	 */

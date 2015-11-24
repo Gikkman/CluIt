@@ -7,6 +7,12 @@ import com.cluit.util.dataTypes.Entry;
 import com.cluit.util.drawing.BMP_Image;
 import com.cluit.util.drawing.RGB_Pixel;
 
+/**Another hepler class wich contains various methods that doesn't belong somewhere specific or is general enough to 
+ * be used thorughout the program.
+ * 
+ * @author Simon
+ *
+ */
 public class MiscUtils {
 	/**Returns a link to a code position
 	 * Intended to be inserted in an error message. 

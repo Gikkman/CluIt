@@ -20,6 +20,10 @@ import com.cluit.util.AoP.MethodMapper;
 import com.cluit.util.structures.Pair;
 
 public class FileReader_Excel {
+	//*******************************************************************************************************
+	//region								VARIABLES 		
+	//*******************************************************************************************************
+
 	public enum TypeFilter {DATE, STRING, BLANK, NUMERIC, BOOL, FORMULA};
 	
 	private Workbook workbook;
@@ -30,8 +34,16 @@ public class FileReader_Excel {
 	
 	private ArrayList<Pair<String, Object[]>> mData = new ArrayList<>();
 	
+	//endregion *********************************************************************************************
+	//region								CONSTRUCTORS 	
+	//*******************************************************************************************************
+
 	private FileReader_Excel(){	}
 	
+	//endregion *********************************************************************************************
+	//region								STATIC			
+	//*******************************************************************************************************
+
 	/**Creates an XLS_Reader bound to a specific file.
 	 * To get the data from the file, the workbook must first be read. Then, a sheet must be loaded (see {@link #loadSheet(int)}).
 	 * 
@@ -52,7 +64,9 @@ public class FileReader_Excel {
 		return reader;
 	}
 	
-	
+	//endregion *********************************************************************************************
+	//region								PUBLIC 			
+	//*******************************************************************************************************
 	
 	public FileReader_Excel loadSheet(int index) throws IOException{
 		if(index >= workbook.getNumberOfSheets() )
@@ -102,47 +116,7 @@ public class FileReader_Excel {
 		return this;
 	}
 	
-	private Object getCellValue(Cell cell) {
-		switch( cell.getCellType() ){
-		case Cell.CELL_TYPE_BOOLEAN:
-			return cell.getBooleanCellValue();
-		case Cell.CELL_TYPE_ERROR:
-			return getCellErrorType( cell );
-		case Cell.CELL_TYPE_FORMULA: 
-		case Cell.CELL_TYPE_NUMERIC:
-			return cell.getNumericCellValue();
-		case Cell.CELL_TYPE_STRING:
-			return cell.getStringCellValue();
-		default:
-			return null;			
-		}
-	}
 
-	private String getCellErrorType(Cell cell) {
-		FormulaError error = FormulaError.forInt( cell.getErrorCellValue() );
-		switch( error ){
-		case CIRCULAR_REF:
-			return "ERR! CIRCULAR_REF";
-		case DIV0:
-			return "ERR! DIV_BY_0";
-		case FUNCTION_NOT_IMPLEMENTED:
-			return "ERR! FUNC_NOT_IMPL";
-		case NA:
-			return "ERR! VAL_NOT_AVAIL";
-		case NAME:
-			return "ERR! NAME_NOT_DEF";
-		case NULL:
-			return "ERR! NULL_VALUE";
-		case NUM:
-			return "ERR! FUNC_ARG_INVAL";
-		case REF:
-			return "ERR! CELL_REF_INVAL";
-		case VALUE:
-			return "ERR! ARG_VAL_INVAL";
-		default:
-			return "ERR! Unknown";
-		}
-	}
 
 	/**The returned String[] can be empty if no data's been loaded by the XLS_Reader.
 	 * 
@@ -313,4 +287,53 @@ public class FileReader_Excel {
 		}
 		return names;
 	}
+	
+	//endregion *********************************************************************************************
+	//region								PRIVATE 		
+	//*******************************************************************************************************
+	
+	private Object getCellValue(Cell cell) {
+		switch( cell.getCellType() ){
+		case Cell.CELL_TYPE_BOOLEAN:
+			return cell.getBooleanCellValue();
+		case Cell.CELL_TYPE_ERROR:
+			return getCellErrorType( cell );
+		case Cell.CELL_TYPE_FORMULA: 
+		case Cell.CELL_TYPE_NUMERIC:
+			return cell.getNumericCellValue();
+		case Cell.CELL_TYPE_STRING:
+			return cell.getStringCellValue();
+		default:
+			return null;			
+		}
+	}
+
+	private String getCellErrorType(Cell cell) {
+		FormulaError error = FormulaError.forInt( cell.getErrorCellValue() );
+		switch( error ){
+		case CIRCULAR_REF:
+			return "ERR! CIRCULAR_REF";
+		case DIV0:
+			return "ERR! DIV_BY_0";
+		case FUNCTION_NOT_IMPLEMENTED:
+			return "ERR! FUNC_NOT_IMPL";
+		case NA:
+			return "ERR! VAL_NOT_AVAIL";
+		case NAME:
+			return "ERR! NAME_NOT_DEF";
+		case NULL:
+			return "ERR! NULL_VALUE";
+		case NUM:
+			return "ERR! FUNC_ARG_INVAL";
+		case REF:
+			return "ERR! CELL_REF_INVAL";
+		case VALUE:
+			return "ERR! ARG_VAL_INVAL";
+		default:
+			return "ERR! Unknown";
+		}
+	}
+	
+	//endregion *********************************************************************************************
+	//*******************************************************************************************************
 }

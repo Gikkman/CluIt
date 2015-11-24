@@ -21,11 +21,19 @@ import com.cluit.util.structures.KeyPriorityQueue_Min;
  *
  */
 public class API {
+	//*******************************************************************************************************
+	//region								VARIABLES 		
+	//*******************************************************************************************************
+	
 	private final int mNumberOfClusters;
 	private final Space mSpace;
 	private final Map<String, Object> mUserDefinedVariables;
 
 	private HashMap<String, Double> mMiscData = new HashMap<>();
+	
+	//endregion *********************************************************************************************
+	//region								CONSTRUCTORS 	
+	//*******************************************************************************************************
 	
 	private API() {
 		ExperimentBundle bundle = VariableSingleton.getInstance().pollNextExperimentBundle();
@@ -36,41 +44,41 @@ public class API {
 		}
 		
 		mUserDefinedVariables = bundle.getUserDefinedData();
-		
 		mNumberOfClusters = bundle.getNumberOfClusters();
 	}
 	
+	//endregion *********************************************************************************************
+	//region								STATIC			
+	//*******************************************************************************************************
+	
+	/**Creates the API object. If this method is intended to be called from within a Nashorn JS-Engine
+	 */
 	public static API create_this_API(){
 		return new API();	
 	}
+	//endregion *********************************************************************************************
+	//region								PUBLIC 			
+	//*******************************************************************************************************	
 	
 	//Step is intended to be used for agglomerative functions, to signal that the current clustering structure is considered one step "forward"
 	//from the initial cluster layout.
-	//TODO: Add support for the API.step() method
 	public void step(){
-		/*
-		Entry[] entries = mSpace.getAllEntries();
-		int[] memberships = new int[entries.length];		
-		for(int i = 0; i < memberships.length; i++)
-			memberships[i] = mSpace.getEntryMembership(entries[i]);
-		
-		MethodMapper.invoke(Const.METHOD_JS_SCRIPT_STEP, entries, memberships );
-		*/
 	}
-	/**Finalized the clustering by calling the Finish-method in the Overseer-class, and passing the membership array as an argument*/
+	
+	/**Finalized the clustering by calling the Finish-method in the ClusterEngine-class*/
 	public void finish(){	
 		mSpace.updateCentoids();
 		
 		MethodMapper.invoke(Const.METHOD_JS_SCRIPT_FINISH, mSpace, mMiscData );
 	}
+	
 	/**Debug method. If API.test() is called by Javascript, "Test completed" is printed into the console  */
 	public void test(){
 		System.out.println("Test completed");
 	}
-	
-	////////////////////////////////////////////////////////////////////////////////////
+	//endregion ///////////////////////////////////////////////////////////////////////
 	//																				  //
-	//                             All the API Functions                              //
+	//region                       All the API Functions                              //
 	//               					    |                                         //
 	//                						|                                         //
 	//                						V                                         //
@@ -137,7 +145,9 @@ public class API {
 	}
 	
 	public Object getFieldValue(String name){
-		return mUserDefinedVariables.get(name);
+		if( mUserDefinedVariables != null )
+			return mUserDefinedVariables.get(name);
+		return null;
 	}
 	
 	public double calcSquaredError(int cluster){
@@ -147,4 +157,7 @@ public class API {
 	public void addMiscData(String ID, double value){
 		mMiscData.put(ID, value);
 	}
+	
+	//endregion *********************************************************************************************
+	//*******************************************************************************************************
 }

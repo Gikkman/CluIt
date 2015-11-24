@@ -6,15 +6,34 @@ import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.PriorityQueue;
 
+/**A Key-Priority queue is a priority queue which orders its elements according to each elements associated key. 
+ * <br>Whenever an element is added to the queue, a key needs to be assigned to it. 
+ * 
+ * @author Simon
+ *
+ * @param <E>
+ */
 public abstract class KeyPriorityQueue<E> implements Iterable<E> {
+	//*******************************************************************************************************
+	//region								VARIABLES 		
+	//*******************************************************************************************************
+
 	private final PriorityQueue<Node> queue;
 	
+	//endregion *********************************************************************************************
+	//region								CONSTRUCTORS 	
+	//*******************************************************************************************************
+
 	public KeyPriorityQueue() {
 		queue = new PriorityQueue<Node>();
 	}	
 	public KeyPriorityQueue(int intialCapacity) {
 		queue = new PriorityQueue<Node>(intialCapacity);
 	}
+	
+	//endregion *********************************************************************************************
+	//region								PUBLIC 			
+	//*******************************************************************************************************
 	
 	public boolean add(double key, E element){
 		Node n = new Node(element, key);
@@ -25,6 +44,8 @@ public abstract class KeyPriorityQueue<E> implements Iterable<E> {
 		return add(key, element);
 	}
 	
+	/** Clears the entire queue
+	 */
 	public void clear(){
 		queue.clear();
 	}
@@ -133,6 +154,10 @@ public abstract class KeyPriorityQueue<E> implements Iterable<E> {
 		return false;
 	}
 	
+	//endregion *********************************************************************************************
+	//region								INTERNALS 		
+	//*******************************************************************************************************
+
 	protected class Node implements Comparator<Node>, Comparable<Node>{
 		E e;
 		double key;
@@ -185,5 +210,8 @@ public abstract class KeyPriorityQueue<E> implements Iterable<E> {
 			throw new UnsupportedOperationException();
 		}				
 	}
+
+	//endregion *********************************************************************************************
+	//*******************************************************************************************************
 }
 

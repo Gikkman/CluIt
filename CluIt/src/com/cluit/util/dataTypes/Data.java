@@ -2,7 +2,18 @@ package com.cluit.util.dataTypes;
 
 import com.cluit.util.methods.ClusteringUtils;
 
+/**This class holds all data needed to perform a clustering experiment.
+ * 
+ * With exception for the getNormalizedData method, this class only consists of simple getters and setters.
+ * 
+ * @author Simon
+ *
+ */
 public class Data {
+	//*******************************************************************************************************
+	//region								VARIABLES 		
+	//*******************************************************************************************************
+
 	private String[]   mLabels;
 	private double[][] mData;
 	private double[][] mNormalizedData;
@@ -10,11 +21,19 @@ public class Data {
 	private String[]   mReferenceLabels;
 	private double[][] mReferenceData;
 	
+	//endregion *********************************************************************************************
+	//region								CONSTRUCTORS 	
+	//*******************************************************************************************************
+
 	public Data(String[] labels, double[][] data){
 		mLabels = labels;
 		mData   = data;
 	}
 	
+	//endregion *********************************************************************************************
+	//region								PUBLIC 			
+	//*******************************************************************************************************
+
 	public int getNumberOfEntries(){
 		return mData.length;
 	}
@@ -64,4 +83,7 @@ public class Data {
 	public double[] getNormalizedEntryData( int entry ){
 		return getNormalizedData()[ entry ];
 	}
+	
+	//endregion *********************************************************************************************
+	//*******************************************************************************************************
 }

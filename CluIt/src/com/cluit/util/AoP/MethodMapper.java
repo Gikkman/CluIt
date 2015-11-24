@@ -3,6 +3,13 @@ package com.cluit.util.AoP;
 import java.util.HashMap;
 import java.util.Map;
 
+/**This class uses Aspect-oriented programming to allow classes to register (and call) methods in other parts of the program without
+ * knowledge of the containing class. <br>
+ * By registering an invocation with a given key, other classes can later on call the invocation only by having the key.
+ * 
+ * @author Simon
+ *
+ */
 public class MethodMapper {
 	private static Map<String, Invocation> map = new HashMap<>();	
 	private MethodMapper() {}

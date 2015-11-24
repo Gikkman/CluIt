@@ -2,6 +2,15 @@ package com.cluit.util.AoP;
 
 import java.util.concurrent.atomic.AtomicReference;
 
+/**<b>This class is currently not used.</b> <br><br>
+ * 
+ * Used to pass variables between different parts of the program without coupling sender and receiver. Also avoids the Singleton problem, in that
+ * a reference can only be extracted once.
+ * 
+ * @author Simon
+ *
+ */
+@Deprecated
 public class ReferencePasser {
 
 	/**Adds a reference to the reference map. A reference can be extracted ONLY ONCE. Each reference needs a UNIQUE key.

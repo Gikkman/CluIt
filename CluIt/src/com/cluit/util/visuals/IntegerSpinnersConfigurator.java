@@ -9,6 +9,13 @@ import javafx.scene.control.SpinnerValueFactory.IntegerSpinnerValueFactory;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 
+/**UI code is messy...
+ * 
+ * This class configures the parameter JFX Spinner to only accept ingeters.
+ * 
+ * @author Simon
+ *
+ */
 public class IntegerSpinnersConfigurator {
 	private IntegerSpinnersConfigurator() { }
 		
@@ -63,8 +70,7 @@ public class IntegerSpinnersConfigurator {
 	    spinner.getEditor().textProperty().addListener( pasteListener );
 	    //Make sure the current value in the edit-text box is committed as soon as it looses focus
 	    spinner.focusedProperty().addListener( (ov, oldV, newV) -> { if(!newV) commitEditorText(spinner, min, max, defaultValue); } );
-	    //Debug reasons only
-	    spinner.valueProperty().addListener( (ov, oldV, newV) -> System.out.println(newV) );
+
 	}
 	
 	 private static void commitEditorText(Spinner<Integer> spinner, int min, int max, int defaultValue) {

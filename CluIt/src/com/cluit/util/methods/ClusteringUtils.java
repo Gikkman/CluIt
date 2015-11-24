@@ -11,7 +11,7 @@ import com.cluit.util.dataTypes.Entry;
 /**Helper class which contains functions for performing different calculations
  * of importance for the clustering algorithms.
  * 
- * @author Simon Jonasson - 2015-07-07
+ * @author Simon Jonasson
  *
  */
 public class ClusteringUtils {

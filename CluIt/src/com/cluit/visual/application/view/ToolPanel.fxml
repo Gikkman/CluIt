@@ -34,9 +34,5 @@
             <Insets />
          </VBox.margin>
       </ScrollPane>
-      <Button mnemonicParsing="false" onAction="#test" text="Button">
-         <VBox.margin>
-            <Insets left="10.0" />
-         </VBox.margin></Button>
    </children>
 </VBox>

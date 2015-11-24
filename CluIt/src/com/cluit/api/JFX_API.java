@@ -12,12 +12,23 @@ import com.cluit.util.AoP.MethodMapper;
  *
  */
 public class JFX_API {
-	
+	//*******************************************************************************************************
+	//region								CONSTRUCTORS 	
+	//*******************************************************************************************************
+
 	private JFX_API() {}
 	
+	//endregion *********************************************************************************************
+	//region								STATIC			
+	//*******************************************************************************************************
+
 	public static JFX_API create_this_API(){
 		return new JFX_API();
 	}
+
+	//endregion *********************************************************************************************
+	//region								PUBLIC 			
+	//*******************************************************************************************************
 
 	/**Creates an integer spinner in the tools panel
 	 * 
@@ -41,6 +52,11 @@ public class JFX_API {
 		MethodMapper.invoke(Const.METHOD_ADD_INTEGER_SPINNER, args);
 	}
 
+	/**Creates a checkbox in the tools panel
+	 * 
+	 * @param name Reference name for the CheckBox
+	 * @param values Default value for the checkbox
+	 */
 	public void createField_CheckBox(String name, boolean ... values){
 		Object[] args = new Object[2];
 		args[0] = name;
@@ -48,4 +64,7 @@ public class JFX_API {
 		
 		MethodMapper.invoke(Const.METHOD_ADD_CHECKBOX, args);
 	}
+	
+	//endregion *********************************************************************************************
+	//*******************************************************************************************************
 }
